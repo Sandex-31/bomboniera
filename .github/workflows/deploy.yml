@@ -25,9 +25,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-        # Served at the root of the custom domain (public/CNAME), so base is /
+        # Served at salvatorepierri.com/bomboniera/ (custom domain set on the Sandex-31.github.io user site)
         env:
-          VITE_BASE: /
+          VITE_BASE: /bomboniera/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

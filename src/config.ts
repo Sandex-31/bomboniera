@@ -12,7 +12,7 @@ export const graduationConfig = {
   university: 'Università degli Studi di Torino',
 
   /** Absolute URL encoded into the QR code printed on the bomboniera. */
-  qrBaseUrl: 'https://salvatorepierri.com',
+  qrBaseUrl: 'https://salvatorepierri.com/bomboniera',
 
   /**
    * Set to false once every TODO in src/data/* has been replaced with real
