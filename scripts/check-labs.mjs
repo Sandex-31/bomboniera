@@ -80,6 +80,19 @@ try {
   for (const q of catQueries) assert.ok(cat.exec(q.sql).length, `catering example query returns nothing: ${q.title}`);
   console.log(`ok — catering: ${tables(cat).length} tables, ${junit.total} JUnit cases green`);
 
+  const del = openFile("food-delivery-db/delivery.db");
+  for (const t of ["utente", "conto", "metodo_pagamento", "ristorante", "portata", "ordine", "ordine_portata", "rider", "recensione"])
+    assert.ok(tables(del).includes(t), `delivery.db is missing ${t}`);
+  const count = (db, sql) => db.exec(sql)[0].values[0][0];
+  assert.ok(count(del, "SELECT COUNT(*) FROM ordine") >= 2500);
+  assert.equal(del.exec("PRAGMA foreign_key_check").length, 0, "dangling foreign keys");
+  const delQueries = JSON.parse(readFileSync(labs("food-delivery-db/queries.json"), "utf8"));
+  for (const q of delQueries) {
+    const res = del.exec(q.sql);
+    assert.ok(res.length && res[0].values.length, `example query returns nothing: ${q.title}`);
+  }
+  console.log(`ok — delivery: ${count(del, "SELECT COUNT(*) FROM ordine")} orders, ${delQueries.length} example queries answer`);
+
   // ── later tasks append their checks here, above this line ──
 } finally {
   await vite.close();
