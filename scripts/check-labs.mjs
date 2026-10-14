@@ -150,6 +150,21 @@ try {
   }
   console.log("ok — code explorer: sources exported, nothing secret");
 
+  const { renderToString } = await import("react-dom/server");
+  const { createElement: h } = await import("react");
+  const { default: LabsPage } = await vite.ssrLoadModule("/src/labs/LabsPage.tsx");
+  const { projects } = await vite.ssrLoadModule("/src/data/projects.ts");
+  const indexHtml = renderToString(h(LabsPage, { route: { page: "labs", tab: "prova" } }));
+  for (const p of projects) assert.ok(indexHtml.includes(p.title.replace(/&/g, "&amp;")), `the index is missing ${p.title}`);
+  const shell = renderToString(h(LabsPage, { route: { page: "labs", id: "lab-asd", tab: "codice" } }));
+  for (const t of ["Prova", "Codice", "Documenti"]) assert.ok(shell.includes(t), `tab ${t} missing`);
+  assert.ok(renderToString(h(LabsPage, { route: { page: "labs", id: "nope", tab: "prova" } })).includes("non esiste"));
+  assert.deepEqual(
+    projects.filter((p) => p.lab).map((p) => [p.id, p.lab]).sort(),
+    [["catering", "sql"], ["film-data", "site"], ["food-delivery-db", "sql"], ["lab-asd", "asd"]],
+  );
+  console.log("ok — labs page renders index, shell and unknown id");
+
   // ── later tasks append their checks here, above this line ──
 } finally {
   await vite.close();

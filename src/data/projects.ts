@@ -7,6 +7,7 @@ import type { Project } from '../types';
 export const projects: Project[] = [
   {
     id: 'food-delivery-db',
+    lab: 'sql',
     title: 'Food Delivery DB',
     year: 2024,
     course: 'Basi di Dati',
@@ -17,6 +18,7 @@ export const projects: Project[] = [
   },
   {
     id: 'lab-asd',
+    lab: 'asd',
     title: 'Laboratorio di Algoritmi',
     year: 2025,
     course: 'Algoritmi e Strutture Dati',
@@ -28,6 +30,7 @@ export const projects: Project[] = [
   },
   {
     id: 'film-data',
+    lab: 'site',
     title: 'Film Data Web App',
     year: 2025,
     course: 'Interazione uomo macchina e tecnologie web',
@@ -43,6 +46,7 @@ export const projects: Project[] = [
   },
   {
     id: 'catering',
+    lab: 'sql',
     title: 'Cat & Ring',
     year: 2026,
     course: 'Sviluppo applicazioni software',
