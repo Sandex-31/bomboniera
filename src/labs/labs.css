@@ -37,3 +37,11 @@
 .asd-wide { flex: 1 1 100%; }
 .asd-form textarea, .asd-form input, .asd-form select { font: inherit; color: var(--text); background: var(--glass); border: 1px solid var(--line); padding: 8px; border-radius: 6px; max-width: 100%; box-sizing: border-box; }
 .asd-term { min-height: 160px; max-height: 50vh; overflow: auto; padding: 16px; background: #0b0b0b; color: #d6f5d6; border: 1px solid var(--line-soft); border-radius: var(--r-sm); font: 13px/1.5 var(--font-mono); white-space: pre-wrap; word-break: break-word; }
+
+.sql-editor { width: 100%; font: 13px/1.5 var(--font-mono); color: var(--text); background: var(--glass); border: 1px solid var(--line); padding: 12px; border-radius: var(--r-sm); margin: 16px 0 8px; box-sizing: border-box; }
+.sql-error { color: #ff8a8a; font-family: var(--font-mono); }
+.sql-table { overflow: auto; max-height: 60vh; margin-top: 16px; border: 1px solid var(--line-soft); border-radius: var(--r-sm); }
+.sql-table table { border-collapse: collapse; font: 12px var(--font-mono); }
+.sql-table th { position: sticky; top: 0; background: var(--ink); color: var(--gold-soft); }
+.sql-table th, .sql-table td { padding: 4px 10px; border-bottom: 1px solid var(--line-soft); text-align: left; white-space: nowrap; }
+.sql-junit ul { list-style: none; padding: 0; font: 13px/1.7 var(--font-mono); color: var(--muted); }

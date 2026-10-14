@@ -186,6 +186,17 @@ try {
   delete globalThis.Worker;
   console.log("ok — asd runner: stop keeps partial output");
 
+  const { openDb } = await vite.ssrLoadModule("/src/labs/sql/db.ts");
+  const ldb = openDb(readFileSync(labs("food-delivery-db/delivery.db")), SQL);
+  const before = ldb.run("SELECT COUNT(*) FROM ordine")[0].rows[0][0];
+  ldb.run("DELETE FROM ordine_portata; DELETE FROM ordine;");
+  assert.equal(ldb.run("SELECT COUNT(*) FROM ordine")[0].rows[0][0], 0, "the visitor's DELETE did not apply");
+  ldb.reset();
+  assert.equal(ldb.run("SELECT COUNT(*) FROM ordine")[0].rows[0][0], before, "reset does not restore the data");
+  assert.throws(() => ldb.run("SELEC 1"), /syntax error/);
+  assert.ok(ldb.tables().includes("rider"));
+  console.log("ok — sql lab: queries apply, reset restores, errors surface");
+
   // ── later tasks append their checks here, above this line ──
 } finally {
   await vite.close();
