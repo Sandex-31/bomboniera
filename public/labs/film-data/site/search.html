@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="it">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ricerca Film</title></head>
+<body>
+<script src="shim.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.8/dist/handlebars.min.js"></script>
+<script>
+  // what central-server/app.js did for GET /search, minus the network
+  (async function () {
+    const q = new URLSearchParams(location.search).get("q") || "";
+    const all = await (await fetch("../api/films/index.json")).json();
+    const movies = window.__shim.matchFilms(all, q);
+    const tpl = Handlebars.compile(await (await fetch("search.hbs")).text());
+    const html = tpl({
+      searchQuery: q, movies, movieCount: movies.length, hasResults: movies.length > 0,
+      errorMessage: q.trim().length > 0 && q.trim().length < 3 ? "Search term must be at least 3 characters" : "",
+    });
+    document.open(); document.write(html); document.close();
+  })();
+</script>
+</body>
+</html>

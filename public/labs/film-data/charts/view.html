@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="it">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Grafico</title>
+<style>html,body{margin:0;height:100%;background:#fff}#c{width:100%;height:100%}</style></head>
+<body>
+<div id="c"></div>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+<script>
+  // one figure from the IUM notebook, as Plotly drew it there: ?f=01.json
+  const f = new URLSearchParams(location.search).get("f");
+  if (/^\d+\.json$/.test(f || "")) fetch(f).then((r) => r.json()).then((fig) => Plotly.newPlot("c", fig.data, { ...fig.layout, autosize: true }, { responsive: true, displaylogo: false }));
+</script>
+</body>
+</html>

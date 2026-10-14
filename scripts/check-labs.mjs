@@ -108,6 +108,32 @@ try {
   assert.ok(one.reviews.length >= 3 && one.reviews.every((r) => r.review_content && r.critic_name));
   console.log(`ok — film-data: ${allFilms.length} films from Wikidata, each with poster and reviews`);
 
+  /* the shim turns the original frontend's localhost calls into static files */
+  const shimSrc = readFileSync(labs("film-data/site/shim.js"), "utf8");
+  const win = {};
+  new Function("window", shimSrc)(win);
+  const { apiPath, matchFilms } = win.__shim;
+  assert.equal(apiPath("http://localhost:3000/api/films/top10"), "../api/films/top10.json");
+  assert.equal(apiPath("http://localhost:3000/api/films/genre/science fiction"), "../api/films/genre/science%20fiction.json");
+  assert.equal(apiPath("http://localhost:3000/api/films/genre/science%20fiction"), "../api/films/genre/science%20fiction.json");
+  assert.equal(apiPath("http://localhost:3000/api/films/12"), "../api/films/12.json");
+  assert.equal(apiPath("http://localhost:3000/films/12/reviews"), "../api/films/12/reviews.json");
+  assert.equal(apiPath("http://localhost:3000/api/nope"), null);
+  const sample = [{ title: "L'attimo fuggente" }, { title: "Il favoloso mondo di Amélie" }, { title: "Alien" }];
+  assert.deepEqual(matchFilms(sample, "amelie").map((f) => f.title), ["Il favoloso mondo di Amélie"]);
+  assert.equal(matchFilms(sample, "l'attimo").length, 1);
+  assert.deepEqual(matchFilms(sample, "al"), [], "under 3 characters the original server returns nothing");
+
+  const page = (p) => readFileSync(labs(`film-data/site/${p}`), "utf8");
+  for (const p of ["index.html", "film-detail-v2.html", "search.hbs", "javascripts/sliderScript.js", "javascripts/film-detail.js"]) {
+    const src = page(p);
+    assert.doesNotMatch(src, /["'`]\/(film-detail-v2|search)\b/, `${p} still links to a server route`);
+    assert.doesNotMatch(src, /href="\/"/, `${p} still links to the server root`);
+    assert.doesNotMatch(src, /cdn\.jsdelivr\.net\/npm\/axios|cdn\.socket\.io/, `${p} still loads the real network clients`);
+  }
+  assert.ok(JSON.parse(readFileSync(labs("film-data/charts/index.json"), "utf8")).length > 0, "no notebook charts");
+  console.log("ok — film-data: original frontend rewired to static files");
+
   // ── later tasks append their checks here, above this line ──
 } finally {
   await vite.close();
