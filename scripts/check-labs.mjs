@@ -165,6 +165,27 @@ try {
   );
   console.log("ok — labs page renders index, shell and unknown id");
 
+  /* the runner: one fresh worker per run, stop() kills it and keeps the partial output */
+  const { runProgram } = await vite.ssrLoadModule("/src/labs/asd/runner.ts");
+  const posted = [];
+  let terminated = false;
+  globalThis.Worker = class {
+    constructor() { setTimeout(() => this.onmessage?.({ data: { type: "line", line: "prima riga" } }), 0); }
+    postMessage(m) { posted.push(m); }
+    terminate() { terminated = true; }
+  };
+  const got = [];
+  const run = runProgram({ url: "x/main.mjs", args: ["a"], files: { "/f": "z" }, onLine: (l) => got.push(l) });
+  await new Promise((r) => setTimeout(r, 5));
+  run.stop();
+  const res = await run.done;
+  assert.equal(res.code, null);
+  assert.ok(terminated, "stop() leaves the worker running");
+  assert.deepEqual(got, ["prima riga"], "partial output is lost on stop");
+  assert.equal(posted[0].url, "x/main.mjs");
+  delete globalThis.Worker;
+  console.log("ok — asd runner: stop keeps partial output");
+
   // ── later tasks append their checks here, above this line ──
 } finally {
   await vite.close();
