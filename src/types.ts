@@ -24,6 +24,8 @@ export type Project = {
   media?: { src: string; alt: string; type?: 'image' | 'video' }[];
   github?: string;
   demo?: string;
+  /** Kind of live demo in the lab page; artifacts live in public/labs/<id>/. No lab = code and docs only. */
+  lab?: "asd" | "sql" | "site";
 };
 
 export type ThesisStep = {

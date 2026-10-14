@@ -4,3 +4,5 @@ dist
 *.local
 .vscode/*
 !.vscode/extensions.json
+.superpowers/
+scripts/labs/cache/tmp/
