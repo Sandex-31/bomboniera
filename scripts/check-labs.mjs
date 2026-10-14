@@ -134,6 +134,22 @@ try {
   assert.ok(JSON.parse(readFileSync(labs("film-data/charts/index.json"), "utf8")).length > 0, "no notebook charts");
   console.log("ok — film-data: original frontend rewired to static files");
 
+  const { excluded, findSecret } = await import("./labs/code.mjs");
+  for (const p of [".env", "config/.env.local", "serviceAccountKey.json", "node_modules/x.js", "target/a.class", "keys/id.pem", "database/catering.db"])
+    assert.ok(excluded(p), `${p} would be published`);
+  assert.ok(!excluded("ex1/src/sort.c"));
+  assert.ok(findSecret('const password = "hunter2";'));
+  assert.ok(findSecret("mongodb+srv://u:p@cluster0.example.net"));
+  assert.equal(findSecret("password: req.body.password"), null);
+  for (const id of ["lab-asd", "catering", "film-data", "food-delivery-db"]) {
+    const index = JSON.parse(readFileSync(labs(`${id}/code/index.json`), "utf8"));
+    assert.ok(index.length > 0, `${id}: no code exported`);
+    for (const f of index) assert.ok(!excluded(f.path), `${id}: ${f.path} should not be public`);
+    const docs = JSON.parse(readFileSync(labs(`${id}/docs.json`), "utf8"));
+    for (const d of docs) assert.ok(existsSync(labs(`${id}/${d.src}`)), `${id}: missing doc ${d.src}`);
+  }
+  console.log("ok — code explorer: sources exported, nothing secret");
+
   // ── later tasks append their checks here, above this line ──
 } finally {
   await vite.close();

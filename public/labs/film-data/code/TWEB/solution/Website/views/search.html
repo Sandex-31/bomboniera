@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<!-- Search results template with server-rendered movie cards. -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>{{#if searchQuery}}Ricerca: {{searchQuery}}{{else}}Ricerca Film{{/if}} - RottenOnionDB</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" 
+          integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" 
+          crossorigin="anonymous">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="stylesheets/style.css">
+</head>
+<body>
+<!-- Top navigation bar with search form -->
+<nav class="navbar fixed-top navbar-expand-sm navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/" style="width: 5%">
+            <img src="images/Cipolla.png" alt="Logo" class="img-fluid">
+        </a>
+        <img src="images/navbarOnion.png" alt="Onion" style="height: 55px; margin-left: 15px;">
+        <button class="navbar-toggler" type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#navbarSupportedContent" 
+                aria-controls="navbarSupportedContent" 
+                aria-expanded="false" 
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
+            <!-- Search Bar Tematica -->
+            <form class="search-form" action="/search" method="GET" onsubmit="return validateSearch()">
+                <div class="search-input-wrapper">
+                    <input class="search-input" 
+                           type="search" 
+                           placeholder="Cerca film (min 3 caratteri)..." 
+                           aria-label="Search movies"
+                           name="q"
+                           value="{{searchQuery}}"
+                           minlength="3"
+                           required>
+                    <button class="search-button" type="submit">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container" style="margin-top: 100px;">
+    <div id="searchResults" class="row">
+        {{#if errorMessage}}
+            <div class="col-12">
+                <p class="text-danger">{{errorMessage}}</p>
+            </div>
+        {{else if hasResults}}
+            <div class="col-12">
+                <h2 style="font-family: Impact, sans-serif; font-size: 2.5rem; color: white; margin-top: 20px; margin-bottom: 10px;">Risultati Ricerca</h2>
+                <hr style="border-top: 2px solid #ffb81c; width: 100%; margin-bottom: 30px;">
+                <h4 class="text-white mb-4">Trovati {{movieCount}} film per "{{searchQuery}}"</h4>
+            </div>
+            
+            {{#each movies}}
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card bg-dark text-white h-100 search-movie-card" style="cursor: pointer;" onclick="window.location.href='/film-detail-v2?id={{this.id}}'">
+                    {{#if this.poster}}
+                        <img src="{{this.poster}}" class="card-img-top search-poster-img" alt="{{this.title}}">
+                    {{else}}
+                        <div class="card-img-top d-flex align-items-center justify-content-center bg-secondary search-poster-placeholder" style="height: 300px;">
+                            <span class="text-muted">Nessuna immagine</span>
+                        </div>
+                    {{/if}}
+                    <div class="card-body" style="background-color: #2a2a2a;">
+                        <h5 class="card-title" style="color: #ffb81c; font-size: 1rem;">{{this.title}}</h5>
+                        <p class="card-text" style="color: #e0e0e0; font-size: 0.9rem;"><strong>Rating:</strong> {{#if this.rating}}{{this.rating}}/5{{else}}N/A{{/if}}</p>
+                        {{#if this.year}}
+                            <p class="card-text" style="color: #e0e0e0; font-size: 0.9rem;">{{this.year}}</p>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+            
+            <div class="col-12 mt-4 text-center">
+                <a href="/" class="btn btn-outline-light" style="background: linear-gradient(135deg, #8B4789, #9932CC); border: none; color: white; padding: 10px 30px; font-weight: bold;">Torna alla home</a>
+            </div>
+        {{else}}
+            {{#if searchQuery}}
+            <div class="col-12 text-center" style="margin-top: 50px;">
+                <h3 class="text-white mb-4">Nessun film trovato per "{{searchQuery}}"</h3>
+                <a href="/" class="btn btn-outline-light mt-3" style="background: linear-gradient(135deg, #8B4789, #9932CC); border: none; color: white;">Torna alla home</a>
+            </div>
+            {{else}}
+            <div class="col-12">
+                <p class="text-white">Inserisci un termine di ricerca per trovare film.</p>
+            </div>
+            {{/if}}
+        {{/if}}
+    </div>
+</div>
+
+<style>
+.search-poster-img {
+    height: 300px;
+    object-fit: cover;
+}
+
+.search-poster-placeholder {
+    height: 300px;
+}
+
+.search-movie-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-movie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(153, 50, 204, 0.4);
+}
+</style>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" 
+        crossorigin="anonymous" defer></script>
+
+<script>
+// Validates search input before submit
+function validateSearch() {
+    const searchInput = document.querySelector('.search-input');
+    const searchTerm = searchInput.value.trim();
+    
+    if (searchTerm.length < 3) {
+        showSearchError('Inserisci almeno 3 caratteri per cercare');
+        return false;
+    }
+    
+    return true;
+}
+
+// Shows a themed inline error message
+function showSearchError(message) {
+    // Rimuovi messaggi precedenti
+    const existingError = document.querySelector('.search-error');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Crea messaggio di errore tematico
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'search-error';
+    errorDiv.innerHTML = `
+        <div class="search-error-content">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    errorDiv.style.cssText = `
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, rgba(139, 71, 137, 0.95), rgba(153, 50, 204, 0.95));
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+        z-index: 1000;
+        min-width: 280px;
+        box-shadow: 0 8px 32px rgba(128, 0, 128, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        animation: slideDown 0.3s ease-out, glow 2s ease-in-out infinite;
+    `;
+    
+    // Aggiungi animazioni CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 8px 32px rgba(128, 0, 128, 0.4);
+            }
+            50% {
+                box-shadow: 0 8px 40px rgba(128, 0, 128, 0.6);
+            }
+        }
+        
+        .search-error-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .search-error-content svg {
+            flex-shrink: 0;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+    `;
+    
+    if (!document.querySelector('#search-error-styles')) {
+        style.id = 'search-error-styles';
+        document.head.appendChild(style);
+    }
+    
+    // Aggiungi al wrapper della search bar
+    const searchWrapper = document.querySelector('.search-input-wrapper');
+    searchWrapper.style.position = 'relative';
+    searchWrapper.appendChild(errorDiv);
+    
+    // Rimuovi dopo 4 secondi con animazione
+    setTimeout(() => {
+        errorDiv.style.animation = 'slideDown 0.3s ease-out reverse';
+        setTimeout(() => {
+            errorDiv.remove();
+        }, 300);
+    }, 4000);
+}
+</script>
+</body>
+</html>

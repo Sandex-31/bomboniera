@@ -1,0 +1,9 @@
+setuptools>=68
+pandas>=2.1.0
+plotly>=5.16.1
+geopandas>=0.14.0
+matplotlib>=3.7.2
+numpy>=1.26.0
+jupyter==1.0.0
+notebook==6.5.4
+country_converter>=1.0.0

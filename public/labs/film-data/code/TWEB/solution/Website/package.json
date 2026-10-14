@@ -1,0 +1,10 @@
+{
+  "name": "Website",
+  "version": "1.0.0",
+  "description": "Static frontend assets for the Film Data Web application",
+  "private": true,
+  "keywords": ["frontend", "static-assets", "handlebars"],
+  "repository": {
+    "type": "git"
+  }
+}
