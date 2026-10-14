@@ -8,7 +8,10 @@
 <script>
   // one figure from the IUM notebook, as Plotly drew it there: ?f=01.json
   const f = new URLSearchParams(location.search).get("f");
-  if (/^\d+\.json$/.test(f || "")) fetch(f).then((r) => r.json()).then((fig) => Plotly.newPlot("c", fig.data, { ...fig.layout, autosize: true }, { responsive: true, displaylogo: false }));
+  if (/^\d+\.json$/.test(f || "")) fetch(f).then((r) => r.json()).then((fig) => {
+    const { width, height, ...layout } = fig.layout ?? {}; // the notebook fixed a size; here the frame decides
+    Plotly.newPlot("c", fig.data, { ...layout, autosize: true }, { responsive: true, displaylogo: false });
+  });
 </script>
 </body>
 </html>

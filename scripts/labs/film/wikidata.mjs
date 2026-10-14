@@ -20,7 +20,7 @@ SELECT ?film ?n WHERE {
 
 const DETAILS = (ids) => `
 SELECT ?film (SAMPLE(?itL) AS ?it) (SAMPLE(?enL) AS ?en) (SAMPLE(?d) AS ?desc)
-       (MIN(?date) AS ?released) (SAMPLE(?dur) AS ?duration) (SAMPLE(?img) AS ?image)
+       (MIN(?date) AS ?released) (SAMPLE(?dur) AS ?duration) (SAMPLE(?img) AS ?image) (SAMPLE(?pst) AS ?poster)
        (GROUP_CONCAT(DISTINCT ?g; separator="|") AS ?genres) WHERE {
   VALUES ?film { ${ids.map((q) => `wd:${q}`).join(" ")} }
   OPTIONAL { ?film rdfs:label ?itL FILTER(LANG(?itL) = "it") }
@@ -29,8 +29,11 @@ SELECT ?film (SAMPLE(?itL) AS ?it) (SAMPLE(?enL) AS ?en) (SAMPLE(?d) AS ?desc)
   OPTIONAL { ?film wdt:P577 ?date }
   OPTIONAL { ?film wdt:P2047 ?dur }
   OPTIONAL { ?film wdt:P18 ?img }
+  OPTIONAL { ?film wdt:P3383 ?pst }
   OPTIONAL { ?film wdt:P136 ?gi. ?gi rdfs:label ?g FILTER(LANG(?g) = "en") }
 } GROUP BY ?film`;
+
+const POSTER_NAME = /poster|locandina|affiche|plakat|cartel|cartaz|one.?sheet|theatrical/i;
 
 /** Cached on disk and committed: the build must not depend on Wikidata being up. */
 export async function wikidataFilms({ refresh = false } = {}) {
@@ -50,7 +53,8 @@ export async function wikidataFilms({ refresh = false } = {}) {
       description: b.desc?.value ?? "",
       released: b.released?.value ?? null,
       duration: b.duration ? Math.round(Number(b.duration.value)) : null,
-      image: b.image?.value ?? null,
+      // P3383 is "film poster"; P18 is any image — set photos, logos, theme-park rides — so it only counts when it is named like a poster
+      image: b.poster?.value ?? (POSTER_NAME.test(decodeURIComponent(b.image?.value ?? "")) ? b.image.value : null),
       genres: b.genres?.value ? b.genres.value.split("|") : [],
     }))
     .filter((f) => f.title && f.released)

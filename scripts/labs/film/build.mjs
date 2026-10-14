@@ -31,7 +31,7 @@ export function buildFilms(raw) {
     const rating = Math.round((reviews.reduce((s, x) => s + Number(x.review_score[0]), 0) / reviews.length) * 10) / 10;
     const chat = Array.from({ length: r.int(0, 6) }, (_, k) => ({ username: r.pick(UTENTI), message: r.pick(FRASI[r.next() < 0.7 ? "Fresh" : "Rotten"]), timestamp: new Date(Date.UTC(2026, 5, 1, 20, k * 3)).toISOString() }));
     return {
-      id, title: f.title, year, releaseYear: year, description: f.description, tagline: "",
+      id, title: f.title, year, releaseYear: year, description: f.description, tagline: f.description, // Wikidata has no taglines; the carousel shows this field next to the poster
       duration: f.duration ?? r.int(85, 150), rating, genres: normGenres(f.genres),
       poster: `../posters/${id}.${f.image ? "jpg" : "svg"}`, image: f.image, reviews, chat,
     };
