@@ -52,8 +52,12 @@ src/
     Media.tsx  Toast.tsx  Icons.tsx  QrPage.tsx
   hooks/index.ts         ← reduced-motion, WebGL, ospite, localStorage
   styles/global.css      ← token di design + tutti gli stili
+  labs/                  ← pagina /#/progetti: demo vive, codice, documenti
 public/media/            ← screenshot e video dei progetti
+public/labs/             ← artefatti dei laboratori (generati, committati)
 scripts/check.mjs        ← self-check eseguito da `npm test`
+scripts/check-labs.mjs   ← self-check dei laboratori, parte di `npm test`
+scripts/labs/            ← `npm run labs`: costruisce public/labs (serve Docker)
 ```
 
 Il flusso: `main.tsx` → `App.tsx` tiene lo stato (sezione aperta, easter egg
@@ -109,6 +113,17 @@ voce a `SHELF_GAPS` in `src/scenes/Room.tsx`.
 `public/media/` (`{ src: 'media/foo.png', alt: '...' }`). `github` e `demo`
 sono opzionali: se mancano, i pulsanti non compaiono. Se un'immagine manca, al
 suo posto appare un segnaposto con l'alt text — niente si rompe.
+
+**Passo 3-bis — laboratori:** ogni progetto con il campo `lab` ha la sua pagina
+in `/#/progetti/<id>`: si prova (il C di ASD compilato in WebAssembly, i database
+interrogabili con SQL, il frontend originale di Film Data), si sfoglia il codice e
+si leggono i documenti. `npm run labs` (con Docker Desktop acceso) ricostruisce
+`public/labs/`: compila il C con emscripten, esegue i test JUnit di Cat & Ring con
+Maven, genera il database del delivery e prende i film da Wikidata (in cache in
+`scripts/labs/cache/`). Il risultato si committa: il deploy non ha bisogno di Docker.
+I percorsi dei progetti sul disco stanno in `scripts/labs/sources.mjs`; per
+aggiungerne uno, una voce lì e una in `projects.ts` con il campo `lab`. L'esportazione
+del codice si ferma se trova qualcosa che sembra una password o una chiave.
 
 **Passo 4 — tesi:** `src/data/thesis.ts`. I cinque `steps`
 (Problema → Ricerca → Sviluppo → Testing → Risultato) diventano la timeline

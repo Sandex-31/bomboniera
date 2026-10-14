@@ -197,7 +197,10 @@ try {
   assert.ok(ldb.tables().includes("rider"));
   console.log("ok — sql lab: queries apply, reset restores, errors surface");
 
-  // ── later tasks append their checks here, above this line ──
+  const { default: ProjectsSection } = await vite.ssrLoadModule("/src/sections/Projects.tsx");
+  const list = renderToString(h(ProjectsSection, {}));
+  for (const p of projects) assert.ok(list.includes(`#/progetti/${p.id}`), `the room does not lead to the ${p.id} lab`);
+  console.log("ok — the room links every project to its lab");
 } finally {
   await vite.close();
 }

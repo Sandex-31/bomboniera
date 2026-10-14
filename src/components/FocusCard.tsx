@@ -2,6 +2,7 @@ import { credits } from "../data/credits";
 import { exams } from "../data/exams";
 import { projects } from "../data/projects";
 import { thesis } from "../data/thesis";
+import { labsHash } from "../labs/route";
 import type { FocusId } from "../scenes/focus";
 import { IconClose } from "./Icons";
 
@@ -11,6 +12,8 @@ type Card = {
   body: string;
   meta?: string[];
   note?: string;
+  /** Where the real thing lives, when there is one (the project labs). */
+  lab?: string;
 };
 
 /** What the visitor should touch when nothing is picked yet. */
@@ -50,6 +53,7 @@ function lookup(section: FocusId, id: string | null): Card | null {
       title: project.title,
       body: project.summary,
       meta: project.tech,
+      lab: labsHash(project.id),
     };
   }
 
@@ -110,6 +114,11 @@ export default function FocusCard({ section, id, onClose, onMore }: Props) {
 
       {card.note && <p className="focus-card__note">{card.note}</p>}
 
+      {card.lab && (
+        <a className="focus-card__more focus-card__more--lab" href={card.lab}>
+          Apri il laboratorio →
+        </a>
+      )}
       <button className="focus-card__more" onClick={onMore}>
         Apri la scheda completa →
       </button>

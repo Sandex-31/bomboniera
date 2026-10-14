@@ -1352,3 +1352,6 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .piece.is-done { animation: none; }
 }
+.card-wrap { display: grid; gap: 6px; }
+.card__lab { font: 12px var(--font-mono); color: var(--gold); justify-self: end; text-decoration: none; }
+.focus-card__more--lab { display: inline-block; margin-right: 18px; text-decoration: none; }
