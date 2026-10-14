@@ -93,6 +93,21 @@ try {
   }
   console.log(`ok — delivery: ${count(del, "SELECT COUNT(*) FROM ordine")} orders, ${delQueries.length} example queries answer`);
 
+  const api = (p) => JSON.parse(readFileSync(labs(`film-data/api/${p}`), "utf8"));
+  const allFilms = api("films/index.json");
+  assert.ok(allFilms.length >= 300, `only ${allFilms.length} films`);
+  assert.equal(new Set(allFilms.map((f) => f.id)).size, allFilms.length);
+  for (const f of allFilms) {
+    assert.ok(f.title && f.year && f.poster && Array.isArray(f.genres), `incomplete film ${f.id}`);
+    assert.ok(f.rating >= 0 && f.rating <= 5);
+    assert.ok(existsSync(labs(`film-data/posters/${f.poster.split("/").pop()}`)), `missing poster for ${f.title}`);
+  }
+  assert.ok(api("films/genre/horror.json").length > 0, "the horror slider would be empty");
+  assert.equal(api("films/top10.json").length, 10);
+  const one = api(`films/${allFilms[0].id}.json`);
+  assert.ok(one.reviews.length >= 3 && one.reviews.every((r) => r.review_content && r.critic_name));
+  console.log(`ok — film-data: ${allFilms.length} films from Wikidata, each with poster and reviews`);
+
   // ── later tasks append their checks here, above this line ──
 } finally {
   await vite.close();

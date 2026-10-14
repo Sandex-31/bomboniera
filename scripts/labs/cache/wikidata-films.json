@@ -1,0 +1,7569 @@
+[
+ {
+  "qid": "Q44578",
+  "title": "Titanic",
+  "description": "film del 1997 diretto da James Cameron",
+  "released": "1997-11-01T00:00:00Z",
+  "duration": 195,
+  "image": null,
+  "genres": [
+   "drama film",
+   "epic film",
+   "romance film",
+   "disaster film",
+   "melodrama",
+   "flashback film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q47703",
+  "title": "Il padrino",
+  "description": "film del 1972 diretto da Francis Ford Coppola",
+  "released": "1972-03-15T00:00:00Z",
+  "duration": 175,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Godfather%20logo.svg",
+  "genres": [
+   "drama film",
+   "epic film",
+   "thriller film",
+   "crime film",
+   "gangster film",
+   "suspense film",
+   "police procedural film",
+   "crime thriller film",
+   "historical film",
+   "crime drama film",
+   "historical drama film"
+  ]
+ },
+ {
+  "qid": "Q24871",
+  "title": "Avatar",
+  "description": "film del 2009 diretto da James Cameron",
+  "released": "2009-12-16T00:00:00Z",
+  "duration": 162,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Avatar%20Flight%20of%20Passage%20%2833825582954%29.jpg",
+  "genres": [
+   "action film",
+   "science fiction film",
+   "epic film",
+   "military science fiction",
+   "adventure film",
+   "live-action/animated film",
+   "white savior film"
+  ]
+ },
+ {
+  "qid": "Q83495",
+  "title": "Matrix",
+  "description": "film del 1999 diretto da Andy e Larry Wachowski",
+  "released": "1999-03-31T00:00:00Z",
+  "duration": 136,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The.Matrix.glmatrix.1.png",
+  "genres": [
+   "action film",
+   "cyberpunk",
+   "film noir",
+   "science fiction film",
+   "thriller film",
+   "superhero film",
+   "post-apocalyptic film",
+   "action thriller",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q128518",
+  "title": "Il gladiatore",
+  "description": "film del 2000 diretto da Ridley Scott",
+  "released": "2000-05-05T00:00:00Z",
+  "duration": 155,
+  "image": null,
+  "genres": [
+   "drama film",
+   "adventure film",
+   "action film",
+   "epic film",
+   "sword-and-sandal film",
+   "melodrama",
+   "historical film",
+   "historical drama film"
+  ]
+ },
+ {
+  "qid": "Q104123",
+  "title": "Pulp Fiction",
+  "description": "film del 1994 diretto da Quentin Tarantino",
+  "released": "1994-05-21T00:00:00Z",
+  "duration": 154,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Dortmund-Graffiti-IMG%206604.JPG",
+  "genres": [
+   "drama film",
+   "comedy film",
+   "action film",
+   "thriller film",
+   "comedy drama",
+   "crime film",
+   "independent film",
+   "neo-noir",
+   "crime comedy film",
+   "suspense film",
+   "crime thriller film",
+   "gangster film",
+   "action thriller",
+   "black comedy film",
+   "crime drama film"
+  ]
+ },
+ {
+  "qid": "Q132689",
+  "title": "Casablanca",
+  "description": "film del 1942 diretto da Michael Curtiz",
+  "released": "1942-11-26T00:00:00Z",
+  "duration": 102,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Bergman%20%26%20Bogart%20Casablanca%20still.jpg",
+  "genres": [
+   "drama film",
+   "film noir",
+   "war film",
+   "romance film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q163872",
+  "title": "Il cavaliere oscuro",
+  "description": "film del 2008 diretto da Christopher Nolan",
+  "released": "2008-07-18T00:00:00Z",
+  "duration": 153,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "crime film",
+   "thriller film",
+   "superhero film",
+   "neo-noir",
+   "crime thriller film"
+  ]
+ },
+ {
+  "qid": "Q172241",
+  "title": "Le ali della libertà",
+  "description": "film del 1994 diretto da Frank Darabont",
+  "released": "1994-09-10T00:00:00Z",
+  "duration": 142,
+  "image": null,
+  "genres": [
+   "drama film",
+   "buddy film",
+   "prison film",
+   "crime film"
+  ]
+ },
+ {
+  "qid": "Q91540",
+  "title": "Ritorno al futuro",
+  "description": "film del 1985 diretto da Robert Zemeckis",
+  "released": "1985-07-03T00:00:00Z",
+  "duration": 115,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "science fiction film",
+   "adventure film",
+   "time-travel film",
+   "teen film"
+  ]
+ },
+ {
+  "qid": "Q190050",
+  "title": "Fight Club",
+  "description": "film del 1999 diretto da David Fincher",
+  "released": "1999-09-10T00:00:00Z",
+  "duration": 139,
+  "image": null,
+  "genres": [
+   "drama film",
+   "psychological thriller",
+   "thriller film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q133654",
+  "title": "Il silenzio degli innocenti",
+  "description": "film del 1991 diretto da Jonathan Demme",
+  "released": "1991-01-30T00:00:00Z",
+  "duration": 118,
+  "image": null,
+  "genres": [
+   "drama film",
+   "horror film",
+   "thriller film",
+   "crime film",
+   "psychological horror film",
+   "psychological thriller film",
+   "police procedural film",
+   "crime thriller film",
+   "LGBTQ-related film",
+   "psychological drama film",
+   "crime drama film"
+  ]
+ },
+ {
+  "qid": "Q483941",
+  "title": "Schindler's List - La lista di Schindler",
+  "description": "film del 1993 diretto da Steven Spielberg",
+  "released": "1993-01-01T00:00:00Z",
+  "duration": 195,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film",
+   "biographical film",
+   "epic film",
+   "psychological drama film",
+   "war drama",
+   "historical film",
+   "historical drama film",
+   "anti-war film"
+  ]
+ },
+ {
+  "qid": "Q162255",
+  "title": "Terminator",
+  "description": "film del 1984 diretto da James Cameron",
+  "released": "1984-10-26T00:00:00Z",
+  "duration": 108,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "adventure film",
+   "cyberpunk",
+   "action film",
+   "horror film",
+   "techno-thriller",
+   "thriller film",
+   "post-apocalyptic film",
+   "independent film",
+   "science fiction film",
+   "time-travel film",
+   "science fiction horror film",
+   "suspense film",
+   "chase film",
+   "science fiction action film",
+   "dystopian film",
+   "tech-noir film"
+  ]
+ },
+ {
+  "qid": "Q102438",
+  "title": "Harry Potter e la pietra filosofale",
+  "description": "film del 2001 diretto da Chris Columbus",
+  "released": "2001-11-04T00:00:00Z",
+  "duration": 152,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "adventure film",
+   "speculative fiction film",
+   "children's film"
+  ]
+ },
+ {
+  "qid": "Q167726",
+  "title": "Jurassic Park",
+  "description": "film del 1993 diretto da Steven Spielberg",
+  "released": "1993-06-09T00:00:00Z",
+  "duration": 127,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q5890",
+  "title": "V per Vendetta",
+  "description": "film del 2005 di James McTeigue",
+  "released": "2005-12-11T00:00:00Z",
+  "duration": 132,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/V%20for%20Vendetta%20film.jpg",
+  "genres": [
+   "thriller film",
+   "political drama",
+   "science fiction action film",
+   "political thriller film",
+   "post-apocalyptic film",
+   "vigilante film",
+   "action thriller",
+   "LGBTQ-related film",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q13417189",
+  "title": "Interstellar",
+  "description": "film del 2014 diretto da Christopher Nolan",
+  "released": "2014-10-26T00:00:00Z",
+  "duration": 169,
+  "image": null,
+  "genres": [
+   "drama film",
+   "adventure film",
+   "hard science fiction",
+   "science fiction film",
+   "dystopian film",
+   "thriller film",
+   "time-travel film"
+  ]
+ },
+ {
+  "qid": "Q25188",
+  "title": "Inception",
+  "description": "film del 2010 diretto da Christopher Nolan",
+  "released": "2010-07-08T00:00:00Z",
+  "duration": 148,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/InceptionCast2July10.jpg",
+  "genres": [
+   "drama film",
+   "action film",
+   "science fiction film",
+   "heist film",
+   "thriller film",
+   "mystery film",
+   "adventure film",
+   "science fiction action film"
+  ]
+ },
+ {
+  "qid": "Q2875",
+  "title": "Via col vento",
+  "description": "film del 1939 diretto da Victor Fleming",
+  "released": "1939-12-15T00:00:00Z",
+  "duration": 238,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Clark%20Gable%20and%20Vivien%20Leigh%20in%20Gone%20with%20the%20Wind.jpg",
+  "genres": [
+   "drama film",
+   "war film",
+   "romance film",
+   "melodrama",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q127367",
+  "title": "Il Signore degli Anelli - La Compagnia dell'Anello",
+  "description": "film del 2001 diretto da Peter Jackson",
+  "released": "2001-12-19T00:00:00Z",
+  "duration": 228,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "adventure film",
+   "action film",
+   "high fantasy"
+  ]
+ },
+ {
+  "qid": "Q17738",
+  "title": "Guerre stellari",
+  "description": "film del 1977 diretto da George Lucas",
+  "released": "1977-01-01T00:00:00Z",
+  "duration": 121,
+  "image": null,
+  "genres": [
+   "action film",
+   "science fiction film",
+   "space opera",
+   "adventure film",
+   "coming-of-age film"
+  ]
+ },
+ {
+  "qid": "Q182218",
+  "title": "The Avengers",
+  "description": "film del 2012 diretto da Joss Whedon",
+  "released": "2012-04-25T00:00:00Z",
+  "duration": 142,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film",
+   "speculative fiction film",
+   "crossover fiction"
+  ]
+ },
+ {
+  "qid": "Q41483",
+  "title": "Il buono, il brutto, il cattivo",
+  "description": "film del 1966 diretto da Sergio Leone",
+  "released": "1966-12-23T00:00:00Z",
+  "duration": 177,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "Western film",
+   "Spaghetti Western",
+   "war film",
+   "epic film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q102244",
+  "title": "Harry Potter e la camera dei segreti",
+  "description": "film del 2002 diretto da Chris Columbus",
+  "released": "2002-11-03T00:00:00Z",
+  "duration": 161,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Harry%20Potter%20wordmark.svg",
+  "genres": [
+   "fantasy film",
+   "adventure film",
+   "children's film"
+  ]
+ },
+ {
+  "qid": "Q131074",
+  "title": "Il Signore degli Anelli - Il ritorno del re",
+  "description": "film del 2003 diretto da Peter Jackson",
+  "released": "2003-12-01T00:00:00Z",
+  "duration": 263,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q170564",
+  "title": "Terminator 2 - Il giorno del giudizio",
+  "description": "film del 1991 diretto da James Cameron",
+  "released": "1991-01-01T00:00:00Z",
+  "duration": 137,
+  "image": null,
+  "genres": [
+   "drama film",
+   "cyberpunk",
+   "comedy film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "techno-thriller",
+   "girls with guns",
+   "post-apocalyptic film",
+   "thriller film",
+   "time-travel film",
+   "dystopian film",
+   "suspense film",
+   "chase film",
+   "science fiction action film",
+   "black comedy film"
+  ]
+ },
+ {
+  "qid": "Q162729",
+  "title": "Braveheart - Cuore impavido",
+  "description": "film del 1995 diretto da Mel Gibson",
+  "released": "1995-05-24T00:00:00Z",
+  "duration": 177,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Mel%20Gibson%20on%20the%20set%20of%20Braveheart%2C%201995.jpg",
+  "genres": [
+   "drama film",
+   "action film",
+   "war film",
+   "biographical film",
+   "medieval film"
+  ]
+ },
+ {
+  "qid": "Q165713",
+  "title": "Star Wars - Episodio I - La minaccia fantasma",
+  "description": "film del 1999 scritto e diretto da George Lucas",
+  "released": "1999-05-19T00:00:00Z",
+  "duration": 133,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "science fiction film"
+  ]
+ },
+ {
+  "qid": "Q46717",
+  "title": "La maledizione della prima luna",
+  "description": "film del 2003 diretto da Gore Verbinski",
+  "released": "2003-07-09T00:00:00Z",
+  "duration": 137,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "action film",
+   "fantasy film",
+   "swashbuckler film",
+   "adventure film",
+   "pirate film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q102225",
+  "title": "Harry Potter e il calice di fuoco",
+  "description": "film del 2005 diretto da Mike Newell",
+  "released": "2005-11-06T00:00:00Z",
+  "duration": 151,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Dragon%20Challenge%2019.jpg",
+  "genres": [
+   "fantasy film",
+   "adventure film",
+   "children's film"
+  ]
+ },
+ {
+  "qid": "Q102448",
+  "title": "Harry Potter e il prigioniero di Azkaban",
+  "description": "film del 2004 diretto da Alfonso Cuarón",
+  "released": "2004-05-31T00:00:00Z",
+  "duration": 141,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Dementor%20%288514403186%29.jpg",
+  "genres": [
+   "fantasy film",
+   "adventure film",
+   "time-travel film",
+   "children's film",
+   "werewolf film"
+  ]
+ },
+ {
+  "qid": "Q103474",
+  "title": "2001: Odissea nello spazio",
+  "description": "film del 1968 diretto da Stanley Kubrick",
+  "released": "1968-04-02T00:00:00Z",
+  "duration": 143,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Photo%20A%20scene%20from%202001.%20A%20Space%20Odyssey%2C%20a%201968%20film%20directed%20by%20Stanley%20Kubrick%201968%20-%20Touring%20Club%20Italiano%2004%200826.jpg",
+  "genres": [
+   "epic film",
+   "mystery film",
+   "arthouse science fiction film",
+   "space adventure film"
+  ]
+ },
+ {
+  "qid": "Q125076",
+  "title": "The Millionaire",
+  "description": "film del 2008 diretto da Danny Boyle",
+  "released": "2008-08-30T00:00:00Z",
+  "duration": 120,
+  "image": null,
+  "genres": [
+   "drama film",
+   "crime film",
+   "romance film",
+   "coming-of-age film"
+  ]
+ },
+ {
+  "qid": "Q161687",
+  "title": "Harry Potter e il principe mezzosangue",
+  "description": "film del 2009 diretto da David Yates",
+  "released": "2009-07-06T00:00:00Z",
+  "duration": 147,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Making%20of%20Harry%20Potter%2029-05-2012%20%287375512280%29.jpg",
+  "genres": [
+   "fantasy film"
+  ]
+ },
+ {
+  "qid": "Q102235",
+  "title": "Harry Potter e l'Ordine della Fenice",
+  "description": "film del 2007 diretto da David Yates",
+  "released": "2007-06-28T00:00:00Z",
+  "duration": 133,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Harry%20Potter%20wordmark.svg",
+  "genres": [
+   "fantasy film",
+   "family film"
+  ]
+ },
+ {
+  "qid": "Q164963",
+  "title": "Il Signore degli Anelli - Le due torri",
+  "description": "film del 2002 diretto da Peter Jackson",
+  "released": "2002-12-05T00:00:00Z",
+  "duration": 235,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q42051",
+  "title": "Star Wars - Episodio III - La vendetta dei Sith",
+  "description": "film del 2005 scritto e diretto da George Lucas",
+  "released": "2005-05-15T00:00:00Z",
+  "duration": 140,
+  "image": null,
+  "genres": [
+   "action film",
+   "fantasy film",
+   "science fiction film",
+   "epic film",
+   "space opera",
+   "adventure film",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q184768",
+  "title": "Il padrino - Parte II",
+  "description": "film del 1974 diretto da Francis Ford Coppola",
+  "released": "1974-12-12T00:00:00Z",
+  "duration": 202,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "crime film",
+   "mystery film",
+   "thriller film",
+   "epic film",
+   "flashback film",
+   "police procedural film",
+   "crime drama film",
+   "suspense film",
+   "historical film",
+   "crime thriller film",
+   "historical drama film",
+   "gangster film"
+  ]
+ },
+ {
+  "qid": "Q106316",
+  "title": "L'attimo fuggente",
+  "description": "film del 1989 diretto da Peter Weir",
+  "released": "1989-06-02T00:00:00Z",
+  "duration": 123,
+  "image": null,
+  "genres": [
+   "drama film",
+   "teen film",
+   "coming-of-age film"
+  ]
+ },
+ {
+  "qid": "Q164103",
+  "title": "A Beautiful Mind",
+  "description": "film del 2001 diretto da Ron Howard",
+  "released": "2001-12-13T00:00:00Z",
+  "duration": 135,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film"
+  ]
+ },
+ {
+  "qid": "Q165817",
+  "title": "Salvate il soldato Ryan",
+  "description": "film del 1998 diretto da Steven Spielberg",
+  "released": "1998-01-01T00:00:00Z",
+  "duration": 169,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "war film"
+  ]
+ },
+ {
+  "qid": "Q54274",
+  "title": "Pirati dei Caraibi - Ai confini del mondo",
+  "description": "film del 2007 diretto da Gore Verbinski",
+  "released": "2007-05-23T00:00:00Z",
+  "duration": 162,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "action film",
+   "fantasy film",
+   "swashbuckler film",
+   "epic film",
+   "comedy drama",
+   "adventure film",
+   "pirate film"
+  ]
+ },
+ {
+  "qid": "Q160618",
+  "title": "I segreti di Brokeback Mountain",
+  "description": "film del 2005 diretto da Ang Lee",
+  "released": "2005-09-02T00:00:00Z",
+  "duration": 134,
+  "image": null,
+  "genres": [
+   "drama film",
+   "romance film",
+   "LGBTQ-related film"
+  ]
+ },
+ {
+  "qid": "Q166262",
+  "title": "Batman Begins",
+  "description": "film del 2005 diretto da Christopher Nolan",
+  "released": "2005-06-15T00:00:00Z",
+  "duration": 140,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Batman%20Begins%20logo.png",
+  "genres": [
+   "drama film",
+   "action film",
+   "adventure film",
+   "crime film",
+   "superhero film",
+   "ninja film",
+   "neo-noir",
+   "crime thriller film"
+  ]
+ },
+ {
+  "qid": "Q24815",
+  "title": "Quarto potere",
+  "description": "film del 1941 diretto da Orson Welles",
+  "released": "1941-01-01T00:00:00Z",
+  "duration": 119,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Citizen%20Kane%20poster%2C%201941%20%28Style%20B%2C%20unrestored%29.jpg",
+  "genres": [
+   "drama film",
+   "biographical film",
+   "mystery film",
+   "fiction film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q181795",
+  "title": "L'Impero colpisce ancora",
+  "description": "film del 1980 diretto da Irvin Kershner",
+  "released": "1980-01-01T00:00:00Z",
+  "duration": 124,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "space opera",
+   "epic film"
+  ]
+ },
+ {
+  "qid": "Q182692",
+  "title": "Apocalypse Now",
+  "description": "film del 1979 diretto da Francis Ford Coppola",
+  "released": "1979-01-01T00:00:00Z",
+  "duration": 202,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Flickr%20-%20law%20keven%20-%20Apocalypse%20Now%5E.......minus%20the%20Helicopters...jpg",
+  "genres": [
+   "drama film",
+   "horror film",
+   "action film",
+   "adventure film",
+   "epic film",
+   "war film",
+   "war drama",
+   "satirical film",
+   "psychological thriller film",
+   "thriller film",
+   "psychological drama film",
+   "psychological horror film"
+  ]
+ },
+ {
+  "qid": "Q184843",
+  "title": "Blade Runner",
+  "description": "film del 1982 diretto da Ridley Scott",
+  "released": "1982-01-01T00:00:00Z",
+  "duration": 116,
+  "image": null,
+  "genres": [
+   "drama film",
+   "cyberpunk",
+   "action film",
+   "film noir",
+   "science fiction film",
+   "neo-noir",
+   "tech noir",
+   "crime film",
+   "crime thriller film",
+   "crime drama film",
+   "dystopian film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q161087",
+  "title": "Pirati dei Caraibi - La maledizione del forziere fantasma",
+  "description": "film del 2006 diretto da Gore Verbinski",
+  "released": "2006-07-07T00:00:00Z",
+  "duration": 145,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "comedy film",
+   "action film",
+   "adventure film",
+   "swashbuckler film",
+   "pirate film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q484442",
+  "title": "Spider-Man",
+  "description": "film del 2002 diretto da Sam Raimi",
+  "released": "2002-05-03T00:00:00Z",
+  "duration": 121,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "science fiction film",
+   "superhero film",
+   "coming-of-age film"
+  ]
+ },
+ {
+  "qid": "Q181803",
+  "title": "Il ritorno dello Jedi",
+  "description": "film del 1983 diretto da Richard Marquand",
+  "released": "1983-01-01T00:00:00Z",
+  "duration": 134,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "science fiction film"
+  ]
+ },
+ {
+  "qid": "Q182153",
+  "title": "Cars - Motori ruggenti",
+  "description": "film d'animazione del 2006 diretto da John Lasseter",
+  "released": "2006-05-26T00:00:00Z",
+  "duration": 116,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "buddy film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q103569",
+  "title": "Alien",
+  "description": "film del 1979 diretto da Ridley Scott",
+  "released": "1979-05-25T00:00:00Z",
+  "duration": 117,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "horror film",
+   "action film",
+   "science fiction film",
+   "adventure film",
+   "mystery film",
+   "monster film",
+   "science fiction horror film",
+   "suspense film",
+   "thriller film",
+   "girls with guns",
+   "science fiction action film",
+   "body horror film"
+  ]
+ },
+ {
+  "qid": "Q131390",
+  "title": "300",
+  "description": "film del 2007 diretto da Zack Snyder",
+  "released": "2006-01-01T00:00:00Z",
+  "duration": 116,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film",
+   "action film",
+   "classical antiquity film",
+   "epic film",
+   "sword-and-sandal film"
+  ]
+ },
+ {
+  "qid": "Q161678",
+  "title": "Harry Potter e i Doni della Morte - Parte 1",
+  "description": "film del 2010 diretto da David Yates",
+  "released": "2010-11-11T00:00:00Z",
+  "duration": 147,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/HIMG%202703%20%288066420985%29.jpg",
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q105031",
+  "title": "Mamma, ho perso l'aereo",
+  "description": "film del 1990 diretto da Chris Columbus",
+  "released": "1990-11-10T00:00:00Z",
+  "duration": 103,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "adventure film",
+   "family film",
+   "Christmas film"
+  ]
+ },
+ {
+  "qid": "Q181069",
+  "title": "Star Wars - Episodio II - L'attacco dei cloni",
+  "description": "film del 2002 scritto e diretto da George Lucas",
+  "released": "2002-01-01T00:00:00Z",
+  "duration": 142,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "science fiction film"
+  ]
+ },
+ {
+  "qid": "Q14171368",
+  "title": "Avengers: Age of Ultron",
+  "description": "film del 2015 diretto da Joss Whedon",
+  "released": "2015-04-22T00:00:00Z",
+  "duration": 141,
+  "image": null,
+  "genres": [
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q190086",
+  "title": "A qualcuno piace caldo",
+  "description": "film del 1959 diretto da Billy Wilder",
+  "released": "1959-03-19T00:00:00Z",
+  "duration": 120,
+  "image": null,
+  "genres": [
+   "drama film",
+   "screwball comedy film",
+   "musical film",
+   "crime film",
+   "gangster film",
+   "LGBTQ-related film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q232009",
+  "title": "Harry Potter e i Doni della Morte - Parte 2",
+  "description": "film del 2011 diretto da David Yates",
+  "released": "2011-07-13T00:00:00Z",
+  "duration": 130,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Gringotts%20Dragon%20%2842428027095%29.jpg",
+  "genres": [
+   "fantasy film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q109116",
+  "title": "Il grande dittatore",
+  "description": "film del 1940 diretto da Charlie Chaplin",
+  "released": "1940-10-15T00:00:00Z",
+  "duration": 125,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Great%20Dictator%20still%20cropped%20%28high%20quality%20version%29.jpg",
+  "genres": [
+   "drama film",
+   "comedy film",
+   "war film",
+   "parody film",
+   "comedy drama",
+   "slapstick",
+   "anti-war film",
+   "political satire",
+   "comedy of error"
+  ]
+ },
+ {
+  "qid": "Q61448040",
+  "title": "Parasite",
+  "description": "film del 2019 diretto da Bong Joon-ho",
+  "released": "2019-05-21T00:00:00Z",
+  "duration": 132,
+  "image": null,
+  "genres": [
+   "black comedy",
+   "comedy drama",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q108839994",
+  "title": "Oppenheimer",
+  "description": "film del 2023 diretto da Christopher Nolan",
+  "released": "2023-07-20T00:00:00Z",
+  "duration": 10809,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "epic film",
+   "thriller film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q19355",
+  "title": "La vita è bella",
+  "description": "film del 1997 diretto da Roberto Benigni",
+  "released": "1997-12-20T00:00:00Z",
+  "duration": 116,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film"
+  ]
+ },
+ {
+  "qid": "Q153723",
+  "title": "Bastardi senza gloria",
+  "description": "film del 2009 diretto da Quentin Tarantino",
+  "released": "2009-05-20T00:00:00Z",
+  "duration": 153,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "war film",
+   "action film",
+   "adventure film",
+   "parody film",
+   "comedy drama",
+   "period drama film",
+   "black comedy film",
+   "epic film",
+   "suspense film",
+   "political satire",
+   "thriller film",
+   "action comedy film",
+   "war drama",
+   "historical drama film",
+   "historical film",
+   "alternate history film"
+  ]
+ },
+ {
+  "qid": "Q172975",
+  "title": "The Departed - Il bene e il male",
+  "description": "film del 2006 diretto da Martin Scorsese",
+  "released": "2006-09-26T00:00:00Z",
+  "duration": 151,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Departed%20logo.svg",
+  "genres": [
+   "drama film",
+   "epic film",
+   "mystery film",
+   "neo-noir",
+   "suspense film",
+   "crime film",
+   "crime thriller film",
+   "crime drama film",
+   "gangster film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q174284",
+  "title": "I predatori dell'arca perduta",
+  "description": "film del 1981 diretto da Steven Spielberg",
+  "released": "1981-06-12T00:00:00Z",
+  "duration": 115,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Indy%27s%20Arc.jpg",
+  "genres": [
+   "action film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q47221",
+  "title": "Taxi Driver",
+  "description": "film del 1976 diretto da Martin Scorsese",
+  "released": "1976-02-08T00:00:00Z",
+  "duration": 114,
+  "image": null,
+  "genres": [
+   "drama film",
+   "film noir",
+   "action film",
+   "crime film",
+   "neo-noir",
+   "suspense film",
+   "vigilante film",
+   "thriller film",
+   "psychological thriller film",
+   "police procedural film",
+   "crime drama film",
+   "crime thriller film",
+   "psychological drama film"
+  ]
+ },
+ {
+  "qid": "Q25139",
+  "title": "American Beauty",
+  "description": "film del 1999 diretto da Sam Mendes",
+  "released": "1999-09-08T00:00:00Z",
+  "duration": 121,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy drama",
+   "black comedy film",
+   "LGBTQ-related film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q183081",
+  "title": "Non è un paese per vecchi",
+  "description": "film del 2007 diretto dai fratelli Coen",
+  "released": "2007-05-19T00:00:00Z",
+  "duration": 122,
+  "image": null,
+  "genres": [
+   "drama film",
+   "Western film",
+   "action film",
+   "adventure film",
+   "mystery film",
+   "neo-noir",
+   "suspense film",
+   "crime film",
+   "crime thriller film",
+   "crime drama film",
+   "gangster film",
+   "psychological thriller film",
+   "thriller film",
+   "psychological drama film",
+   "contemporary Western film"
+  ]
+ },
+ {
+  "qid": "Q228186",
+  "title": "Lawrence d'Arabia",
+  "description": "film del 1962 diretto da David Lean",
+  "released": "1962-01-01T00:00:00Z",
+  "duration": 216,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Peter%20OToole%20in%20Lawrence%20of%20Arabia.jpg",
+  "genres": [
+   "drama film",
+   "adventure film",
+   "biographical film",
+   "war film",
+   "epic film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q275120",
+  "title": "Captain America - Il primo Vendicatore",
+  "description": "film del 2011 diretto da Joe Johnston",
+  "released": "2011-07-22T00:00:00Z",
+  "duration": 124,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "war film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q4941",
+  "title": "Skyfall",
+  "description": "film del 2012 diretto da Sam Mendes",
+  "released": "2012-10-23T00:00:00Z",
+  "duration": 143,
+  "image": null,
+  "genres": [
+   "action film",
+   "spy film",
+   "action thriller"
+  ]
+ },
+ {
+  "qid": "Q217020",
+  "title": "Thor",
+  "description": "film del 2011 diretto da Kenneth Branagh",
+  "released": "2011-04-27T00:00:00Z",
+  "duration": 114,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q105598",
+  "title": "Trappola di cristallo",
+  "description": "film del 1988 diretto da John McTiernan",
+  "released": "1988-01-01T00:00:00Z",
+  "duration": 131,
+  "image": null,
+  "genres": [
+   "action film",
+   "heist film",
+   "action thriller",
+   "Christmas film"
+  ]
+ },
+ {
+  "qid": "Q150804",
+  "title": "Il pianista",
+  "description": "film del 2002 diretto da Roman Polański",
+  "released": "2002-05-24T00:00:00Z",
+  "duration": 149,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film",
+   "musical film",
+   "biographical film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q160060",
+  "title": "Il discorso del re",
+  "description": "film del 2010 diretto da Tom Hooper",
+  "released": "2010-09-06T00:00:00Z",
+  "duration": 118,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20king%27s%20speech.svg",
+  "genres": [
+   "drama film",
+   "biographical film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q163038",
+  "title": "Psyco",
+  "description": "film del 1960 diretto da Alfred Hitchcock",
+  "released": "1960-01-01T00:00:00Z",
+  "duration": 109,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Psycho%20%281960%29%20theatrical%20poster%20%28retouched%29.jpg",
+  "genres": [
+   "drama film",
+   "horror film",
+   "film noir",
+   "independent film",
+   "mystery film",
+   "suspense film",
+   "slasher film",
+   "crime film",
+   "crime thriller film",
+   "crime drama film",
+   "LGBTQ-related film",
+   "psychological thriller film",
+   "thriller film",
+   "psychological drama film",
+   "psychological horror film"
+  ]
+ },
+ {
+  "qid": "Q171669",
+  "title": "Qualcuno volò sul nido del cuculo",
+  "description": "film del 1975 diretto da Miloš Forman",
+  "released": "1975-01-01T00:00:00Z",
+  "duration": 136,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Goldman%20bo.jpg",
+  "genres": [
+   "comedy film",
+   "prison film",
+   "medical drama"
+  ]
+ },
+ {
+  "qid": "Q180098",
+  "title": "Ben-Hur",
+  "description": "film del 1959 diretto da William Wyler",
+  "released": "1959-11-18T00:00:00Z",
+  "duration": 222,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Photo%20An%20iconic%20scene%20from%20Ben-Hur%2C%20a%201959%20film%20directed%20by%20William%20Wyler%201959%20-%20Touring%20Club%20Italiano%2004%200849.jpg",
+  "genres": [
+   "drama film",
+   "action film",
+   "epic film",
+   "sword-and-sandal film"
+  ]
+ },
+ {
+  "qid": "Q484048",
+  "title": "Il favoloso mondo di Amélie",
+  "description": "film del 2001 diretto da Jean-Pierre Jeunet",
+  "released": "2001-02-28T00:00:00Z",
+  "duration": 122,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "romantic comedy film",
+   "magic realist film"
+  ]
+ },
+ {
+  "qid": "Q3023357",
+  "title": "12 anni schiavo",
+  "description": "film del 2013 diretto da Steve McQueen",
+  "released": "2013-08-30T00:00:00Z",
+  "duration": 133,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film"
+  ]
+ },
+ {
+  "qid": "Q46551",
+  "title": "The Prestige",
+  "description": "film del 2006 diretto da Christopher Nolan",
+  "released": "2006-10-17T00:00:00Z",
+  "duration": 125,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "mystery film",
+   "thriller film",
+   "magic realist film"
+  ]
+ },
+ {
+  "qid": "Q208263",
+  "title": "Il miglio verde",
+  "description": "film del 1999 diretto da Frank Darabont",
+  "released": "1999-12-10T00:00:00Z",
+  "duration": 189,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "prison film",
+   "flashback film",
+   "magic realist film"
+  ]
+ },
+ {
+  "qid": "Q2579784",
+  "title": "Gravity",
+  "description": "film del 2013 diretto da Alfonso Cuarón",
+  "released": "2013-08-28T00:00:00Z",
+  "duration": 91,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Warner%20Brothers%20studio%20tour%20%2813084977233%29.jpg",
+  "genres": [
+   "drama film",
+   "horror film",
+   "techno-thriller",
+   "disaster film",
+   "science fiction film",
+   "thriller film",
+   "survival film"
+  ]
+ },
+ {
+  "qid": "Q23780734",
+  "title": "Black Panther",
+  "description": "film del 2018 diretto da Ryan Coogler",
+  "released": "2018-02-14T00:00:00Z",
+  "duration": 134,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q42759035",
+  "title": "Joker",
+  "description": "film del 2019 diretto da Todd Phillips",
+  "released": "2019-08-31T00:00:00Z",
+  "duration": 122,
+  "image": null,
+  "genres": [
+   "drama film",
+   "crime film",
+   "thriller film",
+   "psychological thriller film"
+  ]
+ },
+ {
+  "qid": "Q2345",
+  "title": "La parola ai giurati",
+  "description": "film del 1957 diretto da Sidney Lumet",
+  "released": "1957-04-10T00:00:00Z",
+  "duration": 95,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/12%20Angry%20Men%20%281957%20film%20poster%29.jpg",
+  "genres": [
+   "drama film",
+   "huis-clos film",
+   "trial film"
+  ]
+ },
+ {
+  "qid": "Q202326",
+  "title": "Il padrino - Parte III",
+  "description": "film del 1990 diretto da Francis Ford Coppola",
+  "released": "1990-12-25T00:00:00Z",
+  "duration": 162,
+  "image": null,
+  "genres": [
+   "drama film",
+   "crime film",
+   "epic film",
+   "mystery film",
+   "thriller film",
+   "gangster film",
+   "crime drama film",
+   "crime thriller film"
+  ]
+ },
+ {
+  "qid": "Q208108",
+  "title": "Prova a prendermi",
+  "description": "film del 2002 diretto da Steven Spielberg",
+  "released": "2002-01-01T00:00:00Z",
+  "duration": 135,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "biographical film",
+   "heist film",
+   "crime film"
+  ]
+ },
+ {
+  "qid": "Q102754",
+  "title": "Agente 007 - Licenza di uccidere",
+  "description": "film del 1962 diretto da Terence Young",
+  "released": "1962-01-01T00:00:00Z",
+  "duration": 105,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/%D0%94%D0%BE%D0%BA%D1%82%D0%BE%D1%80%20%D0%9D%D0%BE%D1%83%20%D1%84%D0%B8%D0%BB%D1%8C%D0%BC%201962%20%D1%81%D0%BA%D1%80%D0%B8%D0%BD%20%D0%B7%D0%B0%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B8%205.jpg",
+  "genres": [
+   "action film",
+   "adventure film",
+   "spy film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q6074",
+  "title": "Star Wars - Il risveglio della Forza",
+  "description": "film del 2015 diretto da J. J. Abrams",
+  "released": "2015-12-16T00:00:00Z",
+  "duration": 138,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "space opera",
+   "action film",
+   "science fiction film",
+   "adventure film",
+   "speculative fiction film"
+  ]
+ },
+ {
+  "qid": "Q186341",
+  "title": "Shining",
+  "description": "film del 1980 diretto da Stanley Kubrick",
+  "released": "1980-01-01T00:00:00Z",
+  "duration": 144,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Stanley%20Kubrick%20The%20Exhibition%20-%20TIFF%20-%20Shinning%20%2816215970687%29.jpg",
+  "genres": [
+   "drama film",
+   "horror film",
+   "mystery film",
+   "thriller film",
+   "suspense film",
+   "psychological thriller film",
+   "psychological drama film",
+   "psychological horror film",
+   "ghost film",
+   "supernatural horror film"
+  ]
+ },
+ {
+  "qid": "Q186587",
+  "title": "Troy",
+  "description": "film del 2004 diretto da Wolfgang Petersen",
+  "released": "2004-01-01T00:00:00Z",
+  "duration": 163,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/%C3%87anakkale%20kolaj.jpg",
+  "genres": [
+   "drama film",
+   "action film",
+   "war film",
+   "sword-and-sandal film"
+  ]
+ },
+ {
+  "qid": "Q270470",
+  "title": "Le avventure di Peter Pan",
+  "description": "film d'animazione del 1953 diretto da Hamilton Luske, Clyde Geronimi e Wilfred Jackson",
+  "released": "1953-02-05T00:00:00Z",
+  "duration": 76,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Peter%20Pan%20disney.jpg",
+  "genres": [
+   "fantasy film",
+   "musical film",
+   "children's film"
+  ]
+ },
+ {
+  "qid": "Q1392744",
+  "title": "The Wolf of Wall Street",
+  "description": "film del 2013 diretto da Martin Scorsese",
+  "released": "2013-12-17T00:00:00Z",
+  "duration": 180,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Leonardo%20DiCaprio%202010.jpg",
+  "genres": [
+   "drama film",
+   "comedy film",
+   "biographical film",
+   "crime film",
+   "comedy drama",
+   "black comedy film",
+   "epic film",
+   "crime drama film"
+  ]
+ },
+ {
+  "qid": "Q23010088",
+  "title": "Spider-Man: Homecoming",
+  "description": "film del 2017 diretto da Jon Watts",
+  "released": "2017-07-07T00:00:00Z",
+  "duration": 133,
+  "image": null,
+  "genres": [
+   "action film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q205028",
+  "title": "Iron Man 2",
+  "description": "film del 2010 diretto da Jon Favreau",
+  "released": "2010-05-07T00:00:00Z",
+  "duration": 125,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q183555",
+  "title": "Pirati dei Caraibi - Oltre i confini del mare",
+  "description": "film del 2011 diretto da Rob Marshall",
+  "released": "2011-05-18T00:00:00Z",
+  "duration": 136,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "comedy film",
+   "action film",
+   "adventure film",
+   "swashbuckler film",
+   "pirate film",
+   "zombie film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q185888",
+  "title": "The Social Network",
+  "description": "film del 2010 diretto da David Fincher",
+  "released": "2010-09-24T00:00:00Z",
+  "duration": 121,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "trial film"
+  ]
+ },
+ {
+  "qid": "Q188845",
+  "title": "Rain Man - L'uomo della pioggia",
+  "description": "film del 1988 diretto da Barry Levinson",
+  "released": "1988-12-16T00:00:00Z",
+  "duration": 128,
+  "image": null,
+  "genres": [
+   "drama film",
+   "buddy film",
+   "comedy drama"
+  ]
+ },
+ {
+  "qid": "Q80379",
+  "title": "Lo Hobbit - Un viaggio inaspettato",
+  "description": "film del 2012 diretto da Peter Jackson",
+  "released": "2012-11-28T00:00:00Z",
+  "duration": 182,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q160071",
+  "title": "Twilight",
+  "description": "film del 2008 diretto da Catherine Hardwicke",
+  "released": "2008-11-17T00:00:00Z",
+  "duration": 122,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "action film",
+   "vampire film",
+   "romance film",
+   "melodrama",
+   "teen film"
+  ]
+ },
+ {
+  "qid": "Q180214",
+  "title": "Il cigno nero",
+  "description": "film del 2010 diretto da Darren Aronofsky",
+  "released": "2010-09-01T00:00:00Z",
+  "duration": 108,
+  "image": null,
+  "genres": [
+   "drama film",
+   "horror film",
+   "psychological horror fiction",
+   "thriller film",
+   "LGBTQ-related film",
+   "magic realist film",
+   "psychological thriller film"
+  ]
+ },
+ {
+  "qid": "Q571032",
+  "title": "Django Unchained",
+  "description": "film del 2012 diretto da Quentin Tarantino",
+  "released": "2012-12-25T00:00:00Z",
+  "duration": 165,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "Western film",
+   "revisionist Western",
+   "comedy drama",
+   "blaxploitation film",
+   "historical drama film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q13255497",
+  "title": "Birdman",
+  "description": "film del 2014 diretto da Alejandro G. Iñárritu",
+  "released": "2014-08-27T00:00:00Z",
+  "duration": 119,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Birdman%20logo.png",
+  "genres": [
+   "drama film",
+   "black comedy",
+   "comedy film",
+   "tragicomedy"
+  ]
+ },
+ {
+  "qid": "Q42047",
+  "title": "Quei bravi ragazzi",
+  "description": "film del 1990 diretto da Martin Scorsese",
+  "released": "1990-09-08T00:00:00Z",
+  "duration": 146,
+  "image": null,
+  "genres": [
+   "drama film",
+   "period drama film",
+   "biographical film",
+   "crime film",
+   "crime thriller film",
+   "thriller film",
+   "gangster film",
+   "suspense film",
+   "historical film",
+   "police procedural film",
+   "crime drama film",
+   "historical drama film"
+  ]
+ },
+ {
+  "qid": "Q184605",
+  "title": "2012",
+  "description": "film del 2009 diretto da Roland Emmerich",
+  "released": "2009-11-11T00:00:00Z",
+  "duration": 158,
+  "image": null,
+  "genres": [
+   "science fiction film",
+   "disaster film"
+  ]
+ },
+ {
+  "qid": "Q189540",
+  "title": "I sette samurai",
+  "description": "film del 1954 diretto da Akira Kurosawa",
+  "released": "1954-01-01T00:00:00Z",
+  "duration": 207,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Seven%20Samurai%20poster2.jpg",
+  "genres": [
+   "drama film",
+   "samurai cinema",
+   "action film",
+   "adventure film",
+   "epic film",
+   "historical drama"
+  ]
+ },
+ {
+  "qid": "Q190908",
+  "title": "Seven",
+  "description": "film del 1995 diretto da David Fincher",
+  "released": "1995-09-15T00:00:00Z",
+  "duration": 127,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "independent film",
+   "mystery film",
+   "horror film",
+   "crime thriller film",
+   "crime film",
+   "neo-noir",
+   "thriller film",
+   "buddy cop film",
+   "detective film",
+   "psychological horror film",
+   "psychological thriller film",
+   "police procedural film",
+   "crime drama film",
+   "psychological drama film",
+   "suspense film",
+   "chase film"
+  ]
+ },
+ {
+  "qid": "Q212965",
+  "title": "Hunger Games",
+  "description": "film del 2012 diretto da Gary Ross",
+  "released": "2012-03-21T00:00:00Z",
+  "duration": 142,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Hunger%20Games%20%28Liongate%20films%29%20logo.svg",
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "post-apocalyptic film",
+   "dystopian film",
+   "psychological thriller film"
+  ]
+ },
+ {
+  "qid": "Q214801",
+  "title": "The Truman Show",
+  "description": "film del 1998 diretto da Peter Weir",
+  "released": "1998-01-01T00:00:00Z",
+  "duration": 99,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "tragicomedy",
+   "science fiction film",
+   "dystopian fiction",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q152780",
+  "title": "Vita di Pi",
+  "description": "film del 2012 diretto da Ang Lee",
+  "released": "2012-12-20T00:00:00Z",
+  "duration": 127,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "adventure film",
+   "magic realist film",
+   "survival film"
+  ]
+ },
+ {
+  "qid": "Q171861",
+  "title": "The Artist",
+  "description": "film del 2011 diretto da Michel Hazanavicius",
+  "released": "2011-05-15T00:00:00Z",
+  "duration": 100,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "silent film",
+   "comedy drama",
+   "romance film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q484675",
+  "title": "Léon",
+  "description": "film del 1994 diretto da Luc Besson",
+  "released": "1994-09-14T00:00:00Z",
+  "duration": 110,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Leon%20the%20Professional.png",
+  "genres": [
+   "drama film",
+   "action film",
+   "crime film",
+   "mystery film",
+   "buddy film",
+   "gangster film",
+   "crime thriller film"
+  ]
+ },
+ {
+  "qid": "Q842306",
+  "title": "Saludos Amigos",
+  "description": "film d'animazione del 1943 diretto da Bill Roberts, Hamilton Luske, Jack Kinney e Wilfred Jackson",
+  "released": "1942-08-24T00:00:00Z",
+  "duration": 43,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Saludos%20Amigos%203.jpg",
+  "genres": [
+   "documentary film",
+   "fantasy film",
+   "musical film",
+   "live-action/animated film"
+  ]
+ },
+ {
+  "qid": "Q18002795",
+  "title": "Revenant - Redivivo",
+  "description": "film del 2015 diretto da Alejandro González Iñárritu",
+  "released": "2015-12-25T00:00:00Z",
+  "duration": 157,
+  "image": null,
+  "genres": [
+   "drama film",
+   "Western film",
+   "biographical film",
+   "survival film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q18406872",
+  "title": "Doctor Strange",
+  "description": "film del 2016 diretto da Scott Derrickson",
+  "released": "2016-10-20T00:00:00Z",
+  "duration": 115,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "superhero film",
+   "science fiction film"
+  ]
+ },
+ {
+  "qid": "Q47075",
+  "title": "Scarface",
+  "description": "film del 1983 diretto da Brian De Palma",
+  "released": "1983-01-01T00:00:00Z",
+  "duration": 170,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "crime film",
+   "epic film",
+   "crime thriller film",
+   "neo-noir",
+   "thriller film",
+   "gangster film",
+   "suspense film",
+   "police procedural film",
+   "crime drama film"
+  ]
+ },
+ {
+  "qid": "Q182944",
+  "title": "Shakespeare in Love",
+  "description": "film del 1998 diretto da John Madden",
+  "released": "1998-12-11T00:00:00Z",
+  "duration": 123,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "comedy drama",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q63026",
+  "title": "Il paziente inglese",
+  "description": "film del 1996 diretto da Anthony Minghella",
+  "released": "1996-01-01T00:00:00Z",
+  "duration": 162,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film",
+   "spy film",
+   "romance film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q188652",
+  "title": "Rocky",
+  "description": "film del 1976 diretto da John G. Avildsen",
+  "released": "1976-11-21T00:00:00Z",
+  "duration": 119,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "boxing film"
+  ]
+ },
+ {
+  "qid": "Q189505",
+  "title": "Lo squalo",
+  "description": "film del 1975 diretto da Steven Spielberg",
+  "released": "1975-06-20T00:00:00Z",
+  "duration": 124,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Jaws%20movie%20poster.png",
+  "genres": [
+   "adventure film",
+   "science fiction film",
+   "horror film",
+   "thriller film",
+   "science fiction horror film",
+   "suspense film",
+   "natural horror film",
+   "survival film"
+  ]
+ },
+ {
+  "qid": "Q190525",
+  "title": "Memento",
+  "description": "film del 2000 diretto da Christopher Nolan",
+  "released": "2000-09-05T00:00:00Z",
+  "duration": 113,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Memento.svg",
+  "genres": [
+   "drama film",
+   "film noir",
+   "mystery film",
+   "horror film",
+   "flashback film",
+   "crime film",
+   "neo-noir",
+   "thriller film",
+   "film based on a literary work"
+  ]
+ },
+ {
+  "qid": "Q190956",
+  "title": "Amadeus",
+  "description": "film del 1984 diretto da Miloš Forman",
+  "released": "1984-01-01T00:00:00Z",
+  "duration": 161,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Amadeus%20poster%20logo.png",
+  "genres": [
+   "drama film",
+   "period drama film",
+   "biographical film",
+   "musical film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q105702",
+  "title": "Il dottor Stranamore - Ovvero: come ho imparato a non preoccuparmi e ad amare la bomba",
+  "description": "film del 1964 diretto da Stanley Kubrick",
+  "released": "1964-01-01T00:00:00Z",
+  "duration": 102,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Dr.%20Strangelove%20-%20General%20Buck%20Turgidson.png",
+  "genres": [
+   "comedy film",
+   "war film",
+   "black comedy film"
+  ]
+ },
+ {
+  "qid": "Q109331",
+  "title": "Ritorno al futuro - Parte II",
+  "description": "film del 1989 diretto da Robert Zemeckis",
+  "released": "1989-11-22T00:00:00Z",
+  "duration": 108,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Hover%20board%20%28hovering%29.jpg",
+  "genres": [
+   "comedy film",
+   "science fiction film",
+   "dystopian film",
+   "time-travel film",
+   "teen film"
+  ]
+ },
+ {
+  "qid": "Q174385",
+  "title": "Alice in Wonderland",
+  "description": "film del 2010 diretto da Tim Burton",
+  "released": "2010-02-25T00:00:00Z",
+  "duration": 109,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "cinematic fairy tale"
+  ]
+ },
+ {
+  "qid": "Q181086",
+  "title": "Arancia meccanica",
+  "description": "film del 1971 diretto da Stanley Kubrick",
+  "released": "1971-01-01T00:00:00Z",
+  "duration": 136,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Clockwork%20Orange%20Trailer%20poster.png",
+  "genres": [
+   "drama film",
+   "action film",
+   "science fiction film",
+   "comedy drama",
+   "crime film",
+   "prison film",
+   "mystery film",
+   "crime comedy film",
+   "crime thriller film",
+   "thriller film",
+   "speculative fiction film",
+   "dystopian film",
+   "satirical film",
+   "exploitation film",
+   "arthouse science fiction film",
+   "crime drama film",
+   "black comedy film"
+  ]
+ },
+ {
+  "qid": "Q5887360",
+  "title": "Guardiani della galassia",
+  "description": "film del 2014 diretto da James Gunn",
+  "released": "2014-07-31T00:00:00Z",
+  "duration": 121,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "crime film",
+   "superhero film",
+   "science fiction film"
+  ]
+ },
+ {
+  "qid": "Q18547944",
+  "title": "Sopravvissuto - The Martian",
+  "description": "film del 2015 diretto da Ridley Scott",
+  "released": "2015-10-01T00:00:00Z",
+  "duration": 141,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "survival film"
+  ]
+ },
+ {
+  "qid": "Q19347291",
+  "title": "Deadpool",
+  "description": "film del 2016 diretto da Tim Miller",
+  "released": "2016-02-10T00:00:00Z",
+  "duration": 108,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Deadpool%2C%20Georgia%20Viaduct%2C%20Vancouver%2C%20April%206%202015%20-%203.jpg",
+  "genres": [
+   "action film",
+   "erotic film",
+   "superhero film",
+   "black comedy film"
+  ]
+ },
+ {
+  "qid": "Q202508",
+  "title": "La mummia",
+  "description": "film del 1999 diretto da Stephen Sommers",
+  "released": "1999-05-04T00:00:00Z",
+  "duration": 120,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "comedy film",
+   "action film",
+   "horror film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q184255",
+  "title": "Million Dollar Baby",
+  "description": "film del 2004 diretto da Clint Eastwood",
+  "released": "2004-01-01T00:00:00Z",
+  "duration": 132,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Maggie%27%20boxing%20gloves%20%28Million%20dollar%20baby%29%20Warner%20Bros.%20Studio%20Tour%20Hollywood.jpg",
+  "genres": [
+   "drama film",
+   "buddy film",
+   "boxing film"
+  ]
+ },
+ {
+  "qid": "Q60072",
+  "title": "Tutti insieme appassionatamente",
+  "description": "film del 1965 diretto da Robert Wise",
+  "released": "1965-03-02T00:00:00Z",
+  "duration": 174,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Sound%20of%20Music%20Christopher%20Plummer%20and%20Julie%20Andrews.jpg",
+  "genres": [
+   "drama film",
+   "biographical film",
+   "musical film",
+   "romance film"
+  ]
+ },
+ {
+  "qid": "Q188718",
+  "title": "Il ponte sul fiume Kwai",
+  "description": "film del 1957 diretto da David Lean",
+  "released": "1957-01-01T00:00:00Z",
+  "duration": 156,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Bridge%20on%20the%20River%20Kwai%20%28trailer%20screenshot%29.jpg",
+  "genres": [
+   "drama film",
+   "war film"
+  ]
+ },
+ {
+  "qid": "Q189330",
+  "title": "Il cavaliere oscuro - Il ritorno",
+  "description": "film del 2012 diretto da Christopher Nolan",
+  "released": "2012-07-20T00:00:00Z",
+  "duration": 164,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Batman%203.JPG",
+  "genres": [
+   "drama film",
+   "action film",
+   "superhero film",
+   "thriller film",
+   "crime thriller film"
+  ]
+ },
+ {
+  "qid": "Q209538",
+  "title": "Iron Man 3",
+  "description": "film del 2013 diretto da Shane Black",
+  "released": "2013-04-24T00:00:00Z",
+  "duration": 130,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q210364",
+  "title": "Shutter Island",
+  "description": "film del 2010 diretto da Martin Scorsese",
+  "released": "2010-02-13T00:00:00Z",
+  "duration": 138,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "psychological thriller",
+   "crime film",
+   "adventure film",
+   "mystery film",
+   "horror film",
+   "neo-noir",
+   "thriller film",
+   "crime drama film",
+   "suspense film",
+   "crime thriller film",
+   "psychological drama film",
+   "psychological horror film",
+   "psychological thriller film"
+  ]
+ },
+ {
+  "qid": "Q105387",
+  "title": "Independence Day",
+  "description": "film del 1996 diretto da Roland Emmerich",
+  "released": "1996-01-01T00:00:00Z",
+  "duration": 145,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "disaster film",
+   "alien invasion",
+   "thriller film",
+   "adventure science fiction"
+  ]
+ },
+ {
+  "qid": "Q151904",
+  "title": "Casino Royale",
+  "description": "film del 2006 diretto da Martin Campbell",
+  "released": "2006-11-14T00:00:00Z",
+  "duration": 144,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "crime film",
+   "spy film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q152350",
+  "title": "La corazzata Potëmkin",
+  "description": "film del 1925 diretto da Sergej Mikhajlovič Ėjzenštejn",
+  "released": "1925-12-21T00:00:00Z",
+  "duration": 74,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Battleship%20Potemkin-Ship%20portrait.jpg",
+  "genres": [
+   "drama film",
+   "silent film",
+   "historical drama",
+   "propaganda film"
+  ]
+ },
+ {
+  "qid": "Q1765358",
+  "title": "Captain America: The Winter Soldier",
+  "description": "film del 2014 diretto da Anthony e Joe Russo",
+  "released": "2014-03-26T00:00:00Z",
+  "duration": 136,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "superhero film",
+   "science fiction film"
+  ]
+ },
+ {
+  "qid": "Q18407657",
+  "title": "Captain America: Civil War",
+  "description": "film del 2016 diretto da Anthony e Joe Russo",
+  "released": "2016-04-27T00:00:00Z",
+  "duration": 147,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Brian-lynch-premiere-captain-america-civil-war-01.jpg",
+  "genres": [
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q20502242",
+  "title": "Wonder Woman",
+  "description": "film del 2017 diretto da Patty Jenkins",
+  "released": "2017-06-01T00:00:00Z",
+  "duration": 141,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Cosplayer%20in%20Wonder%20Woman%20costume%20at%20Igromir%202016%20%2829756516910%29.jpg",
+  "genres": [
+   "drama film",
+   "action film",
+   "fantasy film",
+   "adventure film",
+   "war film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q22665878",
+  "title": "Thor: Ragnarok",
+  "description": "film del 2017 diretto da Taika Waititi",
+  "released": "2017-01-01T00:00:00Z",
+  "duration": 130,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "action film",
+   "fantasy film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q48673898",
+  "title": "Green Book",
+  "description": "film del 2018 diretto da Peter Farrelly",
+  "released": "2018-09-11T00:00:00Z",
+  "duration": 130,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "road movie",
+   "biographical film",
+   "comedy drama",
+   "LGBTQ-related film"
+  ]
+ },
+ {
+  "qid": "Q39571",
+  "title": "Il mio vicino Totoro",
+  "description": "film di animazione del 1988 diretto da Hayao Miyazaki",
+  "released": "1988-01-01T00:00:00Z",
+  "duration": 86,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Tonari%20no%20Totoro%20title%20%28green%29.jpg",
+  "genres": [
+   "fantasy film",
+   "children's film",
+   "supernatural anime",
+   "drama anime and manga",
+   "fantasy anime and manga"
+  ]
+ },
+ {
+  "qid": "Q201293",
+  "title": "Vacanze romane",
+  "description": "film del 1953 diretto da William Wyler",
+  "released": "1953-08-27T00:00:00Z",
+  "duration": 118,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Hepburn%20Peck%201953.jpg",
+  "genres": [
+   "drama film",
+   "comedy film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q204191",
+  "title": "La vita è meravigliosa",
+  "description": "film del 1946 diretto da Frank Capra",
+  "released": "1946-12-20T00:00:00Z",
+  "duration": 125,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/James%20Stewart%20It%27s%20a%20Wonderful%20Life%20Still.jpg",
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "comedy film",
+   "flashback film",
+   "romantic comedy film",
+   "Christmas film"
+  ]
+ },
+ {
+  "qid": "Q72962",
+  "title": "Le iene",
+  "description": "film del 1992 diretto da Quentin Tarantino",
+  "released": "1992-01-21T00:00:00Z",
+  "duration": 99,
+  "image": null,
+  "genres": [
+   "drama film",
+   "adventure film",
+   "action film",
+   "independent film",
+   "heist film",
+   "crime film",
+   "comedy drama",
+   "mystery film",
+   "crime comedy film",
+   "thriller film",
+   "neo-noir",
+   "black comedy film",
+   "gangster film",
+   "suspense film",
+   "psychological drama film",
+   "psychological thriller film",
+   "crime drama film",
+   "crime thriller film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q190145",
+  "title": "Spider-Man 2",
+  "description": "film del 2004 diretto da Sam Raimi",
+  "released": "2004-06-30T00:00:00Z",
+  "duration": 122,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "science fiction film",
+   "superhero film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q193835",
+  "title": "Will Hunting - Genio ribelle",
+  "description": "film del 1997 diretto da Gus Van Sant",
+  "released": "1997-12-05T00:00:00Z",
+  "duration": 126,
+  "image": null,
+  "genres": [
+   "drama film",
+   "romance film",
+   "coming-of-age film"
+  ]
+ },
+ {
+  "qid": "Q104814",
+  "title": "Aliens - Scontro finale",
+  "description": "film del 1986 diretto da James Cameron",
+  "released": "1986-07-18T00:00:00Z",
+  "duration": 137,
+  "image": null,
+  "genres": [
+   "adventure film",
+   "action film",
+   "war film",
+   "horror film",
+   "science fiction film",
+   "monster film",
+   "thriller film",
+   "science fiction horror film",
+   "suspense film",
+   "science fiction action film"
+  ]
+ },
+ {
+  "qid": "Q160560",
+  "title": "Il codice da Vinci",
+  "description": "film del 2006, diretto da Ron Howard",
+  "released": "2006-05-17T00:00:00Z",
+  "duration": 149,
+  "image": null,
+  "genres": [
+   "drama film",
+   "crime film",
+   "mystery film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q179215",
+  "title": "Indiana Jones e il tempio maledetto",
+  "description": "film del 1984 diretto da Steven Spielberg",
+  "released": "1984-05-23T00:00:00Z",
+  "duration": 116,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Indiana%20Jones%20logo.svg",
+  "genres": [
+   "adventure film",
+   "action film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q719915",
+  "title": "Lo Hobbit - La desolazione di Smaug",
+  "description": "film del 2013 diretto da Peter Jackson",
+  "released": "2013-12-02T00:00:00Z",
+  "duration": 161,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q736731",
+  "title": "I tre caballeros",
+  "description": "film d'animazione del 1945 diretto da Norman Ferguson",
+  "released": "1944-12-21T00:00:00Z",
+  "duration": 70,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "comedy film",
+   "musical film",
+   "family film",
+   "children's film",
+   "live-action/animated film"
+  ]
+ },
+ {
+  "qid": "Q3604746",
+  "title": "Avatar - La via dell'acqua",
+  "description": "film del 2022 diretto da James Cameron",
+  "released": "2022-12-14T00:00:00Z",
+  "duration": 192,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Estrena%20en%20catal%C3%A0%20d%27Avatar%20El%20sentit%20de%20l%27aigua%203.jpg",
+  "genres": [
+   "drama film",
+   "action film",
+   "adventure film",
+   "epic film",
+   "science fiction film"
+  ]
+ },
+ {
+  "qid": "Q13619743",
+  "title": "Minions",
+  "description": "film d'animazione del 2015 diretto da Pierre Coffin e Kyle Balda",
+  "released": "2015-01-01T00:00:00Z",
+  "duration": 91,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "heist film",
+   "children's film"
+  ]
+ },
+ {
+  "qid": "Q18602670",
+  "title": "Spectre",
+  "description": "film del 2015 diretto da Sam Mendes",
+  "released": "2015-10-26T00:00:00Z",
+  "duration": 148,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "spy film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q26698156",
+  "title": "La forma dell'acqua - The Shape of Water",
+  "description": "film del 2017 diretto da Guillermo del Toro",
+  "released": "2017-08-31T00:00:00Z",
+  "duration": 123,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "romance film",
+   "thriller film",
+   "melodrama",
+   "magic realist film"
+  ]
+ },
+ {
+  "qid": "Q27985819",
+  "title": "Spider-Man: Far from Home",
+  "description": "film del 2019 diretto da Jon Watts",
+  "released": "2019-06-28T00:00:00Z",
+  "duration": 129,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film",
+   "speculative fiction film"
+  ]
+ },
+ {
+  "qid": "Q55436290",
+  "title": "Barbie",
+  "description": "film del 2023 diretto da Greta Gerwig",
+  "released": "2023-01-01T00:00:00Z",
+  "duration": 114,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Barbie%20and%20Ken%20costumes%20from%20Barbie%20movie%20at%20Warner%20Bros.%20Studio%20Tour%20Hollywood.jpg",
+  "genres": [
+   "comedy film",
+   "fantasy film",
+   "adventure film",
+   "musical film",
+   "romance film",
+   "teen film",
+   "family film",
+   "musical comedy",
+   "chick flick",
+   "fantasy comedy film",
+   "romantic comedy film",
+   "satirical film"
+  ]
+ },
+ {
+  "qid": "Q60834962",
+  "title": "Dune",
+  "description": "film del 2021 diretto da Denis Villeneuve",
+  "released": "2021-09-03T00:00:00Z",
+  "duration": 155,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "speculative fiction film"
+  ]
+ },
+ {
+  "qid": "Q68934496",
+  "title": "Spider-Man: No Way Home",
+  "description": "film del 2021 diretto da Jon Watts",
+  "released": "2021-12-15T00:00:00Z",
+  "duration": 148,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film",
+   "technofantasy"
+  ]
+ },
+ {
+  "qid": "Q11621",
+  "title": "E.T. l'extra-terrestre",
+  "description": "film del 1982 diretto da Steven Spielberg",
+  "released": "1982-06-11T00:00:00Z",
+  "duration": 115,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/E.T.%20figure%20at%20Madame%20Tussauds%20London.jpg",
+  "genres": [
+   "drama film",
+   "science fiction film",
+   "children's film",
+   "family film"
+  ]
+ },
+ {
+  "qid": "Q20456",
+  "title": "Balla coi lupi",
+  "description": "film del 1990 diretto da Kevin Costner",
+  "released": "1990-11-09T00:00:00Z",
+  "duration": 236,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Kevin%20Costner%20-Dances%20with%20Wolves.jpg",
+  "genres": [
+   "drama film",
+   "Western film",
+   "adventure film",
+   "war film",
+   "white savior film"
+  ]
+ },
+ {
+  "qid": "Q181540",
+  "title": "Quantum of Solace",
+  "description": "film del 2008 diretto da Marc Forster",
+  "released": "2008-10-29T00:00:00Z",
+  "duration": 106,
+  "image": null,
+  "genres": [
+   "adventure film",
+   "action film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q183066",
+  "title": "The Hurt Locker",
+  "description": "film del 2009 diretto da Kathryn Bigelow",
+  "released": "2008-09-04T00:00:00Z",
+  "duration": 131,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20hurt%20locker.svg",
+  "genres": [
+   "drama film",
+   "action film",
+   "war film",
+   "independent film",
+   "action thriller"
+  ]
+ },
+ {
+  "qid": "Q190588",
+  "title": "Love Actually - L'amore davvero",
+  "description": "film del 2003 diretto da Richard Curtis",
+  "released": "2003-11-06T00:00:00Z",
+  "duration": 135,
+  "image": null,
+  "genres": [
+   "tragicomedy",
+   "romantic comedy film",
+   "Christmas film"
+  ]
+ },
+ {
+  "qid": "Q107270",
+  "title": "Lost in Translation - L'amore tradotto",
+  "description": "film del 2003 diretto da Sofia Coppola",
+  "released": "2003-08-29T00:00:00Z",
+  "duration": 97,
+  "image": null,
+  "genres": [
+   "drama film",
+   "independent film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q622769",
+  "title": "L'uomo d'acciaio",
+  "description": "film del 2013 diretto da Zack Snyder",
+  "released": "2013-06-10T00:00:00Z",
+  "duration": 143,
+  "image": null,
+  "genres": [
+   "action film",
+   "science fiction film",
+   "superhero film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q5901134",
+  "title": "Ant-Man",
+  "description": "film del 2015 diretto da Peyton Reed",
+  "released": "2015-07-17T00:00:00Z",
+  "duration": 117,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q47300912",
+  "title": "C'era una volta a... Hollywood",
+  "description": "film del 2019 diretto da Quentin Tarantino",
+  "released": "2019-07-26T00:00:00Z",
+  "duration": 161,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "alternate history",
+   "comedy drama",
+   "crime film",
+   "black comedy film",
+   "alternate history film"
+  ]
+ },
+ {
+  "qid": "Q19089",
+  "title": "GoldenEye",
+  "description": "film del 1995 su James Bond diretto da Martin Campbell",
+  "released": "1995-01-01T00:00:00Z",
+  "duration": 130,
+  "image": null,
+  "genres": [
+   "action film",
+   "spy film",
+   "action thriller"
+  ]
+ },
+ {
+  "qid": "Q200299",
+  "title": "Eva contro Eva",
+  "description": "film del 1950 diretto da Joseph L. Mankiewicz",
+  "released": "1950-01-01T00:00:00Z",
+  "duration": 138,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Bette%20Davis%20and%20Gary%20Merrill%20in%20All%20About%20Eve.jpg",
+  "genres": [
+   "drama film",
+   "comedy film"
+  ]
+ },
+ {
+  "qid": "Q202211",
+  "title": "Gandhi",
+  "description": "film del 1982 diretto da Richard Attenborough",
+  "released": "1982-11-30T00:00:00Z",
+  "duration": 185,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "flashback film",
+   "historical drama"
+  ]
+ },
+ {
+  "qid": "Q182212",
+  "title": "Spider-Man 3",
+  "description": "film del 2007 diretto da Sam Raimi",
+  "released": "2007-05-01T00:00:00Z",
+  "duration": 139,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "science fiction film",
+   "thriller film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q183063",
+  "title": "The Sixth Sense - Il sesto senso",
+  "description": "film del 1999 diretto da M. Night Shyamalan",
+  "released": "1999-01-01T00:00:00Z",
+  "duration": 107,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Haley%20Joel%20Osment%20in%202001.jpg",
+  "genres": [
+   "drama film",
+   "horror film",
+   "mystery film",
+   "thriller film",
+   "suspense film",
+   "psychological drama film",
+   "psychological horror film",
+   "psychological thriller film",
+   "ghost film"
+  ]
+ },
+ {
+  "qid": "Q185658",
+  "title": "Indiana Jones e l'ultima crociata",
+  "description": "film del 1989 diretto da Steven Spielberg",
+  "released": "1989-05-24T00:00:00Z",
+  "duration": 122,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/ExpoSYFY%20-%20Indiana%20Jones%20and%20the%20Last%20Crusade%20%2810746697934%29.jpg",
+  "genres": [
+   "adventure film",
+   "action comedy film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q213411",
+  "title": "Cast Away",
+  "description": "film del 2000 diretto da Robert Zemeckis",
+  "released": "2000-12-07T00:00:00Z",
+  "duration": 143,
+  "image": null,
+  "genres": [
+   "drama film",
+   "robinsonade",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q220741",
+  "title": "City of God",
+  "description": "film del 2002 diretto da Fernando Meirelles e Kátia Lund",
+  "released": "2002-05-18T00:00:00Z",
+  "duration": 128,
+  "image": null,
+  "genres": [
+   "drama film",
+   "crime film",
+   "coming-of-age film",
+   "hood film"
+  ]
+ },
+ {
+  "qid": "Q151599",
+  "title": "Metropolis",
+  "description": "film del 1927 diretto da Fritz Lang",
+  "released": "1927-01-10T00:00:00Z",
+  "duration": 153,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Horst%20von%20Harbou%20-%20Metropolis%20set%20photograph%2005.jpg",
+  "genres": [
+   "drama film",
+   "science fiction film",
+   "silent film",
+   "arthouse science fiction film",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q154581",
+  "title": "Gangs of New York",
+  "description": "film del 2002 diretto da Martin Scorsese",
+  "released": "2002-12-20T00:00:00Z",
+  "duration": 168,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "period drama film",
+   "epic film",
+   "crime film",
+   "mystery film",
+   "gangster film",
+   "historical film",
+   "crime drama film",
+   "historical drama film"
+  ]
+ },
+ {
+  "qid": "Q171453",
+  "title": "Transformers",
+  "description": "film del 2007 diretto da Michael Bay",
+  "released": "2007-06-12T00:00:00Z",
+  "duration": 143,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Transformers%20Cars.jpg",
+  "genres": [
+   "action film",
+   "science fiction film",
+   "alien invasion"
+  ]
+ },
+ {
+  "qid": "Q1201853",
+  "title": "Thor: The Dark World",
+  "description": "film del 2013 diretto da Alan Taylor",
+  "released": "2013-10-31T00:00:00Z",
+  "duration": 112,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q186323",
+  "title": "Borat - Studio culturale sull'America a beneficio della gloriosa nazione del Kazakistan",
+  "description": "film del 2006 diretto da Larry Charles",
+  "released": "2006-08-04T00:00:00Z",
+  "duration": 84,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Borat%20in%20Cologne.jpg",
+  "genres": [
+   "comedy film",
+   "parody film",
+   "mockumentary"
+  ]
+ },
+ {
+  "qid": "Q193695",
+  "title": "Il mago di Oz",
+  "description": "film del 1939 diretto da Victor Fleming",
+  "released": "1939-08-25T00:00:00Z",
+  "duration": 98,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/WIZARD%20OF%20OZ%20ORIGINAL%20POSTER%201939.jpg",
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "adventure film",
+   "musical film",
+   "family film",
+   "cinematic fairy tale"
+  ]
+ },
+ {
+  "qid": "Q207698",
+  "title": "Le crociate - Kingdom of Heaven",
+  "description": "film del 2005 diretto da Ridley Scott",
+  "released": "2005-01-01T00:00:00Z",
+  "duration": 190,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "war film",
+   "epic film",
+   "historical film",
+   "drama fiction"
+  ]
+ },
+ {
+  "qid": "Q208269",
+  "title": "Se mi lasci ti cancello",
+  "description": "film del 2004 diretto da Michel Gondry",
+  "released": "2004-03-09T00:00:00Z",
+  "duration": 104,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "comedy drama",
+   "romantic comedy",
+   "science fiction film",
+   "melodrama"
+  ]
+ },
+ {
+  "qid": "Q221202",
+  "title": "Mamma, ho riperso l'aereo: mi sono smarrito a New York",
+  "description": "film del 1992 diretto da Chris Columbus",
+  "released": "1992-11-20T00:00:00Z",
+  "duration": 120,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "mystery film",
+   "family film",
+   "Christmas film"
+  ]
+ },
+ {
+  "qid": "Q229808",
+  "title": "The Amazing Spider-Man",
+  "description": "film del 2012 diretto da Marc Webb",
+  "released": "2012-06-28T00:00:00Z",
+  "duration": 136,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20amazing%20Spider-Man.svg",
+  "genres": [
+   "action film",
+   "biopunk",
+   "teen film",
+   "science fiction film",
+   "superhero film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q108297",
+  "title": "Spartacus",
+  "description": "film del 1960 diretto da Stanley Kubrick",
+  "released": "1960-10-08T00:00:00Z",
+  "duration": 198,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Spartacus%20-%201960%20-%20poster.png",
+  "genres": [
+   "drama film",
+   "action film",
+   "war film",
+   "biographical film",
+   "epic film",
+   "romance film",
+   "sword-and-sandal film",
+   "historical film",
+   "historical drama film"
+  ]
+ },
+ {
+  "qid": "Q132351",
+  "title": "I soliti sospetti",
+  "description": "film del 1995 diretto da Bryan Singer",
+  "released": "1995-01-01T00:00:00Z",
+  "duration": 106,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "heist film",
+   "mystery film",
+   "thriller film",
+   "crime thriller film",
+   "flashback film",
+   "crime drama film",
+   "neo-noir",
+   "detective film",
+   "gangster film",
+   "suspense film"
+  ]
+ },
+ {
+  "qid": "Q155476",
+  "title": "Fast and Furious",
+  "description": "film del 2001 diretto da Rob Cohen",
+  "released": "2001-06-22T00:00:00Z",
+  "duration": 103,
+  "image": null,
+  "genres": [
+   "action film",
+   "crime film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q486239",
+  "title": "Saw - L'enigmista",
+  "description": "film del 2004 diretto da James Wan",
+  "released": "2003-01-01T00:00:00Z",
+  "duration": 103,
+  "image": null,
+  "genres": [
+   "horror film",
+   "crime film",
+   "gore film"
+  ]
+ },
+ {
+  "qid": "Q919649",
+  "title": "Lo Hobbit - La battaglia delle cinque armate",
+  "description": "film del 2014 diretto da Peter Jackson",
+  "released": "2014-12-01T00:00:00Z",
+  "duration": 144,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "adventure film",
+   "action film"
+  ]
+ },
+ {
+  "qid": "Q20001199",
+  "title": "Guardiani della Galassia Vol. 2",
+  "description": "film del 2017 diretto da James Gunn",
+  "released": "2017-05-05T00:00:00Z",
+  "duration": 136,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "science fiction film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q131547207",
+  "title": "Odissea",
+  "description": "film del 2026 diretto da Christopher Nolan",
+  "released": "2026-07-06T00:00:00Z",
+  "duration": 172,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Odyssey%20Press%20Conference%20at%20Seoul%20%28August%203%2C%202026%29.jpg",
+  "genres": [
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "epic film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q14320",
+  "title": "The Day After Tomorrow - L'alba del giorno dopo",
+  "description": "film del 2004 diretto da Roland Emmerich",
+  "released": "2004-05-27T00:00:00Z",
+  "duration": 118,
+  "image": null,
+  "genres": [
+   "action film",
+   "disaster film",
+   "apocalyptic film"
+  ]
+ },
+ {
+  "qid": "Q200396",
+  "title": "Sherlock Holmes",
+  "description": "film del 2009 diretto da Guy Ritchie",
+  "released": "2009-12-24T00:00:00Z",
+  "duration": 128,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "mystery film",
+   "crime thriller film",
+   "buddy cop film"
+  ]
+ },
+ {
+  "qid": "Q200804",
+  "title": "Predator",
+  "description": "film del 1987 diretto da John McTiernan",
+  "released": "1987-06-12T00:00:00Z",
+  "duration": 107,
+  "image": null,
+  "genres": [
+   "action film",
+   "horror film",
+   "adventure film",
+   "science fiction film",
+   "monster film",
+   "thriller film",
+   "science fiction action film",
+   "suspense film",
+   "science fiction horror film"
+  ]
+ },
+ {
+  "qid": "Q202548",
+  "title": "La donna che visse due volte",
+  "description": "film del 1958 diretto da Alfred Hitchcock",
+  "released": "1958-01-01T00:00:00Z",
+  "duration": 128,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Vertigo%201958%20trailer%20Stewart%20looking.jpg",
+  "genres": [
+   "drama film",
+   "mystery film",
+   "thriller film",
+   "melodrama",
+   "romance film",
+   "psychological drama film",
+   "psychological thriller film"
+  ]
+ },
+ {
+  "qid": "Q188035",
+  "title": "Apocalypto",
+  "description": "film del 2006 diretto da Mel Gibson",
+  "released": "2006-01-01T00:00:00Z",
+  "duration": 139,
+  "image": null,
+  "genres": [
+   "drama film",
+   "historical drama"
+  ]
+ },
+ {
+  "qid": "Q189600",
+  "title": "Matrix Reloaded",
+  "description": "film del 2003 diretto da Andy e Larry Wachowski",
+  "released": "2003-01-01T00:00:00Z",
+  "duration": 138,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The.Matrix.glmatrix.2.png",
+  "genres": [
+   "action film",
+   "cyberpunk",
+   "martial arts film",
+   "science fiction film",
+   "superhero film",
+   "thriller film",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q190643",
+  "title": "Platoon",
+  "description": "film del 1986, diretto da Oliver Stone",
+  "released": "1986-01-01T00:00:00Z",
+  "duration": 118,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "war film"
+  ]
+ },
+ {
+  "qid": "Q218235",
+  "title": "La fabbrica di cioccolato",
+  "description": "film del 2005 diretto da Tim Burton",
+  "released": "2005-07-10T00:00:00Z",
+  "duration": 115,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Dragon%20Con%202016%20Charlie%20and%20the%20Chocolate%20Factory%20cosplayers.jpg",
+  "genres": [
+   "fantasy film",
+   "musical film",
+   "family film",
+   "black comedy film"
+  ]
+ },
+ {
+  "qid": "Q219421",
+  "title": "The Mask",
+  "description": "film del 1994 diretto da Chuck Russell",
+  "released": "1994-07-29T00:00:00Z",
+  "duration": 97,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "fantasy film",
+   "superhero film",
+   "gangster film",
+   "speculative fiction film"
+  ]
+ },
+ {
+  "qid": "Q230552",
+  "title": "Ritorno al futuro - Parte III",
+  "description": "film del 1990 diretto da Robert Zemeckis",
+  "released": "1990-05-25T00:00:00Z",
+  "duration": 118,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Zur%C3%BCck%20in%20die%20zukunft%203%20logo.svg",
+  "genres": [
+   "comedy film",
+   "Western film",
+   "science fiction film",
+   "teen film",
+   "time-travel film"
+  ]
+ },
+ {
+  "qid": "Q273978",
+  "title": "La tigre e il dragone",
+  "description": "film del 2000 diretto da Ang Lee",
+  "released": "2000-05-18T00:00:00Z",
+  "duration": 115,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "adventure film",
+   "action film",
+   "martial arts film",
+   "romance film"
+  ]
+ },
+ {
+  "qid": "Q172837",
+  "title": "Ladri di biciclette",
+  "description": "film del 1948 diretto da Vittorio De Sica",
+  "released": "1948-01-01T00:00:00Z",
+  "duration": 90,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Photo%20Gino%20Saltamerenda%2C%20Lamberto%20Maggiorani%20and%20other%20actors%20in%20a%20scene%20fromLadri%20di%20biciclette%2C%20a%201948%20film%20directed%20by%20Vittorio%20De%20Sica.%201948%20-%20Touring%20Club%20Italiano%2004%201379.jpg",
+  "genres": [
+   "drama film",
+   "art film"
+  ]
+ },
+ {
+  "qid": "Q4254026",
+  "title": "The Amazing Spider-Man 2 - Il potere di Electro",
+  "description": "film del 2014 diretto da Marc Webb",
+  "released": "2014-04-17T00:00:00Z",
+  "duration": 142,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Amazing%20Spider-Man%202%202014-04-05%2018-17.png",
+  "genres": [
+   "action film",
+   "science fiction film",
+   "teen film",
+   "biopunk",
+   "thriller film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q18199330",
+  "title": "Animali fantastici e dove trovarli",
+  "description": "film del 2016 diretto da David Yates",
+  "released": "2016-11-16T00:00:00Z",
+  "duration": 133,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Fantastic%20Beasts%20%26%20Where%20to%20Find%20Them%20Cast%20%28Cropped%29.jpg",
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "adventure film",
+   "children's film"
+  ]
+ },
+ {
+  "qid": "Q18604504",
+  "title": "Suicide Squad",
+  "description": "film del 2016 diretto da David Ayer",
+  "released": "2016-08-03T00:00:00Z",
+  "duration": 123,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Sebevra%C5%BEedn%C3%BD%20odd%C3%ADl%20v%20kin%C4%9B%20Imax.jpg",
+  "genres": [
+   "fantasy film",
+   "action film",
+   "science fiction film",
+   "adventure film",
+   "prison film",
+   "vigilante film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q20382729",
+  "title": "Arrival",
+  "description": "film del 2016 diretto da Denis Villeneuve",
+  "released": "2016-11-10T00:00:00Z",
+  "duration": 116,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Arrival%202016%20Film.png",
+  "genres": [
+   "drama film",
+   "science fiction film",
+   "mystery film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q29054009",
+  "title": "Terminator 3 - Le macchine ribelli",
+  "description": "film del 2003 diretto da Jonathan Mostow",
+  "released": "2003-07-02T00:00:00Z",
+  "duration": 105,
+  "image": null,
+  "genres": [
+   "cyberpunk",
+   "action film",
+   "science fiction film",
+   "adventure film",
+   "suspense film",
+   "chase film",
+   "science fiction action film",
+   "apocalyptic film",
+   "techno-thriller",
+   "thriller film",
+   "dystopian film",
+   "time-travel film"
+  ]
+ },
+ {
+  "qid": "Q51416",
+  "title": "Men in Black",
+  "description": "film del 1997 diretto da Barry Sonnenfeld",
+  "released": "1997-07-02T00:00:00Z",
+  "duration": 94,
+  "image": null,
+  "genres": [
+   "action film",
+   "comedy film",
+   "science fiction film",
+   "buddy film",
+   "buddy cop film"
+  ]
+ },
+ {
+  "qid": "Q200873",
+  "title": "Il mondo perduto - Jurassic Park",
+  "description": "film del 1997 diretto da Steven Spielberg",
+  "released": "1997-05-23T00:00:00Z",
+  "duration": 129,
+  "image": null,
+  "genres": [
+   "adventure film",
+   "action film",
+   "science fiction film"
+  ]
+ },
+ {
+  "qid": "Q201924",
+  "title": "The Aviator",
+  "description": "film del 2004 diretto da Martin Scorsese",
+  "released": "2004-12-14T00:00:00Z",
+  "duration": 170,
+  "image": null,
+  "genres": [
+   "drama film",
+   "adventure film",
+   "biographical film",
+   "epic film",
+   "thriller film",
+   "historical drama film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q182373",
+  "title": "Indiana Jones e il regno del teschio di cristallo",
+  "description": "film del 2008 diretto da Steven Spielberg",
+  "released": "2008-05-21T00:00:00Z",
+  "duration": 123,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Image%20of%20Mauna%20Kea%20from%20the%20Hilo%20suburbs.jpg",
+  "genres": [
+   "action film",
+   "adventure film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q59653",
+  "title": "Argo",
+  "description": "film del 2012 diretto da Ben Affleck",
+  "released": "2012-08-31T00:00:00Z",
+  "duration": 120,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "thriller film",
+   "historical film",
+   "political thriller film"
+  ]
+ },
+ {
+  "qid": "Q192686",
+  "title": "Prometheus",
+  "description": "film del 2012 diretto da Ridley Scott",
+  "released": "2012-05-30T00:00:00Z",
+  "duration": 124,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Prometheus.svg",
+  "genres": [
+   "action film",
+   "horror film",
+   "adventure film",
+   "science fiction film",
+   "monster film",
+   "thriller film",
+   "science fiction action film",
+   "religious horror",
+   "science fiction horror film",
+   "suspense film"
+  ]
+ },
+ {
+  "qid": "Q207130",
+  "title": "L'ultimo samurai",
+  "description": "film del 2003 diretto da Edward Zwick",
+  "released": "2003-11-20T00:00:00Z",
+  "duration": 154,
+  "image": null,
+  "genres": [
+   "drama film",
+   "adventure film",
+   "war film",
+   "action film",
+   "white savior film",
+   "ninja film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q207536",
+  "title": "Matrix Revolutions",
+  "description": "film del 2003 diretto da Andy e Larry Wachowski",
+  "released": "2003-01-01T00:00:00Z",
+  "duration": 129,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The.Matrix.glmatrix.2.png",
+  "genres": [
+   "cyberpunk",
+   "action film",
+   "science fiction film",
+   "superhero film",
+   "science fiction action film",
+   "wuxia film"
+  ]
+ },
+ {
+  "qid": "Q229633",
+  "title": "3 Idiots",
+  "description": "film del 2010 diretto da Rajkumar Hirani",
+  "released": "2009-12-23T00:00:00Z",
+  "duration": 164,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "buddy film",
+   "musical film",
+   "comedy drama",
+   "romance film"
+  ]
+ },
+ {
+  "qid": "Q233464",
+  "title": "Io e Annie",
+  "description": "film di Woody Allen del 1977",
+  "released": "1977-01-01T00:00:00Z",
+  "duration": 93,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "romantic comedy"
+  ]
+ },
+ {
+  "qid": "Q76479",
+  "title": "Per un pugno di dollari",
+  "description": "film del 1964 diretto da Sergio Leone",
+  "released": "1964-01-01T00:00:00Z",
+  "duration": 99,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Clint%20Eastwood%20-%201960s.JPG",
+  "genres": [
+   "action film",
+   "Western film",
+   "Spaghetti Western"
+  ]
+ },
+ {
+  "qid": "Q106440",
+  "title": "Agente 007 - Missione Goldfinger",
+  "description": "film del 1964 diretto da Guy Hamilton",
+  "released": "1964-09-17T00:00:00Z",
+  "duration": 109,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/ETH-BIB%20Goldfinger%201964%20%E2%80%93%20Com%20C13-035-006.jpg",
+  "genres": [
+   "action film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q116852",
+  "title": "Batman",
+  "description": "film del 1989 diretto da Tim Burton",
+  "released": "1989-01-01T00:00:00Z",
+  "duration": 126,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Batman%20cossplay.JPG",
+  "genres": [
+   "action film",
+   "superhero film",
+   "neo-noir"
+  ]
+ },
+ {
+  "qid": "Q175038",
+  "title": "L'esercito delle 12 scimmie",
+  "description": "film del 1995 diretto da Terry Gilliam",
+  "released": "1995-01-01T00:00:00Z",
+  "duration": 131,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/12singes.PNG",
+  "genres": [
+   "post-apocalyptic film",
+   "dystopian film",
+   "neo-noir"
+  ]
+ },
+ {
+  "qid": "Q853718",
+  "title": "Bongo e i tre avventurieri",
+  "description": "film d'animazione del 1947 diretto da Jack Kinney, Bill Roberts, Hamilton Luske e William Morgan",
+  "released": "1947-09-27T00:00:00Z",
+  "duration": 73,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "musical film",
+   "romantic comedy",
+   "children's film",
+   "live-action/animated film"
+  ]
+ },
+ {
+  "qid": "Q14772351",
+  "title": "Batman v Superman: Dawn of Justice",
+  "description": "film del 2016 diretto da Zack Snyder",
+  "released": "2016-03-23T00:00:00Z",
+  "duration": 182,
+  "image": null,
+  "genres": [
+   "crossover fiction",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q15079318",
+  "title": "La teoria del tutto",
+  "description": "film del 2014 diretto da James Marsh",
+  "released": "2014-01-01T00:00:00Z",
+  "duration": 123,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "melodrama",
+   "historical film",
+   "romance film"
+  ]
+ },
+ {
+  "qid": "Q189889",
+  "title": "Chicago",
+  "description": "film del 2002 diretto da Rob Marshall",
+  "released": "2002-01-01T00:00:00Z",
+  "duration": 113,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "musical film",
+   "comedy drama",
+   "prison film",
+   "detective film"
+  ]
+ },
+ {
+  "qid": "Q191040",
+  "title": "Mr. & Mrs. Smith",
+  "description": "film del 2005 diretto da Doug Liman",
+  "released": "2005-06-07T00:00:00Z",
+  "duration": 126,
+  "image": null,
+  "genres": [
+   "action film",
+   "screwball comedy film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q206124",
+  "title": "Midnight in Paris",
+  "description": "film del 2011 diretto da Woody Allen",
+  "released": "2011-05-11T00:00:00Z",
+  "duration": 94,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "science fiction film",
+   "romantic comedy film",
+   "magic realist film",
+   "time-travel film"
+  ]
+ },
+ {
+  "qid": "Q208572",
+  "title": "American History X",
+  "description": "film del 1998 diretto da Tony Kaye",
+  "released": "1998-01-01T00:00:00Z",
+  "duration": 114,
+  "image": null,
+  "genres": [
+   "drama film",
+   "independent film",
+   "crime film",
+   "prison film"
+  ]
+ },
+ {
+  "qid": "Q209170",
+  "title": "Mary Poppins",
+  "description": "film del 1964 diretto da Robert Stevenson",
+  "released": "1964-08-27T00:00:00Z",
+  "duration": 140,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "fantasy film",
+   "musical film",
+   "family film",
+   "live-action/animated film"
+  ]
+ },
+ {
+  "qid": "Q212775",
+  "title": "L'ultimo imperatore",
+  "description": "film del 1987 diretto da Bernardo Bertolucci",
+  "released": "1987-10-04T00:00:00Z",
+  "duration": 165,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Tobu%20World%20Square%20Forbidden%20City%20Last%20Emperor%201.jpg",
+  "genres": [
+   "drama film",
+   "biographical film",
+   "epic film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q217189",
+  "title": "Il settimo sigillo",
+  "description": "film del 1957 diretto da Ingmar Bergman",
+  "released": "1957-02-16T00:00:00Z",
+  "duration": 96,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Sjunde%20inseglet%201957.jpg",
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q74958",
+  "title": "Blood Diamond - Diamanti di sangue",
+  "description": "film del 2006 diretto da Edward Zwick",
+  "released": "2006-12-08T00:00:00Z",
+  "duration": 143,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "adventure film",
+   "war film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q104137",
+  "title": "Gli spietati",
+  "description": "film del 1992 diretto da Clint Eastwood",
+  "released": "1992-01-01T00:00:00Z",
+  "duration": 131,
+  "image": null,
+  "genres": [
+   "drama film",
+   "Western film",
+   "crime film"
+  ]
+ },
+ {
+  "qid": "Q106182",
+  "title": "X-Men",
+  "description": "film del 2000 diretto da Bryan Singer",
+  "released": "2000-07-13T00:00:00Z",
+  "duration": 104,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "science fiction film",
+   "superhero film",
+   "action thriller"
+  ]
+ },
+ {
+  "qid": "Q106428",
+  "title": "Apollo 13",
+  "description": "film del 1995 diretto da Ron Howard",
+  "released": "1995-06-30T00:00:00Z",
+  "duration": 134,
+  "image": null,
+  "genres": [
+   "drama film",
+   "adventure film",
+   "docudrama",
+   "disaster film",
+   "survival film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q106506",
+  "title": "Il quinto elemento",
+  "description": "film del 1997 diretto da Luc Besson",
+  "released": "1997-05-07T00:00:00Z",
+  "duration": 121,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "comedy film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q106571",
+  "title": "A 007, dalla Russia con amore",
+  "description": "film del 1963 diretto da Terence Young",
+  "released": "1963-01-01T00:00:00Z",
+  "duration": 115,
+  "image": null,
+  "genres": [
+   "action film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q109135",
+  "title": "Trainspotting",
+  "description": "film del 1996 diretto da Danny Boyle",
+  "released": "1996-01-01T00:00:00Z",
+  "duration": 94,
+  "image": null,
+  "genres": [
+   "drama film",
+   "buddy film",
+   "independent film",
+   "crime film",
+   "magic realist film"
+  ]
+ },
+ {
+  "qid": "Q318766",
+  "title": "The Terminal",
+  "description": "film del 2004 diretto da Steven Spielberg",
+  "released": "2004-06-15T00:00:00Z",
+  "duration": 128,
+  "image": null,
+  "genres": [
+   "drama film",
+   "tragicomedy"
+  ]
+ },
+ {
+  "qid": "Q426828",
+  "title": "Donnie Darko",
+  "description": "film del 2001 diretto da Richard Kelly",
+  "released": "2001-01-01T00:00:00Z",
+  "duration": 134,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Donnie%20Darko%20logo.png",
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "comedy film",
+   "horror film",
+   "science fiction film",
+   "mystery film",
+   "comedy drama",
+   "thriller film",
+   "suspense film",
+   "psychological drama film",
+   "psychological thriller film",
+   "magic realist film",
+   "comedy horror film",
+   "psychological horror film",
+   "science fiction horror film"
+  ]
+ },
+ {
+  "qid": "Q10350033",
+  "title": "Pirati dei Caraibi - La vendetta di Salazar",
+  "description": "film del 2017 diretto da Joachim Rønning ed Espen Sandberg",
+  "released": "2017-05-24T00:00:00Z",
+  "duration": 129,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "comedy film",
+   "swashbuckler film",
+   "pirate film",
+   "treasure hunt film"
+  ]
+ },
+ {
+  "qid": "Q14918344",
+  "title": "The Imitation Game",
+  "description": "film del 2014 diretto da Morten Tyldum",
+  "released": "2014-08-29T00:00:00Z",
+  "duration": 114,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film",
+   "biographical film",
+   "LGBTQ-related film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q21935651",
+  "title": "Dunkirk",
+  "description": "film del 2017 diretto da Christopher Nolan",
+  "released": "2017-07-13T00:00:00Z",
+  "duration": 106,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Dunkirk-Teaser-Poster-640x949.jpg",
+  "genres": [
+   "drama film",
+   "war film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q23781129",
+  "title": "Captain Marvel",
+  "description": "film del 2019 diretto da Anna Boden e Ryan Fleck",
+  "released": "2019-03-06T00:00:00Z",
+  "duration": 124,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q22957393",
+  "title": "Ant-Man and the Wasp",
+  "description": "film del 2018 diretto da Peyton Reed",
+  "released": "2018-07-04T00:00:00Z",
+  "duration": 118,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q22998395",
+  "title": "Aquaman",
+  "description": "film del 2018 diretto da James Wan",
+  "released": "2018-11-26T00:00:00Z",
+  "duration": 143,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Chris%20Hardwick%20%26%20Jason%20Momoa%20%2835368589944%29%20%28cropped%29.jpg",
+  "genres": [
+   "action film",
+   "fantasy film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q23006268",
+  "title": "Venom",
+  "description": "film del 2018 diretto da Ruben Fleischer",
+  "released": "2018-10-04T00:00:00Z",
+  "duration": 112,
+  "image": null,
+  "genres": [
+   "thriller film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q61117344",
+  "title": "The Batman",
+  "description": "film del 2022 diretto da Matt Reeves",
+  "released": "2022-02-23T00:00:00Z",
+  "duration": 176,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Batman%202022%20film%20logo.png",
+  "genres": [
+   "drama film",
+   "action film",
+   "thriller film",
+   "crime film",
+   "detective film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q34414",
+  "title": "La finestra sul cortile",
+  "description": "film del 1954 diretto da Alfred Hitchcock",
+  "released": "1954-01-01T00:00:00Z",
+  "duration": 112,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Rearwindow%20trailer%203.jpg",
+  "genres": [
+   "drama film",
+   "thriller film",
+   "mystery film",
+   "crime film",
+   "detective film",
+   "psychological drama film",
+   "psychological thriller film",
+   "crime drama film",
+   "crime thriller film"
+  ]
+ },
+ {
+  "qid": "Q201674",
+  "title": "Il cacciatore",
+  "description": "film del 1978 diretto da Michael Cimino",
+  "released": "1978-12-08T00:00:00Z",
+  "duration": 185,
+  "image": null,
+  "genres": [
+   "drama film",
+   "epic film",
+   "war film",
+   "anti-war film",
+   "war drama"
+  ]
+ },
+ {
+  "qid": "Q204212",
+  "title": "Rebecca, la prima moglie",
+  "description": "film del 1940 diretto da Alfred Hitchcock",
+  "released": "1940-01-01T00:00:00Z",
+  "duration": 126,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Rebecca%20%281939%20poster%29.jpeg",
+  "genres": [
+   "drama film",
+   "romance film",
+   "mystery film",
+   "melodrama",
+   "thriller film",
+   "psychological drama film",
+   "erotic thriller film",
+   "psychological thriller film"
+  ]
+ },
+ {
+  "qid": "Q183239",
+  "title": "Il curioso caso di Benjamin Button",
+  "description": "film del 2008 diretto da David Fincher",
+  "released": "2008-12-10T00:00:00Z",
+  "duration": 166,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "romance film",
+   "speculative fiction film"
+  ]
+ },
+ {
+  "qid": "Q192115",
+  "title": "Sin City",
+  "description": "film del 2005 diretto da Robert Rodríguez, Frank Miller e Quentin Tarantino",
+  "released": "2005-04-01T00:00:00Z",
+  "duration": 124,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Sincity-logo.svg",
+  "genres": [
+   "drama film",
+   "film noir",
+   "action film",
+   "anthology film",
+   "adventure film",
+   "neo-noir",
+   "thriller film",
+   "mystery film",
+   "vigilante film",
+   "crime film",
+   "gangster film",
+   "crime drama film",
+   "crime thriller film"
+  ]
+ },
+ {
+  "qid": "Q206388",
+  "title": "C'era una volta in America",
+  "description": "film del 1984 diretto da Sergio Leone",
+  "released": "1984-05-23T00:00:00Z",
+  "duration": 229,
+  "image": null,
+  "genres": [
+   "drama film",
+   "documentary film",
+   "Western film",
+   "action film",
+   "period drama film",
+   "epic film",
+   "crime film",
+   "crime thriller film",
+   "thriller film",
+   "historical film",
+   "flashback film",
+   "gangster film",
+   "crime drama film",
+   "historical drama film"
+  ]
+ },
+ {
+  "qid": "Q206576",
+  "title": "Hugo Cabret",
+  "description": "film del 2011 diretto da Martin Scorsese",
+  "released": "2011-10-10T00:00:00Z",
+  "duration": 126,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Hugo%20logo.png",
+  "genres": [
+   "drama film",
+   "adventure film",
+   "mystery film",
+   "steampunk film"
+  ]
+ },
+ {
+  "qid": "Q209481",
+  "title": "Eyes Wide Shut",
+  "description": "film del 1999 diretto da Stanley Kubrick",
+  "released": "1999-01-01T00:00:00Z",
+  "duration": 159,
+  "image": null,
+  "genres": [
+   "drama film",
+   "mystery film",
+   "melodrama",
+   "erotic film",
+   "erotic thriller",
+   "thriller film",
+   "Christmas film",
+   "psychological drama film",
+   "psychological thriller film",
+   "erotic drama film"
+  ]
+ },
+ {
+  "qid": "Q243439",
+  "title": "Full Metal Jacket",
+  "description": "film del 1987 diretto da Stanley Kubrick",
+  "released": "1987-06-17T00:00:00Z",
+  "duration": 116,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film"
+  ]
+ },
+ {
+  "qid": "Q135465",
+  "title": "Rashomon",
+  "description": "film del 1950 diretto da Akira Kurosawa",
+  "released": "1950-08-25T00:00:00Z",
+  "duration": 88,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Rashomon%20%281950%29%20Press%20Photo%20of%20Toshiro%20Mifune%20and%20Machiko%20Ky%C5%8D.jpg",
+  "genres": [
+   "drama film",
+   "samurai cinema",
+   "crime film",
+   "flashback film",
+   "medieval film"
+  ]
+ },
+ {
+  "qid": "Q152857",
+  "title": "La caduta - Gli ultimi giorni di Hitler",
+  "description": "film del 2004, diretto da Oliver Hirschbiegel",
+  "released": "2004-01-01T00:00:00Z",
+  "duration": 155,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Der%20untergang.svg",
+  "genres": [
+   "drama film",
+   "war film",
+   "biographical film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q153677",
+  "title": "Per qualche dollaro in più",
+  "description": "film del 1965 diretto da Sergio Leone",
+  "released": "1965-12-18T00:00:00Z",
+  "duration": 132,
+  "image": null,
+  "genres": [
+   "Western film",
+   "action film",
+   "Spaghetti Western"
+  ]
+ },
+ {
+  "qid": "Q271830",
+  "title": "Il terzo uomo",
+  "description": "film del 1949 diretto da Carol Reed",
+  "released": "1949-09-01T00:00:00Z",
+  "duration": 104,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Third%20Man%20%281949%20American%20theatrical%20poster%29.jpg",
+  "genres": [
+   "drama film",
+   "film noir",
+   "adventure film",
+   "mystery film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q274167",
+  "title": "L'esorcista",
+  "description": "film del 1973 diretto da William Friedkin",
+  "released": "1973-12-26T00:00:00Z",
+  "duration": 122,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Exorcist%20steps.jpg",
+  "genres": [
+   "drama film",
+   "horror film",
+   "mystery film",
+   "satanic film",
+   "thriller film",
+   "supernatural horror film"
+  ]
+ },
+ {
+  "qid": "Q168154",
+  "title": "C'era una volta il West",
+  "description": "film del 1968 diretto da Sergio Leone",
+  "released": "1968-01-01T00:00:00Z",
+  "duration": 171,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Jason%20Robards-1968-1.jpg",
+  "genres": [
+   "drama film",
+   "Western film",
+   "action film",
+   "Spaghetti Western",
+   "epic film",
+   "melodrama",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q172271",
+  "title": "Maleficent",
+  "description": "film del 2014 diretto da Robert Stromberg",
+  "released": "2014-05-28T00:00:00Z",
+  "duration": 97,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "cinematic fairy tale",
+   "romance film",
+   "family film",
+   "teen film",
+   "dark fantasy",
+   "romantic drama"
+  ]
+ },
+ {
+  "qid": "Q466611",
+  "title": "L'incredibile Hulk",
+  "description": "film del 2008 diretto da Louis Leterrier",
+  "released": "2008-06-13T00:00:00Z",
+  "duration": 112,
+  "image": null,
+  "genres": [
+   "action film",
+   "science fiction film",
+   "adventure film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q3512046",
+  "title": "Jurassic World",
+  "description": "film del 2015 diretto da Colin Trevorrow",
+  "released": "2015-05-29T00:00:00Z",
+  "duration": 124,
+  "image": null,
+  "genres": [
+   "action film",
+   "science fiction film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q15648198",
+  "title": "Whiplash",
+  "description": "film del 2014 diretto da Damien Chazelle",
+  "released": "2014-01-16T00:00:00Z",
+  "duration": 106,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/John%20Cooper%2C%20Damien%20Chazelle%20and%20Miles%20Teller%20%2812026652416%29.jpg",
+  "genres": [
+   "drama film",
+   "musical film"
+  ]
+ },
+ {
+  "qid": "Q18154496",
+  "title": "Il caso Spotlight",
+  "description": "film del 2015 diretto da Tom McCarthy",
+  "released": "2015-09-03T00:00:00Z",
+  "duration": 127,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film"
+  ]
+ },
+ {
+  "qid": "Q27894574",
+  "title": "Bohemian Rhapsody",
+  "description": "film del 2018 diretto da Bryan Singer",
+  "released": "2018-10-23T00:00:00Z",
+  "duration": 134,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "musical film",
+   "LGBTQ-related film"
+  ]
+ },
+ {
+  "qid": "Q30931",
+  "title": "La morte può attendere",
+  "description": "film del 2002 diretto da Lee Tamahori",
+  "released": "2002-01-01T00:00:00Z",
+  "duration": 133,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q595",
+  "title": "Quasi amici - Intouchables",
+  "description": "film del 2011 diretto da Olivier Nakache e Éric Toledano",
+  "released": "2011-01-01T00:00:00Z",
+  "duration": 112,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "biographical film"
+  ]
+ },
+ {
+  "qid": "Q12018",
+  "title": "8½",
+  "description": "film italiano del 1963 diretto da Federico Fellini",
+  "released": "1963-02-14T00:00:00Z",
+  "duration": 138,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "comedy drama"
+  ]
+ },
+ {
+  "qid": "Q19069",
+  "title": "I magnifici sette",
+  "description": "film del 1960 diretto da John Sturges",
+  "released": "1960-01-01T00:00:00Z",
+  "duration": 128,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Magnificent%20Seven%20cast%20publicity%20photo.jpg",
+  "genres": [
+   "drama film",
+   "Western film",
+   "action film"
+  ]
+ },
+ {
+  "qid": "Q188000",
+  "title": "Crash - Contatto fisico",
+  "description": "film del 2004 diretto da Paul Haggis",
+  "released": "2004-09-10T00:00:00Z",
+  "duration": 115,
+  "image": null,
+  "genres": [
+   "drama film",
+   "crime film"
+  ]
+ },
+ {
+  "qid": "Q192934",
+  "title": "Angeli e demoni",
+  "description": "film del 2009, diretto da Ron Howard",
+  "released": "2009-05-13T00:00:00Z",
+  "duration": 146,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Angels%26DemonsPantheon.JPG",
+  "genres": [
+   "drama film",
+   "mystery film",
+   "crime film"
+  ]
+ },
+ {
+  "qid": "Q193066",
+  "title": "Colazione da Tiffany",
+  "description": "film del 1961 diretto da Blake Edwards",
+  "released": "1961-10-06T00:00:00Z",
+  "duration": 110,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Breakfast%20at%20Tiffany%27s%20%281961%20poster%29.jpg",
+  "genres": [
+   "drama film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q193570",
+  "title": "Viale del tramonto",
+  "description": "film del 1950 diretto da Billy Wilder",
+  "released": "1950-01-01T00:00:00Z",
+  "duration": 110,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Sunset%20Boulevard%20%281950%20poster%29.jpg",
+  "genres": [
+   "drama film",
+   "film noir",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q193577",
+  "title": "Kramer contro Kramer",
+  "description": "film del 1979 diretto da Robert Benton",
+  "released": "1979-12-05T00:00:00Z",
+  "duration": 100,
+  "image": null,
+  "genres": [
+   "drama film"
+  ]
+ },
+ {
+  "qid": "Q244963",
+  "title": "Rambo",
+  "description": "film del 1982 diretto da Ted Kotcheff",
+  "released": "1982-10-22T00:00:00Z",
+  "duration": 93,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "war film",
+   "action thriller"
+  ]
+ },
+ {
+  "qid": "Q208266",
+  "title": "La mia Africa",
+  "description": "film del 1985 diretto da Sydney Pollack",
+  "released": "1985-12-20T00:00:00Z",
+  "duration": 160,
+  "image": null,
+  "genres": [
+   "drama film",
+   "adventure film",
+   "romance film",
+   "biographical film"
+  ]
+ },
+ {
+  "qid": "Q211372",
+  "title": "Fronte del porto",
+  "description": "film del 1954 diretto da Elia Kazan",
+  "released": "1954-07-28T00:00:00Z",
+  "duration": 108,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/On%20the%20Waterfront%20%281954%20poster%29.jpg",
+  "genres": [
+   "drama film",
+   "crime film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q212145",
+  "title": "Il mondo non basta",
+  "description": "film del 1999 diretto da Michael Apted",
+  "released": "1999-01-01T00:00:00Z",
+  "duration": 128,
+  "image": null,
+  "genres": [
+   "action film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q212689",
+  "title": "Io sono leggenda",
+  "description": "film del 2007 diretto da Francis Lawrence",
+  "released": "2007-12-05T00:00:00Z",
+  "duration": 100,
+  "image": null,
+  "genres": [
+   "drama film",
+   "horror film",
+   "action film",
+   "post-apocalyptic film",
+   "vampire film"
+  ]
+ },
+ {
+  "qid": "Q213208",
+  "title": "The Fast and the Furious: Tokyo Drift",
+  "description": "film del 2006 diretto da Justin Lin",
+  "released": "2006-06-16T00:00:00Z",
+  "duration": 104,
+  "image": null,
+  "genres": [
+   "action film",
+   "crime thriller film"
+  ]
+ },
+ {
+  "qid": "Q222720",
+  "title": "Fargo",
+  "description": "film del 1996 diretto dai fratelli Coen",
+  "released": "1996-03-08T00:00:00Z",
+  "duration": 98,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Fargo%20logo.svg",
+  "genres": [
+   "drama film",
+   "comedy film",
+   "film noir",
+   "action film",
+   "mystery film",
+   "crime film",
+   "comedy drama",
+   "suspense film",
+   "crime thriller film",
+   "police procedural film",
+   "crime drama film",
+   "black comedy film",
+   "thriller film",
+   "neo-noir"
+  ]
+ },
+ {
+  "qid": "Q222939",
+  "title": "Jumanji",
+  "description": "film del 1995 diretto da Joe Johnston",
+  "released": "1995-12-15T00:00:00Z",
+  "duration": 101,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "fantasy film",
+   "action film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q232774",
+  "title": "Transformers 3",
+  "description": "film del 2011 diretto da Michael Bay",
+  "released": "2011-06-23T00:00:00Z",
+  "duration": 154,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Transformers3ActorsSetJuly10.jpg",
+  "genres": [
+   "action film",
+   "science fiction film",
+   "alien invasion",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q243643",
+  "title": "Sherlock Holmes - Gioco di ombre",
+  "description": "film del 2011 diretto da Guy Ritchie",
+  "released": "2011-12-16T00:00:00Z",
+  "duration": 129,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "mystery film",
+   "crime thriller film",
+   "steampunk film"
+  ]
+ },
+ {
+  "qid": "Q105624",
+  "title": "The Bourne Identity",
+  "description": "film del 2002 diretto da Doug Liman",
+  "released": "2002-06-06T00:00:00Z",
+  "duration": 119,
+  "image": null,
+  "genres": [
+   "action film",
+   "mystery film",
+   "spy film",
+   "political thriller film",
+   "thriller film",
+   "action thriller"
+  ]
+ },
+ {
+  "qid": "Q107226",
+  "title": "The Bourne Ultimatum - Il ritorno dello sciacallo",
+  "description": "film del 2007 diretto da Paul Greengrass",
+  "released": "2007-07-25T00:00:00Z",
+  "duration": 115,
+  "image": null,
+  "genres": [
+   "action film",
+   "mystery film",
+   "spy film",
+   "thriller film",
+   "action thriller"
+  ]
+ },
+ {
+  "qid": "Q110138",
+  "title": "Top Gun",
+  "description": "film del 1986 diretto da Tony Scott",
+  "released": "1986-01-01T00:00:00Z",
+  "duration": 110,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "melodrama",
+   "romance film"
+  ]
+ },
+ {
+  "qid": "Q116928",
+  "title": "The Twilight Saga: New Moon",
+  "description": "film del 2009 diretto da Chris Weitz",
+  "released": "2009-11-16T00:00:00Z",
+  "duration": 131,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "action film",
+   "horror film",
+   "teen film",
+   "vampire film",
+   "romance film",
+   "werewolf film"
+  ]
+ },
+ {
+  "qid": "Q153882",
+  "title": "Le vite degli altri",
+  "description": "film del 2006 diretto da Florian Henckel von Donnersmarck",
+  "released": "2006-03-15T00:00:00Z",
+  "duration": 137,
+  "image": null,
+  "genres": [
+   "drama film",
+   "political thriller film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q272599",
+  "title": "All'ovest niente di nuovo",
+  "description": "film del 1930 diretto da Lewis Milestone",
+  "released": "1930-01-01T00:00:00Z",
+  "duration": 136,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/All%20Quiet%20on%20the%20Western%20Front%20%281930%20film%29%20poster.jpg",
+  "genres": [
+   "drama film",
+   "war film",
+   "anti-war film"
+  ]
+ },
+ {
+  "qid": "Q272608",
+  "title": "Mulholland Drive",
+  "description": "film del 2001 diretto da David Lynch",
+  "released": "2001-01-01T00:00:00Z",
+  "duration": 147,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "horror film",
+   "crime film",
+   "independent film",
+   "romance film",
+   "art film",
+   "experimental film",
+   "thriller film",
+   "neo-noir",
+   "surrealist film",
+   "mystery film",
+   "LGBTQ-related film",
+   "suspense film",
+   "crime thriller film",
+   "psychological horror film",
+   "psychological thriller film",
+   "crime drama film",
+   "psychological drama film"
+  ]
+ },
+ {
+  "qid": "Q321561",
+  "title": "Scent of a Woman - Profumo di donna",
+  "description": "film del 1992 diretto da Martin Brest",
+  "released": "1992-12-23T00:00:00Z",
+  "duration": 150,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Scent%20of%20a%20Woman%20logo.png",
+  "genres": [
+   "drama film",
+   "coming-of-age film"
+  ]
+ },
+ {
+  "qid": "Q169082",
+  "title": "10 cose che odio di te",
+  "description": "film del 1999 diretto da Gil Junger",
+  "released": "1999-03-31T00:00:00Z",
+  "duration": 97,
+  "image": null,
+  "genres": [
+   "teen film",
+   "comedy drama",
+   "coming-of-age film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q337078",
+  "title": "Il grande Lebowski",
+  "description": "film del 1998 diretto da Joel ed Ethan Coen",
+  "released": "1998-02-26T00:00:00Z",
+  "duration": 117,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "film noir",
+   "crime film",
+   "comedy of error"
+  ]
+ },
+ {
+  "qid": "Q487181",
+  "title": "Requiem for a Dream",
+  "description": "film del 2000 diretto da Darren Aronofsky",
+  "released": "2000-01-01T00:00:00Z",
+  "duration": 102,
+  "image": null,
+  "genres": [
+   "drama film"
+  ]
+ },
+ {
+  "qid": "Q488655",
+  "title": "Ricomincio da capo",
+  "description": "film del 1993 diretto da Harold Ramis",
+  "released": "1993-01-01T00:00:00Z",
+  "duration": 101,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "fantasy film",
+   "science fiction film",
+   "romantic comedy",
+   "comedy drama",
+   "romance film",
+   "melodrama",
+   "magic realist film"
+  ]
+ },
+ {
+  "qid": "Q1757288",
+  "title": "Mad Max: Fury Road",
+  "description": "film del 2015 diretto da George Miller",
+  "released": "2015-05-13T00:00:00Z",
+  "duration": 120,
+  "image": null,
+  "genres": [
+   "action film",
+   "science fiction film",
+   "adventure film",
+   "post-apocalyptic film",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q15624215",
+  "title": "Lucy",
+  "description": "film del 2014 diretto da Luc Besson",
+  "released": "2014-07-25T00:00:00Z",
+  "duration": 89,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "science fiction film",
+   "girls with guns",
+   "biopunk"
+  ]
+ },
+ {
+  "qid": "Q16857406",
+  "title": "Il libro della giungla",
+  "description": "film del 2016 diretto da Jon Favreau",
+  "released": "2016-04-08T00:00:00Z",
+  "duration": 107,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "fantasy film",
+   "adventure film",
+   "live action"
+  ]
+ },
+ {
+  "qid": "Q18486021",
+  "title": "Star Wars - Gli ultimi Jedi",
+  "description": "film del 2017 diretto da Rian Johnson",
+  "released": "2017-12-09T00:00:00Z",
+  "duration": 152,
+  "image": null,
+  "genres": [
+   "action film",
+   "fantasy film",
+   "science fiction film",
+   "adventure film",
+   "space opera"
+  ]
+ },
+ {
+  "qid": "Q25136757",
+  "title": "Chiamami col tuo nome",
+  "description": "film del 2017 diretto da Luca Guadagnino",
+  "released": "2017-01-22T00:00:00Z",
+  "duration": 132,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Call%20Me%20By%20Your%20Name%20Berlinale%208609%208610.jpg",
+  "genres": [
+   "drama film",
+   "romance film",
+   "romantic drama",
+   "coming-of-age film",
+   "LGBTQ-related film"
+  ]
+ },
+ {
+  "qid": "Q27188178",
+  "title": "Aladdin",
+  "description": "film del 2019 diretto da Guy Ritchie",
+  "released": "2019-05-22T00:00:00Z",
+  "duration": 129,
+  "image": null,
+  "genres": [
+   "action film",
+   "fantasy film",
+   "adventure film",
+   "romance film",
+   "musical film",
+   "speculative fiction film",
+   "family film"
+  ]
+ },
+ {
+  "qid": "Q29906232",
+  "title": "Sonic - Il film",
+  "description": "film del 2020 diretto da Jeff Fowler",
+  "released": "2020-02-13T00:00:00Z",
+  "duration": 99,
+  "image": null,
+  "genres": [
+   "action film",
+   "fantasy film",
+   "science fiction film",
+   "comedy film",
+   "adventure film",
+   "family film"
+  ]
+ },
+ {
+  "qid": "Q50861",
+  "title": "Die Hard - Vivere o morire",
+  "description": "film del 2007 diretto da Len Wiseman",
+  "released": "2007-06-27T00:00:00Z",
+  "duration": 128,
+  "image": null,
+  "genres": [
+   "action film",
+   "buddy film",
+   "buddy cop film",
+   "action thriller"
+  ]
+ },
+ {
+  "qid": "Q24953",
+  "title": "Brian di Nazareth",
+  "description": "film del 1979 diretto da Terry Jones",
+  "released": "1979-01-01T00:00:00Z",
+  "duration": 94,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "parody film",
+   "religious satire"
+  ]
+ },
+ {
+  "qid": "Q27411",
+  "title": "Scream",
+  "description": "film del 1996 diretto da Wes Craven",
+  "released": "1996-12-18T00:00:00Z",
+  "duration": 111,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "horror film",
+   "slasher film",
+   "teen film",
+   "mystery film"
+  ]
+ },
+ {
+  "qid": "Q18407",
+  "title": "La dolce vita",
+  "description": "film del 1960 diretto da Federico Fellini",
+  "released": "1960-01-01T00:00:00Z",
+  "duration": 174,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Dolce%20vita1.gif",
+  "genres": [
+   "drama film",
+   "comedy film"
+  ]
+ },
+ {
+  "qid": "Q201215",
+  "title": "My Fair Lady",
+  "description": "film del 1964 diretto da George Cukor",
+  "released": "1964-10-21T00:00:00Z",
+  "duration": 171,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Harry%20Stradling-Audrey%20Hepburn%20in%20My%20Fair%20Lady.jpg",
+  "genres": [
+   "drama film",
+   "romance film",
+   "musical film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q201687",
+  "title": "Milk",
+  "description": "film del 2008 diretto da Gus Van Sant",
+  "released": "2008-01-01T00:00:00Z",
+  "duration": 128,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Castro-nov08.jpg",
+  "genres": [
+   "drama film",
+   "biographical film",
+   "LGBTQ-related film"
+  ]
+ },
+ {
+  "qid": "Q191074",
+  "title": "Babel",
+  "description": "film del 2006 diretto da Alejandro González Iñárritu",
+  "released": "2006-05-23T00:00:00Z",
+  "duration": 142,
+  "image": null,
+  "genres": [
+   "drama film"
+  ]
+ },
+ {
+  "qid": "Q207916",
+  "title": "Il domani non muore mai",
+  "description": "film del 1997 diretto da Roger Spottiswoode",
+  "released": "1997-01-01T00:00:00Z",
+  "duration": 119,
+  "image": null,
+  "genres": [
+   "action film",
+   "spy film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q207954",
+  "title": "Pretty Woman",
+  "description": "film del 1990 diretto da Garry Marshall",
+  "released": "1990-03-23T00:00:00Z",
+  "duration": 119,
+  "image": null,
+  "genres": [
+   "romance film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q213081",
+  "title": "Star Trek",
+  "description": "film del 2009 diretto da J. J. Abrams",
+  "released": "2009-05-06T00:00:00Z",
+  "duration": 127,
+  "image": null,
+  "genres": [
+   "drama film",
+   "science fiction film",
+   "action film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q219776",
+  "title": "X-Men 2",
+  "description": "film del 2003 diretto da Bryan Singer",
+  "released": "2003-05-01T00:00:00Z",
+  "duration": 134,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "science fiction film",
+   "action film",
+   "superhero film",
+   "speculative fiction film"
+  ]
+ },
+ {
+  "qid": "Q107761",
+  "title": "Agente 007 - Si vive solo due volte",
+  "description": "film del 1967 diretto da Lewis Gilbert",
+  "released": "1967-01-01T00:00:00Z",
+  "duration": 117,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Little%20Nellie.jpg",
+  "genres": [
+   "action film",
+   "spy film",
+   "adventure film",
+   "thriller film",
+   "ninja film"
+  ]
+ },
+ {
+  "qid": "Q146673",
+  "title": "Basic Instinct",
+  "description": "film del 1992 diretto da Paul Verhoeven",
+  "released": "1992-03-18T00:00:00Z",
+  "duration": 128,
+  "image": null,
+  "genres": [
+   "drama film",
+   "erotic film",
+   "mystery film",
+   "crime film",
+   "LGBTQ-related film",
+   "thriller film",
+   "erotic thriller"
+  ]
+ },
+ {
+  "qid": "Q152456",
+  "title": "Munich",
+  "description": "film del 2005 diretto da Steven Spielberg",
+  "released": "2005-12-23T00:00:00Z",
+  "duration": 157,
+  "image": null,
+  "genres": [
+   "drama film",
+   "spy film",
+   "political thriller film"
+  ]
+ },
+ {
+  "qid": "Q401976",
+  "title": "Fast & Furious 5",
+  "description": "film del 2011 diretto da Justin Lin",
+  "released": "2011-04-15T00:00:00Z",
+  "duration": 131,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Fast%20Five%20Cast.jpg",
+  "genres": [
+   "action film",
+   "crime film",
+   "heist film",
+   "crime thriller film"
+  ]
+ },
+ {
+  "qid": "Q323827",
+  "title": "Il dottor Živago",
+  "description": "film del 1965 diretto da David Lean",
+  "released": "1965-12-22T00:00:00Z",
+  "duration": 197,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Il%20dottor%20%C5%BDivago%20logo.png",
+  "genres": [
+   "drama film",
+   "war film",
+   "romance film",
+   "melodrama"
+  ]
+ },
+ {
+  "qid": "Q379873",
+  "title": "Chi ha incastrato Roger Rabbit",
+  "description": "film del 1988 diretto da Robert Zemeckis",
+  "released": "1988-06-22T00:00:00Z",
+  "duration": 100,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "fantasy film",
+   "buddy film",
+   "neo-noir",
+   "crossover fiction",
+   "live-action/animated film"
+  ]
+ },
+ {
+  "qid": "Q475693",
+  "title": "Oldboy",
+  "description": "film del 2003 diretto da Park Chan-wook",
+  "released": "2003-01-01T00:00:00Z",
+  "duration": 116,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "thriller film",
+   "mystery film"
+  ]
+ },
+ {
+  "qid": "Q644987",
+  "title": "Chinatown",
+  "description": "film del 1974 diretto da Roman Polański",
+  "released": "1974-06-20T00:00:00Z",
+  "duration": 133,
+  "image": null,
+  "genres": [
+   "drama film",
+   "film noir",
+   "neo-noir",
+   "mystery film",
+   "crime thriller film"
+  ]
+ },
+ {
+  "qid": "Q869741",
+  "title": "Lo scrigno delle sette perle",
+  "description": "film d'animazione del 1948 diretto da Clyde Geronimi, Wilfred Jackson, Hamilton Luske e Jack Kinney",
+  "released": "1948-05-27T00:00:00Z",
+  "duration": 75,
+  "image": null,
+  "genres": [
+   "children's film",
+   "musical film",
+   "live-action/animated film"
+  ]
+ },
+ {
+  "qid": "Q788822",
+  "title": "Lei",
+  "description": "film del 2013 scritto e diretto da Spike Jonze",
+  "released": "2013-10-12T00:00:00Z",
+  "duration": 126,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Her%20Premiere%20NYFF%202013.jpg",
+  "genres": [
+   "drama film",
+   "comedy film",
+   "science fiction film",
+   "romantic comedy film",
+   "arthouse science fiction film"
+  ]
+ },
+ {
+  "qid": "Q1102220",
+  "title": "Jurassic Park III",
+  "description": "film del 2001 diretto da Joe Johnston",
+  "released": "2001-07-18T00:00:00Z",
+  "duration": 92,
+  "image": null,
+  "genres": [
+   "action film",
+   "science fiction film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q3521099",
+  "title": "Grand Budapest Hotel",
+  "description": "film del 2014 diretto da Wes Anderson",
+  "released": "2014-02-06T00:00:00Z",
+  "duration": 99,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "tragicomedy",
+   "adventure film",
+   "crime film",
+   "romance film"
+  ]
+ },
+ {
+  "qid": "Q14650496",
+  "title": "Fast & Furious 7",
+  "description": "film del 2015 diretto da James Wan",
+  "released": "2015-03-26T00:00:00Z",
+  "duration": 137,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "action film",
+   "thriller film",
+   "heist film"
+  ]
+ },
+ {
+  "qid": "Q21534241",
+  "title": "No Time to Die",
+  "description": "film del 2021 diretto da Cary Joji Fukunaga",
+  "released": "2021-09-28T00:00:00Z",
+  "duration": 163,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "thriller film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q21500755",
+  "title": "Blade Runner 2049",
+  "description": "film del 2017 diretto da Denis Villeneuve",
+  "released": "2017-10-04T00:00:00Z",
+  "duration": 164,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "cyberpunk",
+   "science fiction film",
+   "thriller film",
+   "mystery film",
+   "neo-noir",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q24053263",
+  "title": "Logan: The Wolverine",
+  "description": "film del 2017 diretto da James Mangold",
+  "released": "2017-02-17T00:00:00Z",
+  "duration": 137,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "science fiction film",
+   "survival film",
+   "superhero film",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q27044293",
+  "title": "Il re leone",
+  "description": "film del 2019 diretto da Jon Favreau",
+  "released": "2019-07-17T00:00:00Z",
+  "duration": 118,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "adventure film",
+   "musical film",
+   "family film"
+  ]
+ },
+ {
+  "qid": "Q64211112",
+  "title": "Doctor Strange nel Multiverso della Follia",
+  "description": "film del 2022 diretto da Sam Raimi",
+  "released": "2022-05-04T00:00:00Z",
+  "duration": 126,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "horror film",
+   "adventure film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q62721520",
+  "title": "1917",
+  "description": "film del 2019 diretto da Sam Mendes",
+  "released": "2019-12-25T00:00:00Z",
+  "duration": 119,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film"
+  ]
+ },
+ {
+  "qid": "Q51668",
+  "title": "La passione di Cristo",
+  "description": "film del 2004 diretto da Mel Gibson",
+  "released": "2004-01-01T00:00:00Z",
+  "duration": 127,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "sword-and-sandal film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q42198",
+  "title": "Heat - La sfida",
+  "description": "film del 1995 diretto da Michael Mann",
+  "released": "1995-01-01T00:00:00Z",
+  "duration": 171,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "adventure film",
+   "epic film",
+   "heist film",
+   "crime film",
+   "thriller film",
+   "gangster film",
+   "neo-noir",
+   "mystery film",
+   "suspense film",
+   "crime thriller film",
+   "psychological drama film",
+   "psychological thriller film",
+   "crime drama film"
+  ]
+ },
+ {
+  "qid": "Q45602",
+  "title": "Tempi moderni",
+  "description": "film del 1936 diretto da Charlie Chaplin",
+  "released": "1936-02-05T00:00:00Z",
+  "duration": 99,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Modern%20Times%20poster.jpg",
+  "genres": [
+   "tragicomedy",
+   "silent film",
+   "comedy drama",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q205447",
+  "title": "Ocean's Eleven - Fate il vostro gioco",
+  "description": "film del 2001 diretto da Steven Soderbergh",
+  "released": "2001-01-01T00:00:00Z",
+  "duration": 112,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Pitt%20Clooney%20Damon.jpg",
+  "genres": [
+   "comedy film",
+   "action film",
+   "adventure film",
+   "heist film",
+   "mystery film"
+  ]
+ },
+ {
+  "qid": "Q191543",
+  "title": "Terminator Salvation",
+  "description": "film del 2009 diretto da McG",
+  "released": "2009-05-21T00:00:00Z",
+  "duration": 115,
+  "image": null,
+  "genres": [
+   "drama film",
+   "cyberpunk",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "war film",
+   "techno-thriller",
+   "post-apocalyptic film",
+   "thriller film",
+   "chase film",
+   "dystopian film",
+   "science fiction action film"
+  ]
+ },
+ {
+  "qid": "Q193573",
+  "title": "Moulin Rouge!",
+  "description": "film del 2001 diretto da Baz Luhrmann",
+  "released": "2001-05-09T00:00:00Z",
+  "duration": 123,
+  "image": null,
+  "genres": [
+   "drama film",
+   "musical film",
+   "romance film",
+   "melodrama",
+   "dance film"
+  ]
+ },
+ {
+  "qid": "Q207588",
+  "title": "Da qui all'eternità",
+  "description": "film del 1953 diretto da Fred Zinnemann",
+  "released": "1953-08-28T00:00:00Z",
+  "duration": 118,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Burt%20Lancaster%20and%20Deborah%20Kerr%20in%20From%20Here%20to%20Eternity%20trailer.jpg",
+  "genres": [
+   "drama film",
+   "war film",
+   "romance film"
+  ]
+ },
+ {
+  "qid": "Q207921",
+  "title": "Momenti di gloria",
+  "description": "film del 1981 diretto da Hugh Hudson",
+  "released": "1981-03-30T00:00:00Z",
+  "duration": 122,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "historical film",
+   "sport film"
+  ]
+ },
+ {
+  "qid": "Q220780",
+  "title": "Toro scatenato",
+  "description": "film del 1980 diretto da Martin Scorsese",
+  "released": "1980-01-01T00:00:00Z",
+  "duration": 129,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Wie%20ein%20wilder%20Stier%20Logo.png",
+  "genres": [
+   "drama film",
+   "action film",
+   "period drama film",
+   "biographical film",
+   "boxing film",
+   "historical film",
+   "neo-noir",
+   "sport film",
+   "historical drama film"
+  ]
+ },
+ {
+  "qid": "Q221103",
+  "title": "Halloween - La notte delle streghe",
+  "description": "film del 1978 diretto da John Carpenter",
+  "released": "1978-10-25T00:00:00Z",
+  "duration": 92,
+  "image": null,
+  "genres": [
+   "drama film",
+   "horror film",
+   "independent film",
+   "slasher film",
+   "crime film",
+   "teen film",
+   "thriller film",
+   "mystery film",
+   "crime thriller film",
+   "crime drama film",
+   "teen horror film"
+  ]
+ },
+ {
+  "qid": "Q221249",
+  "title": "Tootsie",
+  "description": "film del 1982 diretto da Sydney Pollack",
+  "released": "1982-12-17T00:00:00Z",
+  "duration": 112,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Tootsie%20-%20plak%C3%A1t%20Jan%20Sarkandr%20Tom%C3%A1nek.jpg",
+  "genres": [
+   "comedy drama",
+   "LGBTQ-related film",
+   "romantic comedy film",
+   "satirical film"
+  ]
+ },
+ {
+  "qid": "Q222867",
+  "title": "2 Fast 2 Furious",
+  "description": "film del 2003 diretto da John Singleton",
+  "released": "2003-06-03T00:00:00Z",
+  "duration": 103,
+  "image": null,
+  "genres": [
+   "action film",
+   "crime film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q223139",
+  "title": "Intrigo internazionale",
+  "description": "film del 1959 diretto da Alfred Hitchcock",
+  "released": "1959-01-01T00:00:00Z",
+  "duration": 136,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/North%20by%20Northwest%20movie%20trailer%20screenshot%20%285%29.jpg",
+  "genres": [
+   "drama film",
+   "action film",
+   "adventure film",
+   "crime film",
+   "spy film",
+   "thriller film",
+   "mystery film",
+   "crime thriller film",
+   "crime drama film"
+  ]
+ },
+ {
+  "qid": "Q238211",
+  "title": "Luci della città",
+  "description": "film del 1931 diretto da Charlie Chaplin",
+  "released": "1931-01-30T00:00:00Z",
+  "duration": 87,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/City%20Lights%20%281931%20theatrical%20poster%20-%20retouched%29.jpg",
+  "genres": [
+   "tragicomedy",
+   "comedy drama",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q244315",
+  "title": "Il petroliere",
+  "description": "film del 2007 diretto da Paul Thomas Anderson",
+  "released": "2007-12-26T00:00:00Z",
+  "duration": 158,
+  "image": null,
+  "genres": [
+   "drama film",
+   "Western film",
+   "independent film",
+   "period drama film",
+   "revisionist Western",
+   "epic film",
+   "historical film",
+   "thriller film",
+   "historical drama film"
+  ]
+ },
+ {
+  "qid": "Q107724",
+  "title": "Agente 007 - Thunderball (Operazione tuono)",
+  "description": "film del 1965 diretto da Terence Young",
+  "released": "1965-01-01T00:00:00Z",
+  "duration": 130,
+  "image": null,
+  "genres": [
+   "action film",
+   "thriller film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q107914",
+  "title": "Agente 007 - Una cascata di diamanti",
+  "description": "film del 1971 diretto da Guy Hamilton",
+  "released": "1971-01-01T00:00:00Z",
+  "duration": 120,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Sean%20Connery%20as%20James%20Bond%20%281971%29.jpg",
+  "genres": [
+   "action film",
+   "adventure film",
+   "thriller film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q108745",
+  "title": "Ghostbusters - Acchiappafantasmi",
+  "description": "film del 1984 diretto da Ivan Reitman",
+  "released": "1984-06-08T00:00:00Z",
+  "duration": 105,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Ghostbusers%20Logo.svg",
+  "genres": [
+   "fantasy film",
+   "comedy film",
+   "action film",
+   "comedy horror",
+   "adventure film",
+   "science fiction film",
+   "buddy film",
+   "monster film",
+   "ghost film"
+  ]
+ },
+ {
+  "qid": "Q110043",
+  "title": "Gli uccelli",
+  "description": "film del 1963 diretto da Alfred Hitchcock",
+  "released": "1963-01-01T00:00:00Z",
+  "duration": 119,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Alfred%20Hitchcock%27s%20The%20Birds%20Trailer%20-%20Tippi.png",
+  "genres": [
+   "drama film",
+   "action film",
+   "horror film",
+   "adventure film",
+   "thriller film",
+   "melodrama",
+   "mystery film",
+   "suspense film",
+   "natural horror film"
+  ]
+ },
+ {
+  "qid": "Q114819",
+  "title": "Dune",
+  "description": "film del 1984 diretto da David Lynch",
+  "released": "1984-12-14T00:00:00Z",
+  "duration": 137,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Dune%20%28Logo%29.png",
+  "genres": [
+   "action film"
+  ]
+ },
+ {
+  "qid": "Q151895",
+  "title": "Nosferatu il vampiro",
+  "description": "film del 1922 diretto da Friedrich Wilhelm Murnau",
+  "released": "1922-02-17T00:00:00Z",
+  "duration": 94,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Wismar%20Markt%20Nosferatu%2001%20%28cropped%29.jpg",
+  "genres": [
+   "drama film",
+   "horror film",
+   "silent film",
+   "vampire film"
+  ]
+ },
+ {
+  "qid": "Q269912",
+  "title": "Into the Wild - Nelle terre selvagge",
+  "description": "film del 2007 diretto da Sean Penn",
+  "released": "2007-01-01T00:00:00Z",
+  "duration": 148,
+  "image": null,
+  "genres": [
+   "drama film",
+   "road movie",
+   "biographical film",
+   "docudrama",
+   "drama fiction"
+  ]
+ },
+ {
+  "qid": "Q380996",
+  "title": "Fast & Furious - Solo parti originali",
+  "description": "film del 2009 diretto da Justin Lin",
+  "released": "2009-03-12T00:00:00Z",
+  "duration": 102,
+  "image": null,
+  "genres": [
+   "action film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q471716",
+  "title": "Barry Lyndon",
+  "description": "film del 1975, diretto da Stanley Kubrick",
+  "released": "1975-01-01T00:00:00Z",
+  "duration": 184,
+  "image": null,
+  "genres": [
+   "drama film",
+   "adventure film",
+   "war film",
+   "period drama film",
+   "comedy drama",
+   "historical film",
+   "war drama",
+   "historical drama film"
+  ]
+ },
+ {
+  "qid": "Q892735",
+  "title": "Il grande Gatsby",
+  "description": "film del 2013 diretto da Baz Luhrmann",
+  "released": "2013-05-01T00:00:00Z",
+  "duration": 142,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Joel%20Edgerton%2C%20Baz%20Luhrmann%2C%20Elizabeth%20Debicki%2C%20Carey%20Mulligan%2C%20Tobey%20Maguire%20and%20Catherine%20Martin.jpg",
+  "genres": [
+   "drama film",
+   "romance film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q4985891",
+  "title": "X-Men - Giorni di un futuro passato",
+  "description": "film del 2014 diretto da Bryan Singer",
+  "released": "2014-05-21T00:00:00Z",
+  "duration": 131,
+  "image": null,
+  "genres": [
+   "action film",
+   "science fiction film",
+   "superhero film",
+   "dystopian film",
+   "thriller film",
+   "crossover fiction",
+   "time-travel film"
+  ]
+ },
+ {
+  "qid": "Q14920425",
+  "title": "L'amore bugiardo - Gone Girl",
+  "description": "film del 2014 diretto da David Fincher",
+  "released": "2014-09-26T00:00:00Z",
+  "duration": 149,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Gone%20Girl%20Premiere%20at%20the%2052nd%20New%20York%20Film%20Festival%20P1070670%20%2815184372097%29.jpg",
+  "genres": [
+   "drama film",
+   "crime film",
+   "mystery film",
+   "crime thriller film",
+   "thriller film",
+   "detective film"
+  ]
+ },
+ {
+  "qid": "Q19946102",
+  "title": "La bella e la bestia",
+  "description": "film del 2017 diretto da Bill Condon",
+  "released": "2017-03-16T00:00:00Z",
+  "duration": 129,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "musical film",
+   "romance film",
+   "family film",
+   "romantic drama",
+   "melodrama",
+   "cinematic fairy tale"
+  ]
+ },
+ {
+  "qid": "Q21010856",
+  "title": "La battaglia di Hacksaw Ridge",
+  "description": "film del 2016 diretto da Mel Gibson",
+  "released": "2016-09-04T00:00:00Z",
+  "duration": 131,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film",
+   "biographical film"
+  ]
+ },
+ {
+  "qid": "Q23894626",
+  "title": "Black Widow",
+  "description": "film del 2021 diretto da Cate Shortland",
+  "released": "2021-07-07T00:00:00Z",
+  "duration": 133,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "superhero film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q60997779",
+  "title": "Minions 2 - Come Gru diventa cattivissimo",
+  "description": "film d'animazione del 2022 diretto da Kyle Balda",
+  "released": "2022-06-30T00:00:00Z",
+  "duration": 90,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "action film",
+   "family film"
+  ]
+ },
+ {
+  "qid": "Q83808444",
+  "title": "Everything Everywhere All at Once",
+  "description": "film del 2022 scritto e diretto da Daniel Kwan e Daniel Scheinert",
+  "released": "2022-03-11T00:00:00Z",
+  "duration": 139,
+  "image": null,
+  "genres": [
+   "action film",
+   "science fiction film",
+   "comedy drama",
+   "martial arts film",
+   "absurdist fiction",
+   "psychedelic film"
+  ]
+ },
+ {
+  "qid": "Q49003",
+  "title": "Ghost - Fantasma",
+  "description": "film del 1990 diretto da Jerry Zucker",
+  "released": "1990-07-13T00:00:00Z",
+  "duration": 122,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Ghost%20opening%20title.jpg",
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "romance film",
+   "ghost film"
+  ]
+ },
+ {
+  "qid": "Q27204",
+  "title": "Agente 007 - Vivi e lascia morire",
+  "description": "film del 1973 diretto da Guy Hamilton",
+  "released": "1973-01-01T00:00:00Z",
+  "duration": 121,
+  "image": null,
+  "genres": [
+   "action film",
+   "blaxploitation film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q200437",
+  "title": "Stalker",
+  "description": "film del 1979 diretto da Andrej Tarkovskij",
+  "released": "1979-05-25T00:00:00Z",
+  "duration": 163,
+  "image": null,
+  "genres": [
+   "drama film",
+   "science fiction film",
+   "art film",
+   "arthouse science fiction film"
+  ]
+ },
+ {
+  "qid": "Q200572",
+  "title": "Io, robot",
+  "description": "film del 2004 diretto da Alex Proyas",
+  "released": "2004-07-07T00:00:00Z",
+  "duration": 115,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Irobot%20head.jpg",
+  "genres": [
+   "cyberpunk",
+   "action film",
+   "science fiction film",
+   "detective film",
+   "dystopian film",
+   "neo-noir"
+  ]
+ },
+ {
+  "qid": "Q201819",
+  "title": "District 9",
+  "description": "film del 2009 diretto da Neill Blomkamp",
+  "released": "2009-08-13T00:00:00Z",
+  "duration": 112,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "horror film",
+   "adventure film",
+   "science fiction film",
+   "independent film",
+   "mockumentary",
+   "biopunk",
+   "thriller film",
+   "action thriller",
+   "science fiction horror film",
+   "suspense film",
+   "dystopian film",
+   "science fiction action film"
+  ]
+ },
+ {
+  "qid": "Q204374",
+  "title": "The Help",
+  "description": "film del 2011 diretto da Tate Taylor",
+  "released": "2011-08-09T00:00:00Z",
+  "duration": 146,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy drama",
+   "female buddy film",
+   "white savior film"
+  ]
+ },
+ {
+  "qid": "Q189054",
+  "title": "Batman - Il ritorno",
+  "description": "film del 1992 diretto da Tim Burton",
+  "released": "1992-06-16T00:00:00Z",
+  "duration": 126,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "science fiction film",
+   "superhero film",
+   "thriller film",
+   "Christmas film",
+   "neo-noir"
+  ]
+ },
+ {
+  "qid": "Q191100",
+  "title": "Transformers - La vendetta del caduto",
+  "description": "film del 2009 diretto da Michael Bay",
+  "released": "2009-06-19T00:00:00Z",
+  "duration": 150,
+  "image": null,
+  "genres": [
+   "action film",
+   "science fiction film"
+  ]
+ },
+ {
+  "qid": "Q206374",
+  "title": "I mercenari - The Expendables",
+  "description": "film del 2010 diretto da Sylvester Stallone",
+  "released": "2010-08-03T00:00:00Z",
+  "duration": 104,
+  "image": null,
+  "genres": [
+   "action film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q207659",
+  "title": "Space Jam",
+  "description": "film del 1996 diretto da Joe Pytka",
+  "released": "1996-11-15T00:00:00Z",
+  "duration": 88,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "comedy film",
+   "children's film",
+   "sport film",
+   "crossover fiction",
+   "live-action/animated film"
+  ]
+ },
+ {
+  "qid": "Q208632",
+  "title": "Accadde una notte",
+  "description": "film del 1934 diretto da Frank Capra",
+  "released": "1934-02-22T00:00:00Z",
+  "duration": 105,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Clark%20Gable%20and%20Claudette%20Colbert%20in%20It%20Happened%20One%20Night.jpg",
+  "genres": [
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q221113",
+  "title": "A.I. - Intelligenza artificiale",
+  "description": "film del 2001 diretto da Steven Spielberg",
+  "released": "2001-06-29T00:00:00Z",
+  "duration": 146,
+  "image": null,
+  "genres": [
+   "drama film",
+   "science fiction film",
+   "post-apocalyptic film"
+  ]
+ },
+ {
+  "qid": "Q221168",
+  "title": "X-Men - Conflitto finale",
+  "description": "film del 2006 diretto da Brett Ratner",
+  "released": "2006-05-24T00:00:00Z",
+  "duration": 104,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/XMen3e3.jpg",
+  "genres": [
+   "fantasy film",
+   "action film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q221594",
+  "title": "Qualcosa è cambiato",
+  "description": "film del 1997, diretto da James L. Brooks",
+  "released": "1997-12-23T00:00:00Z",
+  "duration": 133,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "comedy drama",
+   "romance film",
+   "LGBTQ-related film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q223316",
+  "title": "Il diavolo veste Prada",
+  "description": "film del 2006 diretto da David Frankel",
+  "released": "2006-06-29T00:00:00Z",
+  "duration": 109,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy drama"
+  ]
+ },
+ {
+  "qid": "Q223559",
+  "title": "Robin Hood",
+  "description": "film del 2010 diretto da Ridley Scott",
+  "released": "2010-05-12T00:00:00Z",
+  "duration": 140,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Bourne%20Wood%20Movie%20Castle.jpg",
+  "genres": [
+   "drama film",
+   "swashbuckler film",
+   "action film",
+   "adventure film",
+   "epic film",
+   "medieval film"
+  ]
+ },
+ {
+  "qid": "Q223884",
+  "title": "Hotel Rwanda",
+  "description": "film del 2004 diretto da Terry George",
+  "released": "2004-01-01T00:00:00Z",
+  "duration": 121,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film"
+  ]
+ },
+ {
+  "qid": "Q239756",
+  "title": "Il posto delle fragole",
+  "description": "film del 1957 diretto da Ingmar Bergman",
+  "released": "1957-12-26T00:00:00Z",
+  "duration": 92,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Ingmar%20Bergman%20Smultronstallet.jpg",
+  "genres": [
+   "drama film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q108006",
+  "title": "Speed",
+  "description": "film del 1994 diretto da Jan de Bont",
+  "released": "1994-06-10T00:00:00Z",
+  "duration": 116,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "crime film",
+   "action thriller"
+  ]
+ },
+ {
+  "qid": "Q116845",
+  "title": "Il lato positivo - Silver Linings Playbook",
+  "description": "film del 2012 diretto da David O. Russell",
+  "released": "2012-09-08T00:00:00Z",
+  "duration": 122,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "Christmas film",
+   "American football film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q156608",
+  "title": "The Bourne Supremacy",
+  "description": "film del 2004 diretto da Paul Greengrass",
+  "released": "2004-07-15T00:00:00Z",
+  "duration": 108,
+  "image": null,
+  "genres": [
+   "action film",
+   "action thriller",
+   "spy film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q159063",
+  "title": "The Reader - A voce alta",
+  "description": "film del 2008 diretto da Stephen Daldry",
+  "released": "2008-01-01T00:00:00Z",
+  "duration": 124,
+  "image": null,
+  "genres": [
+   "drama film",
+   "prison film",
+   "romance film",
+   "coming-of-age film"
+  ]
+ },
+ {
+  "qid": "Q160215",
+  "title": "King Kong",
+  "description": "film del 2005 diretto da Peter Jackson",
+  "released": "2005-12-14T00:00:00Z",
+  "duration": 187,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "adventure film",
+   "romance film"
+  ]
+ },
+ {
+  "qid": "Q162277",
+  "title": "Alexander",
+  "description": "film del 2004 diretto da Oliver Stone",
+  "released": "2004-01-01T00:00:00Z",
+  "duration": 175,
+  "image": null,
+  "genres": [
+   "drama film",
+   "action film",
+   "war film",
+   "biographical film",
+   "sword-and-sandal film",
+   "LGBTQ-related film"
+  ]
+ },
+ {
+  "qid": "Q171711",
+  "title": "Into Darkness - Star Trek",
+  "description": "film del 2013 diretto da J. J. Abrams",
+  "released": "2013-04-23T00:00:00Z",
+  "duration": 145,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "science fiction action film"
+  ]
+ },
+ {
+  "qid": "Q485803",
+  "title": "Le cronache di Narnia - Il leone, la strega e l'armadio",
+  "description": "film del 2005 diretto da Andrew Adamson",
+  "released": "2005-12-08T00:00:00Z",
+  "duration": 143,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "Christmas film"
+  ]
+ },
+ {
+  "qid": "Q747570",
+  "title": "Un americano a Parigi",
+  "description": "film del 1951 diretto da Vincente Minnelli",
+  "released": "1951-01-01T00:00:00Z",
+  "duration": 108,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/An%20American%20in%20Paris%20%281951%20film%20poster%29.jpg",
+  "genres": [
+   "musical film"
+  ]
+ },
+ {
+  "qid": "Q631103",
+  "title": "Mean Girls",
+  "description": "film del 2004 diretto da Mark Waters",
+  "released": "2004-04-19T00:00:00Z",
+  "duration": 97,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "teen film",
+   "LGBTQ-related film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q660950",
+  "title": "Velluto blu",
+  "description": "film del 1986 diretto da David Lynch",
+  "released": "1986-01-01T00:00:00Z",
+  "duration": 121,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Blue%20Velvet%20%281986%29%20-%20Lobby%20Card.jpg",
+  "genres": [
+   "drama film",
+   "horror film",
+   "independent film",
+   "romance film",
+   "erotic film",
+   "neo-noir",
+   "thriller film",
+   "mystery film",
+   "crime thriller film",
+   "crime film",
+   "erotic thriller film",
+   "psychological thriller film",
+   "crime drama film",
+   "psychological drama film",
+   "psychological horror film"
+  ]
+ },
+ {
+  "qid": "Q1405126",
+  "title": "American Psycho",
+  "description": "film del 2000 diretto da Mary Harron",
+  "released": "2000-01-21T00:00:00Z",
+  "duration": 102,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy horror",
+   "thriller film",
+   "black comedy film",
+   "slasher film",
+   "crime film"
+  ]
+ },
+ {
+  "qid": "Q9013673",
+  "title": "American Hustle - L'apparenza inganna",
+  "description": "film del 2013 diretto da David O. Russell",
+  "released": "2013-12-13T00:00:00Z",
+  "duration": 138,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/American%20Hustle%20Logo.png",
+  "genres": [
+   "drama film",
+   "comedy film",
+   "heist film",
+   "crime film"
+  ]
+ },
+ {
+  "qid": "Q18225084",
+  "title": "The Hateful Eight",
+  "description": "film del 2015 diretto da Quentin Tarantino",
+  "released": "2015-12-01T00:00:00Z",
+  "duration": 187,
+  "image": null,
+  "genres": [
+   "Western film",
+   "action film",
+   "revisionist Western",
+   "thriller film",
+   "mystery film",
+   "suspense film",
+   "crime thriller film",
+   "crime film",
+   "crime drama film"
+  ]
+ },
+ {
+  "qid": "Q19829521",
+  "title": "Fast & Furious 8",
+  "description": "film del 2017 diretto da F. Gary Gray",
+  "released": "2017-04-14T00:00:00Z",
+  "duration": 136,
+  "image": null,
+  "genres": [
+   "action film",
+   "crime film"
+  ]
+ },
+ {
+  "qid": "Q21527875",
+  "title": "Moonlight",
+  "description": "film del 2016 diretto da Barry Jenkins",
+  "released": "2016-09-02T00:00:00Z",
+  "duration": 111,
+  "image": null,
+  "genres": [
+   "drama film",
+   "LGBTQ-related film",
+   "coming-of-age film"
+  ]
+ },
+ {
+  "qid": "Q25136484",
+  "title": "It",
+  "description": "film del 2017 diretto da Andy Muschietti",
+  "released": "2017-09-07T00:00:00Z",
+  "duration": 135,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "horror film",
+   "thriller film",
+   "supernatural horror film",
+   "coming-of-age film",
+   "psychological thriller film",
+   "contemporary fantasy",
+   "mystery film",
+   "supernatural film"
+  ]
+ },
+ {
+  "qid": "Q63985561",
+  "title": "Tenet",
+  "description": "film del 2020 diretto da Christopher Nolan",
+  "released": "2020-08-13T00:00:00Z",
+  "duration": 150,
+  "image": null,
+  "genres": [
+   "action film",
+   "spy film",
+   "thriller film",
+   "science fiction film",
+   "time-travel film"
+  ]
+ },
+ {
+  "qid": "Q32433",
+  "title": "Lincoln",
+  "description": "film del 2012 diretto da Steven Spielberg",
+  "released": "2012-10-08T00:00:00Z",
+  "duration": 150,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film",
+   "biographical film",
+   "trial film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q202028",
+  "title": "La guerra dei mondi",
+  "description": "film del 2005 diretto da Steven Spielberg",
+  "released": "2005-06-29T00:00:00Z",
+  "duration": 117,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/WarOfTheWorlds-Set.jpg",
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "disaster film",
+   "alien invasion",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q61696",
+  "title": "Un uomo da marciapiede",
+  "description": "film del 1969 diretto da John Schlesinger",
+  "released": "1969-01-01T00:00:00Z",
+  "duration": 108,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Midnight%20Cowboy%20trailer%20-%20poster.jpg",
+  "genres": [
+   "drama film",
+   "buddy film",
+   "LGBTQ-related film"
+  ]
+ },
+ {
+  "qid": "Q208344",
+  "title": "Armageddon - Giudizio finale",
+  "description": "film del 1998 diretto da Michael Bay",
+  "released": "1998-01-01T00:00:00Z",
+  "duration": 151,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/ArmageddonPremiere98.jpg",
+  "genres": [
+   "drama film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "disaster film",
+   "speculative fiction film"
+  ]
+ },
+ {
+  "qid": "Q213012",
+  "title": "Boog & Elliot a caccia di amici",
+  "description": "film di animazione del 2006 diretto da Roger Allers e Jill Culton",
+  "released": "2006-09-25T00:00:00Z",
+  "duration": 86,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "buddy film",
+   "musical film",
+   "family film",
+   "flashback film"
+  ]
+ },
+ {
+  "qid": "Q216006",
+  "title": "Il labirinto del fauno",
+  "description": "film del 2006 diretto da Guillermo del Toro",
+  "released": "2006-05-27T00:00:00Z",
+  "duration": 119,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "war film",
+   "teen film"
+  ]
+ },
+ {
+  "qid": "Q217182",
+  "title": "Edward mani di forbice",
+  "description": "film del 1990 diretto da Tim Burton",
+  "released": "1990-01-01T00:00:00Z",
+  "duration": 105,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/New%20York%20Comic%20Con%202015%20-%20Edward%20Scissorhands%20%2821442118814%29.jpg",
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "romance film",
+   "Christmas film",
+   "cinematic fairy tale"
+  ]
+ },
+ {
+  "qid": "Q217627",
+  "title": "Il laureato",
+  "description": "film del 1967 diretto da Mike Nichols",
+  "released": "1967-12-21T00:00:00Z",
+  "duration": 102,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20Verne%20United%20Methodist%20Church%20%28featured%20in%20last%20scene%20of%20The%20Graduate%29.jpg",
+  "genres": [
+   "drama film",
+   "independent film",
+   "comedy drama",
+   "coming-of-age film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q220394",
+  "title": "La nascita di una nazione",
+  "description": "film del 1915 diretto da David Wark Griffith",
+  "released": "1915-01-01T00:00:00Z",
+  "duration": 187,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Birth-of-a-nation-klan-and-black-man.jpg",
+  "genres": [
+   "drama film",
+   "silent film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q220515",
+  "title": "La ricerca della felicità",
+  "description": "film del 2006 diretto da Gabriele Muccino",
+  "released": "2006-12-15T00:00:00Z",
+  "duration": 113,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film"
+  ]
+ },
+ {
+  "qid": "Q220713",
+  "title": "American Pie",
+  "description": "film del 1999 diretto da Paul Weitz Chris Weitz",
+  "released": "1999-07-09T00:00:00Z",
+  "duration": 95,
+  "image": null,
+  "genres": [
+   "teen film",
+   "sex comedy",
+   "coming-of-age film",
+   "romantic comedy film",
+   "high school film"
+  ]
+ },
+ {
+  "qid": "Q223374",
+  "title": "Le pagine della nostra vita",
+  "description": "film del 2004 diretto da Nick Cassavetes",
+  "released": "2004-05-20T00:00:00Z",
+  "duration": 123,
+  "image": null,
+  "genres": [
+   "drama film",
+   "romance film",
+   "coming-of-age film"
+  ]
+ },
+ {
+  "qid": "Q224130",
+  "title": "I Fantastici Quattro",
+  "description": "film del 2005 diretto da Tim Story",
+  "released": "2005-01-01T00:00:00Z",
+  "duration": 102,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "science fiction film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q270215",
+  "title": "Contact",
+  "description": "film del 1997 diretto da Robert Zemeckis",
+  "released": "1997-07-11T00:00:00Z",
+  "duration": 144,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Contact%20uniforms.jpg",
+  "genres": [
+   "drama film",
+   "science fiction film"
+  ]
+ },
+ {
+  "qid": "Q270385",
+  "title": "Orgoglio e pregiudizio",
+  "description": "film del 2005 diretto da Joe Wright",
+  "released": "2005-09-16T00:00:00Z",
+  "duration": 127,
+  "image": null,
+  "genres": [
+   "drama film",
+   "romance film"
+  ]
+ },
+ {
+  "qid": "Q270510",
+  "title": "L'appartamento",
+  "description": "film del 1960 diretto da Billy Wilder",
+  "released": "1960-06-15T00:00:00Z",
+  "duration": 125,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Apartment%20%281960%20poster%29.jpg",
+  "genres": [
+   "drama film",
+   "Christmas film",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q272064",
+  "title": "007 - Zona pericolo",
+  "description": "film del 1987 diretto da John Glen",
+  "released": "1987-01-01T00:00:00Z",
+  "duration": 130,
+  "image": null,
+  "genres": [
+   "action film",
+   "thriller film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q286868",
+  "title": "Noah",
+  "description": "film del 2014 diretto da Darren Aronofsky",
+  "released": "2014-03-10T00:00:00Z",
+  "duration": 138,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "adventure film",
+   "epic film",
+   "sword-and-sandal film",
+   "speculative fiction film",
+   "apocalyptic film"
+  ]
+ },
+ {
+  "qid": "Q320461",
+  "title": "La mummia - Il ritorno",
+  "description": "film del 2001 diretto da Stephen Sommers",
+  "released": "2001-05-04T00:00:00Z",
+  "duration": 129,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "horror film",
+   "action film"
+  ]
+ },
+ {
+  "qid": "Q174371",
+  "title": "127 ore",
+  "description": "film del 2010 diretto da Danny Boyle",
+  "released": "2010-11-05T00:00:00Z",
+  "duration": 94,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/127%20Hours%20poster.svg",
+  "genres": [
+   "drama film",
+   "biographical film",
+   "docudrama",
+   "independent film",
+   "survival film"
+  ]
+ },
+ {
+  "qid": "Q335160",
+  "title": "Snatch - Lo strappo",
+  "description": "film del 2000 diretto da Guy Ritchie",
+  "released": "2000-01-01T00:00:00Z",
+  "duration": 104,
+  "image": null,
+  "genres": [
+   "crime comedy film",
+   "boxing film"
+  ]
+ },
+ {
+  "qid": "Q337881",
+  "title": "Johnny English",
+  "description": "film del 2003 diretto da Peter Howitt",
+  "released": "2003-01-01T00:00:00Z",
+  "duration": 87,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Johnny%20English%20Title.png",
+  "genres": [
+   "action film",
+   "parody film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q372514",
+  "title": "RoboCop",
+  "description": "film del 1987 diretto da Paul Verhoeven",
+  "released": "1987-01-01T00:00:00Z",
+  "duration": 102,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Robocop%201.png",
+  "genres": [
+   "cyberpunk",
+   "action film",
+   "science fiction film",
+   "thriller film",
+   "superhero film",
+   "speculative fiction film",
+   "dystopian film",
+   "splatter film"
+  ]
+ },
+ {
+  "qid": "Q18067135",
+  "title": "Il ponte delle spie",
+  "description": "film del 2015 diretto da Steven Spielberg",
+  "released": "2015-10-16T00:00:00Z",
+  "duration": 142,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Berlin%20Krise%201961.jpg",
+  "genres": [
+   "war film",
+   "biographical film",
+   "trial film",
+   "historical film"
+  ]
+ },
+ {
+  "qid": "Q19590955",
+  "title": "Rogue One: A Star Wars Story",
+  "description": "film del 2016 diretto da Gareth Edwards",
+  "released": "2016-12-13T00:00:00Z",
+  "duration": 133,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "science fiction film",
+   "war film",
+   "space opera"
+  ]
+ },
+ {
+  "qid": "Q23894629",
+  "title": "Eternals",
+  "description": "film del 2021 diretto da Chloé Zhao",
+  "released": "2021-11-03T00:00:00Z",
+  "duration": 156,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Eternals%20logo.png",
+  "genres": [
+   "action film",
+   "drama film",
+   "adventure film",
+   "science fiction film",
+   "superhero film",
+   "speculative fiction film"
+  ]
+ },
+ {
+  "qid": "Q54021143",
+  "title": "I Mitchell contro le macchine",
+  "description": "film d'animazione del 2021 diretto da Mike Rianda e Jeff Rowe",
+  "released": "2021-04-22T00:00:00Z",
+  "duration": 113,
+  "image": null,
+  "genres": [
+   "science fiction film",
+   "road movie",
+   "apocalyptic film"
+  ]
+ },
+ {
+  "qid": "Q109228991",
+  "title": "Dune - Parte due",
+  "description": "film del 2024 diretto da Denis Villeneuve",
+  "released": "2024-02-27T00:00:00Z",
+  "duration": 166,
+  "image": null,
+  "genres": [
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "epic film",
+   "speculative fiction film"
+  ]
+ },
+ {
+  "qid": "Q28196",
+  "title": "World War Z",
+  "description": "film del 2013 diretto da Marc Forster",
+  "released": "2013-06-02T00:00:00Z",
+  "duration": 116,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/World%20War%20Z%20in%20Glasgow%20030%20%289194785674%29.jpg",
+  "genres": [
+   "drama film",
+   "horror film",
+   "action film",
+   "adventure film",
+   "science fiction film",
+   "zombie film",
+   "post-apocalyptic film",
+   "apocalyptic film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q18428",
+  "title": "Amarcord",
+  "description": "film italiano del 1973 diretto da Federico Fellini",
+  "released": "1973-12-18T00:00:00Z",
+  "duration": 127,
+  "image": null,
+  "genres": [
+   "drama film",
+   "comedy film",
+   "art film",
+   "coming-of-age film"
+  ]
+ },
+ {
+  "qid": "Q200672",
+  "title": "Notting Hill",
+  "description": "film del 1999 diretto da Roger Michell",
+  "released": "1999-05-21T00:00:00Z",
+  "duration": 119,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Notting%20Hill.JPG",
+  "genres": [
+   "comedy drama",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q204398",
+  "title": "Octopussy - Operazione piovra",
+  "description": "film del 1983 diretto da John Glen",
+  "released": "1983-01-01T00:00:00Z",
+  "duration": 131,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Octopussy%20circus.jpg",
+  "genres": [
+   "action film",
+   "adventure film",
+   "thriller film",
+   "spy film"
+  ]
+ },
+ {
+  "qid": "Q188850",
+  "title": "Mamma Mia!",
+  "description": "film del 2008 diretto da Phyllida Lloyd",
+  "released": "2008-06-30T00:00:00Z",
+  "duration": 108,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/ABBA%202008%20Av%20Daniel%20%C3%85hs.jpg",
+  "genres": [
+   "romantic comedy",
+   "musical film",
+   "musical comedy"
+  ]
+ },
+ {
+  "qid": "Q194413",
+  "title": "Pearl Harbor",
+  "description": "film del 2001 diretto da Michael Bay",
+  "released": "2001-01-01T00:00:00Z",
+  "duration": 183,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film",
+   "romance film"
+  ]
+ },
+ {
+  "qid": "Q244604",
+  "title": "Minority Report",
+  "description": "film del 2002 diretto da Steven Spielberg",
+  "released": "2002-06-17T00:00:00Z",
+  "duration": 145,
+  "image": null,
+  "genres": [
+   "science fiction film",
+   "action film",
+   "dystopian film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q211009",
+  "title": "Van Helsing",
+  "description": "film del 2004, diretto da Stephen Sommers",
+  "released": "2004-05-03T00:00:00Z",
+  "duration": 126,
+  "image": null,
+  "genres": [
+   "action film",
+   "fantasy film",
+   "horror film",
+   "swashbuckler film",
+   "adventure film",
+   "mystery film",
+   "werewolf film",
+   "thriller film",
+   "vampire film",
+   "crossover fiction"
+  ]
+ },
+ {
+  "qid": "Q212041",
+  "title": "Sweeney Todd - Il diabolico barbiere di Fleet Street",
+  "description": "film del 2007 diretto da Tim Burton",
+  "released": "2007-12-03T00:00:00Z",
+  "duration": 116,
+  "image": null,
+  "genres": [
+   "drama film",
+   "horror film",
+   "slasher film",
+   "crime film",
+   "romance film",
+   "crime drama film",
+   "Gothic film",
+   "splatter film",
+   "gothic horror film",
+   "musical drama",
+   "musical film",
+   "romantic horror film",
+   "crime thriller film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q214723",
+  "title": "La febbre dell'oro",
+  "description": "film del 1925 (versione muta) - 1942 (versione sonora) diretto da Charlie Chaplin",
+  "released": "1925-06-26T00:00:00Z",
+  "duration": 96,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Chaplin%20the%20gold%20rush%20boot.jpg",
+  "genres": [
+   "comedy film",
+   "silent film",
+   "romantic comedy",
+   "social comedy film"
+  ]
+ },
+ {
+  "qid": "Q217220",
+  "title": "Patton, generale d'acciaio",
+  "description": "film del 1970 diretto da Franklin J. Schaffner",
+  "released": "1970-02-04T00:00:00Z",
+  "duration": 170,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "war film"
+  ]
+ },
+ {
+  "qid": "Q217552",
+  "title": "X-Men le origini - Wolverine",
+  "description": "film del 2009 diretto da Gavin Hood",
+  "released": "2009-04-29T00:00:00Z",
+  "duration": 107,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Wolverine%20%287343567212%29%20%28retouched%29.jpg",
+  "genres": [
+   "science fiction film",
+   "action film",
+   "superhero film"
+  ]
+ },
+ {
+  "qid": "Q221090",
+  "title": "I figli degli uomini",
+  "description": "film del 2006 diretto da Alfonso Cuarón",
+  "released": "2006-09-03T00:00:00Z",
+  "duration": 106,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Children%20of%20Men%20Baby.JPG",
+  "genres": [
+   "drama film",
+   "science fiction film",
+   "adventure film",
+   "tech noir",
+   "dystopian film",
+   "post-apocalyptic film",
+   "speculative fiction film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q221491",
+  "title": "La sottile linea rossa",
+  "description": "film del 1998 diretto da Terrence Malick",
+  "released": "1998-01-01T00:00:00Z",
+  "duration": 166,
+  "image": null,
+  "genres": [
+   "drama film",
+   "war film"
+  ]
+ },
+ {
+  "qid": "Q221586",
+  "title": "Mystic River",
+  "description": "film del 2003 diretto da Clint Eastwood",
+  "released": "2003-05-23T00:00:00Z",
+  "duration": 137,
+  "image": null,
+  "genres": [
+   "drama film",
+   "neo-noir",
+   "mystery film",
+   "crime thriller film",
+   "psychological thriller film"
+  ]
+ },
+ {
+  "qid": "Q243983",
+  "title": "L'alba del pianeta delle scimmie",
+  "description": "film del 2011 diretto da Rupert Wyatt",
+  "released": "2011-08-05T00:00:00Z",
+  "duration": 105,
+  "image": null,
+  "genres": [
+   "drama film",
+   "science fiction film",
+   "action film",
+   "dystopian film"
+  ]
+ },
+ {
+  "qid": "Q106871",
+  "title": "Die Hard - Duri a morire",
+  "description": "film del 1995 diretto da John McTiernan",
+  "released": "1995-05-19T00:00:00Z",
+  "duration": 131,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Die%20Hard%20with%20a%20Vengeance.png",
+  "genres": [
+   "action film",
+   "heist film",
+   "buddy film",
+   "buddy cop film",
+   "action thriller"
+  ]
+ },
+ {
+  "qid": "Q107894",
+  "title": "Agente 007 - Al servizio segreto di Sua Maestà",
+  "description": "film del 1969 diretto da Peter R. Hunt",
+  "released": "1969-01-01T00:00:00Z",
+  "duration": 142,
+  "image": null,
+  "genres": [
+   "action film",
+   "crime film",
+   "adventure film",
+   "thriller film",
+   "spy film",
+   "Christmas film"
+  ]
+ },
+ {
+  "qid": "Q125772",
+  "title": "Solaris",
+  "description": "film del 1972 diretto da Andrej Tarkovskij",
+  "released": "1972-01-01T00:00:00Z",
+  "duration": 160,
+  "image": null,
+  "genres": [
+   "drama film",
+   "science fiction film",
+   "art film",
+   "adventure film",
+   "arthouse science fiction film"
+  ]
+ },
+ {
+  "qid": "Q126699",
+  "title": "Gran Torino",
+  "description": "film del 2008 diretto da Clint Eastwood",
+  "released": "2008-12-12T00:00:00Z",
+  "duration": 116,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Gran-torino-509e76b22e77f.png",
+  "genres": [
+   "drama film",
+   "crime film",
+   "white savior film"
+  ]
+ },
+ {
+  "qid": "Q153484",
+  "title": "Resident Evil",
+  "description": "film del 2002 diretto da Paul W. S. Anderson",
+  "released": "2002-01-01T00:00:00Z",
+  "duration": 100,
+  "image": null,
+  "genres": [
+   "action film",
+   "horror film",
+   "science fiction film",
+   "biopunk",
+   "girls with guns",
+   "zombie film",
+   "science fiction horror film"
+  ]
+ },
+ {
+  "qid": "Q272860",
+  "title": "The Elephant Man",
+  "description": "film del 1980 diretto da David Lynch",
+  "released": "1980-10-03T00:00:00Z",
+  "duration": 124,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film"
+  ]
+ },
+ {
+  "qid": "Q329805",
+  "title": "Tutto su mia madre",
+  "description": "film del 1999 diretto da Pedro Almodóvar",
+  "released": "1999-04-08T00:00:00Z",
+  "duration": 104,
+  "image": null,
+  "genres": [
+   "comedy drama",
+   "transgender film"
+  ]
+ },
+ {
+  "qid": "Q157044",
+  "title": "The Hours",
+  "description": "film del 2002 diretto da Stephen Daldry",
+  "released": "2002-01-01T00:00:00Z",
+  "duration": 114,
+  "image": null,
+  "genres": [
+   "drama film",
+   "LGBTQ-related film"
+  ]
+ },
+ {
+  "qid": "Q165325",
+  "title": "Kill Bill - Volume 1",
+  "description": "film del 2003 diretto da Quentin Tarantino",
+  "released": "2003-01-01T00:00:00Z",
+  "duration": 111,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Killbill-vol1-logo.svg",
+  "genres": [
+   "drama film",
+   "action film",
+   "samurai cinema",
+   "crime film",
+   "martial arts film",
+   "splatter film",
+   "girls with guns",
+   "neo-noir",
+   "thriller film",
+   "vigilante film",
+   "action thriller",
+   "crime thriller film",
+   "wuxia film",
+   "crime drama film"
+  ]
+ },
+ {
+  "qid": "Q374172",
+  "title": "Il monello",
+  "description": "film del 1921 diretto da Charlie Chaplin",
+  "released": "1921-01-16T00:00:00Z",
+  "duration": 68,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Chaplin%20The%20Kid.jpg",
+  "genres": [
+   "drama film",
+   "silent film",
+   "comedy drama",
+   "social comedy film"
+  ]
+ },
+ {
+  "qid": "Q387601",
+  "title": "Una notte al museo",
+  "description": "film del 2006 diretto da Shawn Levy",
+  "released": "2006-12-17T00:00:00Z",
+  "duration": 105,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action comedy film"
+  ]
+ },
+ {
+  "qid": "Q454398",
+  "title": "I Puffi",
+  "description": "film del 2011 diretto da Raja Gosnell",
+  "released": "2011-07-16T00:00:00Z",
+  "duration": 102,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "comedy film",
+   "children's film"
+  ]
+ },
+ {
+  "qid": "Q483852",
+  "title": "Mrs. Doubtfire - Mammo per sempre",
+  "description": "film del 1993 diretto da Chris Columbus",
+  "released": "1993-01-01T00:00:00Z",
+  "duration": 125,
+  "image": null,
+  "genres": [
+   "drama film",
+   "screwball comedy film",
+   "comedy drama",
+   "LGBTQ-related film"
+  ]
+ },
+ {
+  "qid": "Q570567",
+  "title": "Ultimo tango a Parigi",
+  "description": "film del 1972 diretto da Bernardo Bertolucci",
+  "released": "1972-01-01T00:00:00Z",
+  "duration": 129,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Ultimo%20tango%20a%20Parigi%20-%20wikillustrazione%201.jpg",
+  "genres": [
+   "drama film",
+   "romance film",
+   "erotic film"
+  ]
+ },
+ {
+  "qid": "Q2937646",
+  "title": "Captain Phillips",
+  "description": "film del 2013 diretto da Paul Greengrass",
+  "released": "2013-09-27T00:00:00Z",
+  "duration": 134,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Captain%20Phillips.jpg",
+  "genres": [
+   "drama film",
+   "action film",
+   "biographical film",
+   "pirate film",
+   "thriller film",
+   "survival film"
+  ]
+ },
+ {
+  "qid": "Q15068238",
+  "title": "Kingsman - Secret Service",
+  "description": "film del 2014 diretto da Matthew Vaughn",
+  "released": "2014-01-01T00:00:00Z",
+  "duration": 129,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "action film",
+   "crime film",
+   "spy film",
+   "action comedy film"
+  ]
+ },
+ {
+  "qid": "Q15140437",
+  "title": "Terminator Genisys",
+  "description": "film del 2015 diretto da Alan Taylor",
+  "released": "2015-06-25T00:00:00Z",
+  "duration": 126,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "action film",
+   "cyberpunk",
+   "science fiction film",
+   "adventure film",
+   "techno-thriller",
+   "chase film",
+   "thriller film",
+   "dystopian film",
+   "science fiction action film",
+   "suspense film",
+   "time-travel film"
+  ]
+ },
+ {
+  "qid": "Q16970789",
+  "title": "American Sniper",
+  "description": "film del 2014 diretto da Clint Eastwood",
+  "released": "2014-11-11T00:00:00Z",
+  "duration": 132,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/American-sniper-logo.svg",
+  "genres": [
+   "drama film",
+   "action film",
+   "war film",
+   "biographical film"
+  ]
+ },
+ {
+  "qid": "Q17042878",
+  "title": "X-Men: Apocalisse",
+  "description": "film del 2016 diretto da Bryan Singer",
+  "released": "2016-05-18T00:00:00Z",
+  "duration": 131,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "superhero film",
+   "science fiction film",
+   "science fiction action film",
+   "apocalyptic film"
+  ]
+ },
+ {
+  "qid": "Q24053277",
+  "title": "Three Billboards Outside Ebbing, Missouri",
+  "description": "film del 2017 diretto da Martin McDonagh",
+  "released": "2017-09-04T00:00:00Z",
+  "duration": 115,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Logo%20Three%20Billboards%20Outside%20Ebbing%2C%20Missouri%20grau.svg",
+  "genres": [
+   "drama film",
+   "mystery film",
+   "crime film",
+   "black comedy film"
+  ]
+ },
+ {
+  "qid": "Q25431158",
+  "title": "Deadpool 2",
+  "description": "film del 2018 diretto da David Leitch",
+  "released": "2018-05-15T00:00:00Z",
+  "duration": 119,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Movie%20advertisement%20on%20bus%20in%20Brisbane%2C%20Australia.jpg",
+  "genres": [
+   "superhero film",
+   "LGBTQ-related film",
+   "black comedy film",
+   "time-travel film"
+  ]
+ },
+ {
+  "qid": "Q65768604",
+  "title": "Thor: Love and Thunder",
+  "description": "film del 2022 diretto da Taika Waititi",
+  "released": "2022-07-08T00:00:00Z",
+  "duration": 119,
+  "image": null,
+  "genres": [
+   "action film",
+   "superhero film",
+   "science fiction film",
+   "adventure film"
+  ]
+ },
+ {
+  "qid": "Q105970894",
+  "title": "Sonic 2 - Il film",
+  "description": "film del 2022 diretto da Jeff Fowler",
+  "released": "2022-03-30T00:00:00Z",
+  "duration": 123,
+  "image": null,
+  "genres": [
+   "comedy film",
+   "action film",
+   "science fiction film",
+   "adventure film",
+   "live-action/animated film"
+  ]
+ },
+ {
+  "qid": "Q25043",
+  "title": "Monty Python e il Sacro Graal",
+  "description": "film del 1975 diretto da Terry Gilliam e Terry Jones",
+  "released": "1975-01-01T00:00:00Z",
+  "duration": 91,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "comedy film",
+   "period drama film",
+   "parody film",
+   "adventure film",
+   "knight film"
+  ]
+ },
+ {
+  "qid": "Q18402",
+  "title": "La strada",
+  "description": "film del 1954 diretto da Federico Fellini",
+  "released": "1954-09-06T00:00:00Z",
+  "duration": 104,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/La%20strada%20film.jpg",
+  "genres": [
+   "drama film"
+  ]
+ },
+ {
+  "qid": "Q204057",
+  "title": "Philadelphia",
+  "description": "film del 1993 diretto da Jonathan Demme",
+  "released": "1993-01-01T00:00:00Z",
+  "duration": 125,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Philadelphia-CityHall-2006.jpg",
+  "genres": [
+   "drama film",
+   "trial film",
+   "LGBTQ-related film"
+  ]
+ },
+ {
+  "qid": "Q244448",
+  "title": "Com'era verde la mia valle",
+  "description": "film del 1941 diretto da John Ford",
+  "released": "1941-01-01T00:00:00Z",
+  "duration": 118,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/How%20Green%20Was%20My%20Valley%204.jpg",
+  "genres": [
+   "drama film"
+  ]
+ },
+ {
+  "qid": "Q207816",
+  "title": "Una settimana da Dio",
+  "description": "film del 2003 diretto da Tom Shadyac",
+  "released": "2003-05-23T00:00:00Z",
+  "duration": 101,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "comedy film",
+   "comedy drama",
+   "romantic comedy film"
+  ]
+ },
+ {
+  "qid": "Q210756",
+  "title": "La cosa",
+  "description": "film del 1982 diretto da John Carpenter",
+  "released": "1982-01-01T00:00:00Z",
+  "duration": 109,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Thing%201982%20publicity%20still.jpg",
+  "genres": [
+   "drama film",
+   "action film",
+   "horror film",
+   "science fiction film",
+   "splatter film",
+   "mystery film",
+   "monster film",
+   "thriller film",
+   "survival film",
+   "science fiction horror film",
+   "suspense film",
+   "body horror film"
+  ]
+ },
+ {
+  "qid": "Q217010",
+  "title": "The Twilight Saga: Eclipse",
+  "description": "film del 2010 diretto da David Slade",
+  "released": "2010-06-24T00:00:00Z",
+  "duration": 124,
+  "image": null,
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "romance film",
+   "vampire film",
+   "werewolf film",
+   "teen film"
+  ]
+ },
+ {
+  "qid": "Q219424",
+  "title": "Scary Movie",
+  "description": "film del 2000 diretto da Keenen Ivory Wayans",
+  "released": "2000-07-07T00:00:00Z",
+  "duration": 88,
+  "image": null,
+  "genres": [
+   "parody film",
+   "horror film",
+   "comedy horror",
+   "slasher film",
+   "teen film"
+  ]
+ },
+ {
+  "qid": "Q220735",
+  "title": "Il braccio violento della legge",
+  "description": "film del 1971 diretto da William Friedkin",
+  "released": "1971-10-07T00:00:00Z",
+  "duration": 106,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/French%20connection%20intertitle.png",
+  "genres": [
+   "drama film",
+   "action film",
+   "crime film",
+   "neo-noir",
+   "mystery film",
+   "police procedural film",
+   "crime drama film",
+   "action thriller",
+   "buddy cop film",
+   "suspense film",
+   "chase film",
+   "crime thriller film",
+   "thriller film",
+   "detective film"
+  ]
+ },
+ {
+  "qid": "Q220910",
+  "title": "Casinò",
+  "description": "film del 1995 diretto da Martin Scorsese",
+  "released": "1995-11-14T00:00:00Z",
+  "duration": 178,
+  "image": null,
+  "genres": [
+   "drama film",
+   "biographical film",
+   "epic film",
+   "crime film",
+   "mystery film",
+   "crime drama film",
+   "gangster film",
+   "crime thriller film",
+   "thriller film"
+  ]
+ },
+ {
+  "qid": "Q221109",
+  "title": "The Butterfly Effect",
+  "description": "film del 2004 diretto da Eric Bress J. Mackye Gruber",
+  "released": "2004-01-01T00:00:00Z",
+  "duration": 120,
+  "image": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Butterfly%20Effect%20%282004%29.png",
+  "genres": [
+   "drama film",
+   "fantasy film",
+   "science fiction film",
+   "crime thriller film",
+   "psychological thriller film"
+  ]
+ },
+ {
+  "qid": "Q221345",
+  "title": "Batman Forever",
+  "description": "film del 1995 diretto da Joel Schumacher",
+  "released": "1995-06-16T00:00:00Z",
+  "duration": 117,
+  "image": null,
+  "genres": [
+   "fantasy film",
+   "action film",
+   "superhero film",
+   "neo-noir"
+  ]
+ }
+]
