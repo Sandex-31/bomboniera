@@ -64,6 +64,22 @@ try {
     assert.ok(existsSync(labs(`lab-asd/data/${f}`)), `missing lab-asd/data/${f}`);
   console.log("ok — lab-asd: 4 C test suites green, ex1 sorts, ex2 answers the same twice");
 
+  /* SQL labs open with the same sql.js the page uses */
+  const initSqlJs = (await import("sql.js")).default;
+  const SQL = await initSqlJs();
+  const openFile = (p) => new SQL.Database(readFileSync(labs(p)));
+  const tables = (db) => db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")[0].values.map((r) => r[0]);
+
+  const cat = openFile("catering/catering.db");
+  assert.ok(tables(cat).length >= 5, "catering.db has fewer tables than the project");
+  for (const t of tables(cat)) cat.exec(`SELECT * FROM "${t}" LIMIT 1`);
+  const junit = JSON.parse(readFileSync(labs("catering/tests.json"), "utf8"));
+  assert.ok(junit.total > 0, "no JUnit cases recorded");
+  assert.equal(junit.failures, 0, junit.cases.filter((c) => !c.ok).map((c) => c.name).join(", "));
+  const catQueries = JSON.parse(readFileSync(labs("catering/queries.json"), "utf8"));
+  for (const q of catQueries) assert.ok(cat.exec(q.sql).length, `catering example query returns nothing: ${q.title}`);
+  console.log(`ok — catering: ${tables(cat).length} tables, ${junit.total} JUnit cases green`);
+
   // ── later tasks append their checks here, above this line ──
 } finally {
   await vite.close();
