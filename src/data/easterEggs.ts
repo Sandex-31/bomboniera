@@ -5,8 +5,7 @@ import { thesis } from './thesis';
 
 /**
  * Objects hidden in the room. Found ones are remembered in localStorage.
- * Every `reveal` marked TODO is a line only you can write — the counter, the
- * toast and the "trovati" list all read from this array, so adding or removing
+ * The counter, the toast and the "trovati" list all read from this array, so adding or removing
  * an entry is the whole change.
  */
 export type EasterEgg = {

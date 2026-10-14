@@ -39,8 +39,7 @@ export const credits: CreditBlock[] = [
  * bottom of the Grazie panel — same data, so the names stay readable without
  * WebGL and for a screen reader.
  *
- * TODO: replace every placeholder with a real name. Keep the groups short:
- * the roll takes about twelve seconds per screenful.
+ * Keep the groups short: the roll takes about twelve seconds per screenful.
  */
 export const creditRoll: CreditGroup[] = [
   {

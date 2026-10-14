@@ -1,55 +1,54 @@
 import type { Project } from '../types';
 
 /**
- * TODO: replace with the real projects.
  * `media` paths resolve against the site base — put files in /public/media/.
  * A missing image never breaks the page: it falls back to a placeholder tile.
  */
 export const projects: Project[] = [
   {
-    id: 'distributed-app',
-    title: 'Distributed Application',
-    year: 2025,
-    course: 'Ingegneria del Software',
-    summary: 'Servizio distribuito containerizzato, progettato per essere messo in crisi.',
-    description:
-      'TODO: descrizione reale. Applicazione a servizi con API REST, persistenza su PostgreSQL, deploy containerizzato e test di carico per osservare il comportamento sotto stress.',
-    tech: ['Java', 'Spring', 'Docker', 'PostgreSQL', 'AWS'],
-    media: [{ src: 'media/distributed-1.png', alt: 'Architettura del sistema distribuito' }],
-    github: 'https://github.com/',
-  },
-  {
-    id: 'compiler-toy',
-    title: 'Toy Compiler',
-    year: 2025,
-    course: 'Linguaggi e Traduttori',
-    summary: 'Un linguaggio giocattolo, dal lexer alla macchina virtuale.',
-    description:
-      'TODO: descrizione reale. Front-end completo (lexing, parsing, AST, type checking) e back-end verso bytecode eseguito da una VM a stack scritta da zero.',
-    tech: ['TypeScript', 'ANTLR', 'Vitest'],
-    media: [{ src: 'media/compiler-1.png', alt: 'Output del compilatore' }],
-    github: 'https://github.com/',
-  },
-  {
-    id: 'graph-viz',
-    title: 'Graph Playground',
+    id: 'food-delivery-db',
+    title: 'Food Delivery DB',
     year: 2024,
+    course: 'Basi di Dati',
+    summary: 'Il database di un’app di delivery, dai requisiti allo schema.',
+    description:
+      'Progettazione completa della base di dati per una piattaforma di food delivery: analisi dei requisiti, glossario dei termini, schema E-R con utenti, ristoranti, rider, ordini, portate e recensioni, fino alla traduzione nello schema relazionale.',
+    tech: ['SQL', 'Modello E-R', 'Schema relazionale'],
+  },
+  {
+    id: 'lab-asd',
+    title: 'Laboratorio di Algoritmi',
+    year: 2025,
     course: 'Algoritmi e Strutture Dati',
-    summary: 'Visualizzatore interattivo di algoritmi su grafi.',
+    summary: 'Quattro esercizi in C, dagli ordinamenti ai grafi.',
     description:
-      'TODO: descrizione reale. Strumento didattico che anima Dijkstra, BFS/DFS e Kruskal passo per passo su grafi costruiti a mano.',
-    tech: ['React', 'Canvas', 'TypeScript'],
-    media: [{ src: 'media/graph-1.png', alt: 'Animazione di Dijkstra' }],
-    demo: 'https://example.com',
+      'Merge Sort e Quick Sort su milioni di record, edit distance, tabelle hash con concatenamento e grafi sparsi con visita in ampiezza sulle distanze tra città italiane. Ogni esercizio con unit test e relazione.',
+    tech: ['C', 'Make', 'Unit testing', 'Doxygen'],
+    github: 'https://github.com/Sandex-31/laboratorio-algoritmi-2024-2025',
   },
   {
-    id: 'sensor-net',
-    title: 'Sensor Mesh',
-    year: 2024,
-    course: 'Reti di Calcolatori',
-    summary: 'Rete di sensori low-power con raccolta dati centralizzata.',
+    id: 'film-data',
+    title: 'Film Data Web App',
+    year: 2025,
+    course: 'Interazione uomo macchina e tecnologie web',
+    summary: 'Una piattaforma di film divisa in microservizi.',
     description:
-      'TODO: descrizione reale. Nodi embedded che pubblicano telemetria via MQTT verso un broker, con dashboard di monitoraggio e calibrazione manuale delle soglie.',
-    tech: ['Python', 'MQTT', 'InfluxDB', 'Grafana'],
+      'Un gateway centrale che smista le richieste tra un servizio del catalogo su PostgreSQL e uno delle recensioni su MongoDB con chat in tempo reale, più un sito Express/Handlebars per cercare i film e notebook Jupyter per l’analisi dei dati.',
+    tech: ['Express', 'Handlebars', 'PostgreSQL', 'MongoDB', 'Socket.io', 'Jupyter'],
+    media: [
+      { src: 'media/ium-tweb-home.jpeg', alt: 'Pagina principale del sito di film' },
+      { src: 'media/ium-tweb-film.jpeg', alt: 'Pagina di dettaglio di un film' },
+    ],
+    github: 'https://github.com/SalvatorePierri/Project_IUM_TWEB',
+  },
+  {
+    id: 'catering',
+    title: 'Cat & Ring',
+    year: 2026,
+    course: 'Sviluppo applicazioni software',
+    summary: 'Il gestionale di un’azienda di catering, a strati.',
+    description:
+      'Business logic per eventi, menù, ricette, compiti di cucina e personale, con fogli riepilogativi e controllo delle autorizzazioni. Persistenza su SQLite e test JUnit sui casi d’uso.',
+    tech: ['Java', 'Maven', 'SQLite', 'JUnit'],
   },
 ];

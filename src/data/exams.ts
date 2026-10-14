@@ -1,9 +1,6 @@
 import type { Exam } from '../types';
 
 /**
- * TODO: replace with the real exam list, CFU, grades and notes.
- * Everything below is realistic PLACEHOLDER content for a 3-year Italian
- * CS bachelor — no grade here is a real result.
  * The UI renders whatever is in this array: add, remove or reorder freely.
  */
 export const exams: Exam[] = [
