@@ -12,7 +12,7 @@ export const ensureDir = (p) => (mkdirSync(p, { recursive: true }), p);
 export const writeJson = (p, data) => (ensureDir(dirname(p)), writeFileSync(p, JSON.stringify(data)));
 export const writeGz = (p, data) => (ensureDir(dirname(p)), writeFileSync(p, gzipSync(data, { level: 9 })));
 /** Docker Desktop on Windows wants forward slashes. */
-export const dockerPath = (p) => resolve(p).replace(/\/g, "/");
+export const dockerPath = (p) => resolve(p).split("\\").join("/");
 
 export function sh(cmd, args, opts = {}) {
   const r = spawnSync(cmd, args, { stdio: "inherit", ...opts });
