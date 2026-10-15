@@ -35,6 +35,54 @@ SELECT ?film (SAMPLE(?itL) AS ?it) (SAMPLE(?enL) AS ?en) (SAMPLE(?d) AS ?desc)
 
 const POSTER_NAME = /poster|locandina|affiche|plakat|cartel|cartaz|one.?sheet|theatrical/i;
 
+/** Wikimedia rate-limits by User-Agent: on 429 wait what Retry-After asks, a few times, then give up. */
+export async function politeFetch(url) {
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(url, { headers: { "User-Agent": UA } });
+    if (res.status !== 429 || attempt === 4) return res;
+    const wait = Number(res.headers.get("retry-after")) || 30;
+    console.log(`  429, riprovo tra ${wait}s`);
+    await new Promise((r) => setTimeout(r, wait * 1000));
+  }
+}
+
+async function mwApi(base, params) {
+  const res = await politeFetch(base + "?" + new URLSearchParams({ format: "json", formatversion: "2", ...params }));
+  if (!res.ok) throw new Error(`${base} ${res.status}`);
+  return res.json();
+}
+
+async function posterAmongImages(title) {
+  const { query } = await mwApi("https://en.wikipedia.org/w/api.php", { action: "query", prop: "images", imlimit: "max", titles: title });
+  const file = query.pages[0]?.images?.map((i) => i.title.replace(/^File:/, "")).find((n) => POSTER_NAME.test(n));
+  return file?.replace(/ /g, "_");
+}
+
+/** English Wikipedia's infobox image — the theatrical poster for nearly every film, shown there as fair use. Cached like the Wikidata rows. */
+export async function enwikiPosters(films, { refresh = false } = {}) {
+  const file = join(ensureDir(CACHE), "enwiki-posters.json");
+  if (existsSync(file) && !refresh) return JSON.parse(readFileSync(file, "utf8"));
+  const posters = {};
+  for (let i = 0; i < films.length; i += 50) {
+    const qids = films.slice(i, i + 50).map((f) => f.qid);
+    const { entities } = await mwApi("https://www.wikidata.org/w/api.php", { action: "wbgetentities", ids: qids.join("|"), props: "sitelinks", sitefilter: "enwiki" });
+    const byTitle = new Map(qids.flatMap((q) => (entities[q]?.sitelinks?.enwiki ? [[entities[q].sitelinks.enwiki.title, q]] : [])));
+    const { query } = await mwApi("https://en.wikipedia.org/w/api.php", { action: "query", prop: "pageimages", piprop: "name", pilicense: "any", pilimit: "50", redirects: "1", titles: [...byTitle.keys()].join("|") });
+    const alias = new Map([...(query.normalized ?? []), ...(query.redirects ?? [])].map((x) => [x.from, x.to]));
+    for (const [title, qid] of byTitle) {
+      let t = title;
+      while (alias.has(t)) t = alias.get(t);
+      const page = query.pages.find((p) => p.title === t);
+      // no page image (PageImages skips some infoboxes): the article file named like a poster, if any
+      const name = page?.pageimage ?? (page && (await posterAmongImages(t)));
+      if (name) posters[qid] = `https://en.wikipedia.org/wiki/Special:FilePath/${encodeURIComponent(name)}`;
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  writeFileSync(file, JSON.stringify(posters, null, 1));
+  return posters;
+}
+
 /** Cached on disk and committed: the build must not depend on Wikidata being up. */
 export async function wikidataFilms({ refresh = false } = {}) {
   const file = join(ensureDir(CACHE), "wikidata-films.json");

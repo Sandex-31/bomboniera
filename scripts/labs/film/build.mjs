@@ -1,8 +1,8 @@
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { rng } from "../seed.mjs";
 import { ensureDir, outDir, writeJson } from "../util.mjs";
-import { wikidataFilms } from "./wikidata.mjs";
+import { enwikiPosters, politeFetch, wikidataFilms } from "./wikidata.mjs";
 import site from "./site.mjs";
 
 /** Wikidata genre labels ("horror film", "science fiction film") → the short English names the original dataset and frontend use. */
@@ -66,24 +66,28 @@ function typographic(f) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 450"><rect width="300" height="450" fill="${bg}"/><rect x="14" y="14" width="272" height="422" fill="none" stroke="#e8d9a8" stroke-opacity=".5"/>${text}<text x="150" y="400" fill="#e8d9a8" font-family="monospace" font-size="16" text-anchor="middle">${f.year}</text></svg>`;
 }
 
-/** Free Commons image when there is one (P18 lives on Commons); otherwise a typographic poster, never a copyrighted one. */
+/** The poster image when there is one (free on Commons, else the English Wikipedia one); a typographic poster if the download fails. */
 export async function writePosters(films, out) {
   const dir = ensureDir(join(out, "posters"));
   for (const f of films) {
     if (f.image && !existsSync(join(dir, `${f.id}.jpg`))) {
-      const res = await fetch(`${f.image.replace("http://", "https://")}?width=300`, { headers: { "User-Agent": "bomboniera-labs/1.0 (salvatorepierri.com)" } }).catch(() => null);
+      const res = await politeFetch(`${f.image.replace("http://", "https://")}?width=300`).catch(() => null);
       if (res?.ok) writeFileSync(join(dir, `${f.id}.jpg`), Buffer.from(await res.arrayBuffer()));
     }
     if (!existsSync(join(dir, `${f.id}.jpg`))) {
       f.poster = `../posters/${f.id}.svg`;
       writeFileSync(join(dir, `${f.id}.svg`), typographic(f));
-    }
+    } else rmSync(join(dir, `${f.id}.svg`), { force: true });
   }
 }
 
 export default async function film() {
   const out = ensureDir(outDir("film-data"));
-  const films = buildFilms(await wikidataFilms());
+  const raw = await wikidataFilms();
+  const posters = await enwikiPosters(raw);
+  // an "unknown value" poster on Wikidata comes back as a .well-known/genid blank node, not a Commons file
+  const commons = (url) => (/commons\.wikimedia\.org/.test(url ?? "") ? url : null);
+  const films = buildFilms(raw.map((f) => ({ ...f, image: commons(f.image) ?? posters[f.qid] ?? null })));
   await writePosters(films, out);
   writeApi(films, out);
   await site(films, out);
