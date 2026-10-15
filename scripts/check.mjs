@@ -655,6 +655,16 @@ try {
   const { projects } = await vite2.ssrLoadModule("/src/data/projects.ts");
   assert.ok(projectsHtml.includes(projects[0].title), "the project list is not rendering its data");
 
+  // the monitor lists one row per project: the rows, gaps included, stay on the 0.66-high screen
+  const roomText = await (await import("node:fs/promises")).readFile(new URL("../src/scenes/Room.tsx", import.meta.url), "utf8");
+  const pitch = roomText.match(/ROW_STEP = Math\.min\(([\d.]+), ([\d.]+) \/ Math\.max\(projects\.length/);
+  const rowH = roomText.match(/ROW_H = ROW_STEP \* ([\d.]+)/);
+  assert.ok(pitch && rowH, "could not read the monitor rows from Room.tsx");
+  for (const n of [projects.length, 12]) {
+    const step = Math.min(Number(pitch[1]), Number(pitch[2]) / n);
+    assert.ok((n - 1) * step + step * Number(rowH[1]) <= 0.66, `${n} projects overflow the monitor`);
+  }
+
   // the close-up card must resolve a picked item back to its real data
   const { exams: allExams } = await vite2.ssrLoadModule("/src/data/exams.ts");
   const cardHtml = renderToString(

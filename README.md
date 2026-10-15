@@ -118,7 +118,7 @@ suo posto appare un segnaposto con l'alt text — niente si rompe.
 in `/#/progetti/<id>`: si prova (il C di ASD compilato in WebAssembly, i database
 interrogabili con SQL, il frontend originale di Film Data), si sfoglia il codice e
 si leggono i documenti. `npm run labs` (con Docker Desktop acceso) ricostruisce
-`public/labs/`: compila il C con emscripten, esegue i test JUnit di Cat & Ring con
+`public/labs/`: compila il C con emscripten, esegue i test JUnit di Catering con
 Maven, genera il database del delivery e prende i film da Wikidata (in cache in
 `scripts/labs/cache/`). Il risultato si committa: il deploy non ha bisogno di Docker.
 I percorsi dei progetti sul disco stanno in `scripts/labs/sources.mjs`; per

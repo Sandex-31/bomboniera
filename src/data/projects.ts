@@ -47,7 +47,7 @@ export const projects: Project[] = [
   {
     id: 'catering',
     lab: 'sql',
-    title: 'Cat & Ring',
+    title: 'Catering',
     year: 2026,
     course: 'Sviluppo applicazioni software',
     summary: 'Il gestionale di un’azienda di catering, a strati.',

@@ -1263,9 +1263,9 @@ function Monitor({ focused, picked, onPickItem }: FocusProps) {
   );
 }
 
-/** Row height + gap, sized so the whole list always fits the 0.66-high screen. */
-const ROW_H = Math.min(0.12, 0.58 / Math.max(projects.length, 1));
-const ROW_STEP = ROW_H + 0.02;
+/** Row pitch, then height, sized so the whole list, gaps included, always fits the 0.66-high screen. */
+const ROW_STEP = Math.min(0.14, 0.62 / Math.max(projects.length, 1));
+const ROW_H = ROW_STEP * 0.75;
 
 /** One project, shown as a selectable line on the monitor. */
 function ProjectRow({
