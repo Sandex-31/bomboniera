@@ -1,0 +1,9 @@
+for(3 > 2){
+    assign[12 to x];
+    if(< 3 x){
+        assign[5 to y]
+        print(y);
+    }else{
+        print(x)
+    }end
+}

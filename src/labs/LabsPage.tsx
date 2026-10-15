@@ -49,8 +49,8 @@ function Index() {
 }
 
 function Shell({ project, route }: { project: Project; route: LabsRoute }) {
-  const tabs = project.lab ? TABS : TABS.filter(([t]) => t !== "prova");
-  const tab: LabsTab = project.lab || route.tab !== "prova" ? route.tab : "codice";
+  const tabs = TABS.filter(([t]) => (t !== "prova" || project.lab) && (t !== "codice" || !project.noCode));
+  const tab: LabsTab = tabs.some(([t]) => t === route.tab) ? route.tab : tabs[0][0];
   const Demo = project.lab ? DEMOS[project.lab] : null;
   return (
     <>

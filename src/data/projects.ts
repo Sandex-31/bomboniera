@@ -55,4 +55,45 @@ export const projects: Project[] = [
       'Business logic per eventi, menù, ricette, compiti di cucina e personale, con fogli riepilogativi e controllo delle autorizzazioni. Persistenza su SQLite e test JUnit sui casi d’uso.',
     tech: ['Java', 'Maven', 'SQLite', 'JUnit'],
   },
+  {
+    id: 'mtdi',
+    noCode: true,
+    title: 'Il banco delle scelte',
+    year: 2025,
+    course: 'Metodologie e tecnologie didattiche per l’informatica',
+    summary: 'Una lezione sullo switch per la seconda superiore.',
+    description:
+      'Progetto di un’attività didattica sul costrutto switch e sul fall-through in Java: si parte da un problema che rende necessario lo switch, poi un’attività unplugged in cui la classe fa da programma, esercizi di problem-based learning, condivisione con il Jigsaw e dubbi raccolti con il Fishbowl. Con obiettivi classificati secondo la tassonomia SOLO e rubrica valutativa.',
+    tech: ['Didattica dell’informatica', 'Java', 'Attività unplugged', 'PBL', 'Jigsaw'],
+  },
+  {
+    id: 'so-centrale',
+    title: 'Centrale nucleare',
+    year: 2024,
+    course: 'Sistemi Operativi',
+    summary: 'Una reazione a catena simulata con processi Unix.',
+    description:
+      'Simulazione di una centrale nucleare in C: un processo master crea atomi che si scindono generando nuovi processi, un attivatore che innesca le scissioni, un’alimentazione che immette nuovi atomi e un inibitore che assorbe energia. Tutti condividono lo stato in memoria condivisa System V, protetta da semafori; la simulazione termina per timeout, blackout, esplosione o meltdown (quando non si possono più creare processi).',
+    tech: ['C', 'fork', 'Memoria condivisa', 'Semafori System V', 'Segnali', 'Make'],
+  },
+  {
+    id: 'lft',
+    title: 'Compilatore LFT',
+    year: 2024,
+    course: 'Linguaggi formali e traduttori',
+    summary: 'Dal lexer al bytecode Java, un passo alla volta.',
+    description:
+      'Un piccolo linguaggio con assegnamenti, read, print, if ed espressioni in notazione prefissa, compilato per la JVM. Le consegne seguono la costruzione: automi a stati finiti, analizzatore lessicale, parser a discesa ricorsiva, valutatore e infine il traduttore che genera codice Jasmin eseguibile dalla macchina virtuale Java.',
+    tech: ['Java', 'DFA', 'Parser LL(1)', 'Jasmin', 'JVM'],
+  },
+  {
+    id: 'client-email',
+    title: 'Client Email',
+    year: 2025,
+    course: 'Programmazione III',
+    summary: 'Una posta elettronica client-server in JavaFX.',
+    description:
+      'Un client di posta con interfaccia JavaFX e un server su socket TCP: login per indirizzo, invio, risposta e inoltro, casella aggiornata da un thread in ascolto e una vista amministratore che segue il log del server. Architettura MVC con viste FXML.',
+    tech: ['Java', 'JavaFX', 'FXML', 'Socket', 'Thread', 'Maven'],
+  },
 ];

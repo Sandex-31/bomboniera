@@ -106,7 +106,9 @@ try {
   assert.equal(api("films/top10.json").length, 10);
   const one = api(`films/${allFilms[0].id}.json`);
   assert.ok(one.reviews.length >= 3 && one.reviews.every((r) => r.review_content && r.critic_name));
-  console.log(`ok — film-data: ${allFilms.length} films from Wikidata, each with poster and reviews`);
+  const real = allFilms.filter((f) => f.poster.endsWith(".jpg")).length;
+  assert.ok(real >= allFilms.length * 0.95, `only ${real}/${allFilms.length} films have a real poster`);
+  console.log(`ok — film-data: ${allFilms.length} films from Wikidata, each with poster and reviews (${real} real posters)`);
 
   /* the shim turns the original frontend's localhost calls into static files */
   const shimSrc = readFileSync(labs("film-data/site/shim.js"), "utf8");
@@ -141,10 +143,11 @@ try {
   assert.ok(findSecret('const password = "hunter2";'));
   assert.ok(findSecret("mongodb+srv://u:p@cluster0.example.net"));
   assert.equal(findSecret("password: req.body.password"), null);
-  for (const id of ["lab-asd", "catering", "film-data", "food-delivery-db"]) {
+  for (const id of ["lab-asd", "catering", "film-data", "food-delivery-db", "so-centrale", "lft", "client-email"]) {
     const index = JSON.parse(readFileSync(labs(`${id}/code/index.json`), "utf8"));
     assert.ok(index.length > 0, `${id}: no code exported`);
     for (const f of index) assert.ok(!excluded(f.path), `${id}: ${f.path} should not be public`);
+    for (const f of index) assert.ok(!/@(gmail|yahoo|hotmail)\./i.test(readFileSync(labs(`${id}/code/${f.path}`), "utf8")), `${id}: ${f.path} publishes an email address`);
     const docs = JSON.parse(readFileSync(labs(`${id}/docs.json`), "utf8"));
     for (const d of docs) assert.ok(existsSync(labs(`${id}/${d.src}`)), `${id}: missing doc ${d.src}`);
   }
@@ -158,6 +161,8 @@ try {
   for (const p of projects) assert.ok(indexHtml.includes(p.title.replace(/&/g, "&amp;")), `the index is missing ${p.title}`);
   const shell = renderToString(h(LabsPage, { route: { page: "labs", id: "lab-asd", tab: "codice" } }));
   for (const t of ["Prova", "Codice", "Documenti"]) assert.ok(shell.includes(t), `tab ${t} missing`);
+  const docsOnly = renderToString(h(LabsPage, { route: { page: "labs", id: "mtdi", tab: "prova" } }));
+  assert.ok(docsOnly.includes("Documenti") && !docsOnly.includes(">Codice<") && !docsOnly.includes(">Prova<"), "mtdi shows documents only");
   assert.ok(renderToString(h(LabsPage, { route: { page: "labs", id: "nope", tab: "prova" } })).includes("non esiste"));
   assert.deepEqual(
     projects.filter((p) => p.lab).map((p) => [p.id, p.lab]).sort(),

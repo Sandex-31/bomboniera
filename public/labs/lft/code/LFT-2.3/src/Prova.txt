@@ -1,0 +1,4 @@
+for(> x_2 4){
+    //ciao
+    assign[10 to x_2];
+}

@@ -1,0 +1,8 @@
+read(a,b,c); 
+if(> a b){
+print(a)
+}end;
+for(> a b)do{
+print(a);
+assign[-1 a to a]
+}

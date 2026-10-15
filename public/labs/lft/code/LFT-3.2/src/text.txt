@@ -1,0 +1,7 @@
+for(< 3 2)do{
+    print(4); //ciao
+    assign[x to y];
+    if(== x y){
+        assign[+(x,1) to x];
+    }end
+}

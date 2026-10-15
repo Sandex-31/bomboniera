@@ -24,13 +24,29 @@ const LANG = { ".c": "c", ".h": "c", ".java": "java", ".js": "javascript", ".mjs
 /** What each lab shows in "Codice" and "Documenti". Paths in `docs` are relative to `root`. */
 const PLAN = {
   "lab-asd": { root: SOURCES["lab-asd"].repo, files: "git", docs: ["Relazione es1.pdf", "Relazione es2.pdf", "Relazione es3.pdf", "Relazione es4.pdf"] },
-  catering: { root: join(TMP, "catering/progetto"), files: "walk", docs: [] },
+  catering: { root: join(TMP, "catering/progetto"), files: "walk", docs: [], extraPdf: { src: SOURCES.catering.pdf, name: "gestire-il-personale.pdf", title: "Gestire il personale (analisi e casi d'uso)" } },
   "film-data": {
     root: SOURCES["film-data"].repo, files: "git",
     only: /^(TWEB\/solution\/|IUM\/Pulizia CSV\/(README\.md|requirements\.txt)$|README\.md$|Report\/[^/]+\.md$)/,
     docs: ["Report/IUM-TWEB Report.md", "QueryScreenshot/mainPage.jpeg", "QueryScreenshot/filmDetailPage.jpeg", "QueryScreenshot/searchPage.jpeg", "QueryScreenshot/mainPageQueryLog.png"],
   },
   "food-delivery-db": { root: join(ROOT, "scripts/labs/delivery"), files: "walk", docs: [], extraPdf: { src: SOURCES["food-delivery-db"].pdf, name: "progetto-bd.pdf", title: "Progetto di Basi di Dati (requisiti e schema E-R)" } },
+  mtdi: {
+    docs: [],
+    extraPdf: [
+      { src: SOURCES.mtdi.pdf, name: "mtdi-switch.pdf", title: "Attività di programmazione: switch-case e fall-through" },
+      { src: SOURCES.mtdi.consegne, name: "mtdi-consegne.pdf", title: "Consegne delle attività del corso" },
+    ],
+  },
+  "so-centrale": { root: SOURCES["so-centrale"].dir, files: "walk", only: /\.(c|h)$|^Makefile$/, docs: [] },
+  lft: { root: SOURCES.lft.dir, files: "walk", only: /^LFT-[^/]+\/src\/[^/]+\.(java|txt|j)$/, docs: [] },
+  "client-email": {
+    root: SOURCES["client-email"].dir, files: "walk",
+    only: /^(Client_Email\/(pom\.xml|src\/.+\.(java|fxml|css))|Server\/src\/.+\.java)$/, // not Server/messages.txt: old test mail
+    // the demo accounts were real-looking addresses: published as placeholders
+    rewrite: [[/Simonepanetti@gmail\.com/g, "simone@example.com"], [/Salvatorepierri@gmail\.com/g, "admin@example.com"], [/Giacomoporetti@yahoo\.it/g, "giacomo@example.com"], [/Lauraspadaro22@hotmail\.net/g, "laura@example.com"]],
+    docs: [],
+  },
 };
 
 const walk = (d, pre = "") => readdirSync(d).flatMap((n) => (statSync(join(d, n)).isDirectory() ? walk(join(d, n), `${pre}${n}/`) : [`${pre}${n}`]));
@@ -43,12 +59,12 @@ export default async function code() {
     rmSync(join(out, "code"), { recursive: true, force: true });
     rmSync(join(out, "docs"), { recursive: true, force: true });
     const index = [];
-    for (const path of list(plan.root, plan.files)) {
+    for (const path of plan.root ? list(plan.root, plan.files) : []) {
       if (excluded(path) || (plan.only && !plan.only.test(path))) continue;
       const abs = join(plan.root, path);
       const size = statSync(abs).size;
       if (size > 300 * 1024) continue;
-      const text = readFileSync(abs, "utf8");
+      const text = (plan.rewrite ?? []).reduce((t, [re, to]) => t.replace(re, to), readFileSync(abs, "utf8"));
       if (text.includes("\u0000")) continue; // binary that slipped past the extension list
       const hit = findSecret(text);
       if (hit) throw new Error(`${id}: possibile segreto in ${path} (${hit}). Va tolto dal progetto d'origine prima di pubblicarlo.`);
@@ -67,9 +83,9 @@ export default async function code() {
       copyFileSync(join(plan.root, d), join(docDir, name));
       docs.push({ title: name.replace(/\.[^.]+$/, ""), src: `docs/${name}`, kind: kindOf(name) });
     }
-    if (plan.extraPdf) {
-      copyFileSync(plan.extraPdf.src, join(docDir, plan.extraPdf.name));
-      docs.push({ title: plan.extraPdf.title, src: `docs/${plan.extraPdf.name}`, kind: "pdf" });
+    for (const pdf of [plan.extraPdf ?? []].flat()) {
+      copyFileSync(pdf.src, join(docDir, pdf.name));
+      docs.push({ title: pdf.title, src: `docs/${pdf.name}`, kind: "pdf" });
     }
     writeJson(join(out, "docs.json"), docs);
     console.log(`  ${id}: ${index.length} file, ${docs.length} documenti`);

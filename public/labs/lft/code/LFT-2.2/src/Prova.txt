@@ -1,0 +1,6 @@
+for(> x_2 4){
+    assign[10 to x_2];
+    if(>= x_2 3){
+        print(ciao);
+    }
+}
