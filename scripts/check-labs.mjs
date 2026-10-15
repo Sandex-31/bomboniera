@@ -194,6 +194,43 @@ try {
   assert.deepEqual(mail.send("simone@example.com", "  ", "x", () => assert.fail("nothing to send")), { sent: [], invalid: [] });
   console.log("ok — email: delivery, queue, admin log, delete");
 
+  /* Centrale nucleare: the engine against Atomo.c and Master.c */
+  const so = await vite.ssrLoadModule("/src/labs/so/engine.ts");
+  const d0 = () => ({ energy: 0, index: 0, Scorie: 0, attivatore: 1, scissioni: 0, energyRubata: 0, logInibitore: 0, Inibitore: 0 });
+  let d = d0(); so.energy(d, 10, 7); assert.equal(d.energy, 60, "Energy(10,7) = 70-10");
+  d = d0(); so.energy(d, 5, 5); assert.equal(d.energy, 20, "Energy(5,5) = 25-5");
+  d = { ...d0(), energy: 100, Inibitore: 1 }; so.energy(d, 10, 7);
+  assert.deepEqual([d.energy, d.energyRubata], [65, 94], "inhibitor: (100+60)/1.7 stolen, int truncation");
+  assert.equal(so.cRand(1, 3), so.cRand(1, 3), "same second, same rand()");
+  const runTo = (over, secs = 200) => {
+    const s = so.createSim({ ...so.RALLENTATA, ...over });
+    for (let i = 0; i < secs * so.TICKS && !s.outcome; i++) so.step(s);
+    return s;
+  };
+  assert.equal(runTo({ ENERGY_EXPLODE_THRESHOLD: -1e12, ENERGY_DEMAND: 0 }).outcome, "EXPLODE");
+  assert.equal(runTo({ ENERGY_DEMAND: 1e12, ENERGY_EXPLODE_THRESHOLD: 1e15, N_NUOVI_ATOMI: 0 }).outcome, "BLACKOUT");
+  assert.equal(runTo({ MAX_PROCESSI: 10 }).outcome, "MELTDOWN", "500 initial atoms cannot fork under ulimit 10");
+  assert.equal(runTo({ NATOM: 0, N_NUOVI_ATOMI: 0, ENERGY_DEMAND: 0, SIM_DURATION: 2 }).outcome, "Tempo scaduto");
+  assert.equal(runTo(so.ORIGINALI, 5).outcome, "MELTDOWN", "the original STEP of 0.5 ms forks past any ulimit");
+  // extreme sliders still end, never NaN (N_MAX_ATOM 0: every atom has temp 0)
+  for (const over of [{ NATOM: 0 }, { N_NUOVI_ATOMI: 0, NATOM: 0, SIM_DURATION: 3 }, { MAX_PROCESSI: 5 }, { N_MAX_ATOM: 0 }]) {
+    const s = runTo(over);
+    assert.ok(s.outcome, `no outcome for ${JSON.stringify(over)}`);
+    assert.ok(Number.isFinite(s.d.energy), `energy is ${s.d.energy} for ${JSON.stringify(over)}`);
+  }
+  // the report is Master.c's printf block, line by line
+  const masterC = readFileSync(labs("so-centrale/code/Master.c"), "utf8");
+  const loop = masterC.slice(masterC.indexOf("while(1){"));
+  const fmts = [...loop.matchAll(/printf\("((?:[^"\\]|\\.)*)"/g)].map((m) => m[1].replace(/\\n$/, "")).slice(0, 13);
+  const rep = runTo({ SIM_DURATION: 2, ENERGY_DEMAND: 0, ENERGY_EXPLODE_THRESHOLD: 1e15, N_NUOVI_ATOMI: 0, NATOM: 0 });
+  const at = rep.out.indexOf(fmts[0]);
+  assert.ok(at >= 0, "no report in the output");
+  fmts.forEach((f, i) => {
+    const re = new RegExp("^" + f.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/%d/g, "-?\\d+") + "$");
+    assert.ok(re.test(rep.out[at + i]), `report line ${i}: "${rep.out[at + i]}" vs printf("${f}")`);
+  });
+  console.log("ok — centrale: Atomo.c energy, the four outcomes, Master.c report");
+
   const { renderToString } = await import("react-dom/server");
   const { createElement: h } = await import("react");
   const { default: LabsPage } = await vite.ssrLoadModule("/src/labs/LabsPage.tsx");
