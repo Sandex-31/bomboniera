@@ -89,6 +89,7 @@ export const projects: Project[] = [
   },
   {
     id: 'client-email',
+    lab: 'email',
     title: 'Client Email',
     year: 2025,
     course: 'Programmazione III',

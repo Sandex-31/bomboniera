@@ -64,3 +64,13 @@
 .mtdi-case, .mtdi-break { font: 12px var(--font-mono); color: var(--muted); white-space: nowrap; }
 .mtdi-before { margin-top: 16px; }
 @media (prefers-reduced-motion: reduce) { .mtdi-desk { transition: none; } }
+.mail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 16px; align-items: start; }
+.mail-win { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px; background: var(--glass); min-width: 0; }
+.mail-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; word-break: break-all; }
+.mail-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; max-height: 240px; overflow: auto; font-size: 13px; }
+.mail-item { display: grid; width: 100%; text-align: left; font: inherit; color: inherit; background: none; border: 1px solid var(--line-soft); border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+.mail-preview { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mail-open pre { white-space: pre-wrap; margin: 8px 0; }
+.mail-open .chip { margin-right: 6px; }
+.mail-error { color: #ff8a80; font-size: 13px; }
+.mail-console { max-height: 200px; font-size: 11px; }

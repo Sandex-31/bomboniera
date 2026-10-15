@@ -167,6 +167,33 @@ try {
   assert.equal(ANIMALI[8].verso, "Fenicottero: Kraaaah", "verses come from the report");
   console.log("ok — mtdi: switch, break and fall-through");
 
+  /* Client Email: the server protocol of ServerMain.java, without sockets */
+  const mail = await vite.ssrLoadModule("/src/labs/email/server.ts");
+  assert.equal(mail.javaHash("ciao"), 3053332, "javaHash matches String.hashCode");
+  const srv = mail.createMailServer();
+  const box = { simone: [], laura: [], giacomo: [], admin: [] };
+  const conn = (k) => ({ deliver: (t) => box[k].push(t) });
+  srv.request("CLIENT:admin@example.com role: admin\n", conn("admin"));
+  srv.request("CLIENT:Simone@Example.com\n", conn("simone"));
+  srv.request("CLIENT:laura@example.com\n", conn("laura"));
+  assert.ok(srv.console.includes("Client registrato: simone@example.com"), "login lowercases the address");
+  const sent = mail.send("simone@example.com", "laura@example.com, giacomo@example.com; nessuno@example.com", "Ciao!", (i) => srv.request(i, conn("simone")));
+  assert.deepEqual(sent.invalid, ["nessuno@example.com"], "unknown recipients are refused before the server");
+  assert.equal(sent.sent.length, 2);
+  assert.equal(box.laura.length, 1, "online recipient gets it at once");
+  assert.deepEqual(mail.parse(box.laura[0]), { from: "simone@example.com", to: "laura@example.com", body: "Ciao!" });
+  assert.equal(box.giacomo.length, 0, "offline recipient waits");
+  assert.ok(box.admin.includes("Log: simone@example.com ha mandato una mail a laura@example.com"));
+  srv.request("CLIENT:giacomo@example.com\n", conn("giacomo"));
+  assert.equal(box.giacomo.length, 1, "queued mail is delivered at login");
+  srv.disconnect("laura@example.com");
+  srv.request("CLIENT:laura@example.com\n", conn("laura"));
+  assert.equal(box.laura.length, 2, "logging in again refills the inbox, as the deleted delivered file did");
+  srv.request("DELETE_MESSAGE\n" + box.laura[0], conn("laura"));
+  assert.equal(srv.messages.filter((m) => mail.parse(m).to === "laura@example.com").length, 0, "DELETE_MESSAGE removes it");
+  assert.deepEqual(mail.send("simone@example.com", "  ", "x", () => assert.fail("nothing to send")), { sent: [], invalid: [] });
+  console.log("ok — email: delivery, queue, admin log, delete");
+
   const { renderToString } = await import("react-dom/server");
   const { createElement: h } = await import("react");
   const { default: LabsPage } = await vite.ssrLoadModule("/src/labs/LabsPage.tsx");
@@ -180,7 +207,7 @@ try {
   assert.ok(renderToString(h(LabsPage, { route: { page: "labs", id: "nope", tab: "prova" } })).includes("non esiste"));
   assert.deepEqual(
     projects.filter((p) => p.lab).map((p) => [p.id, p.lab]).sort(),
-    [["catering", "sql"], ["film-data", "site"], ["food-delivery-db", "sql"], ["lab-asd", "asd"], ["mtdi", "mtdi"]],
+    [["catering", "sql"], ["client-email", "email"], ["film-data", "site"], ["food-delivery-db", "sql"], ["lab-asd", "asd"], ["mtdi", "mtdi"]],
   );
   console.log("ok — labs page renders index, shell and unknown id");
 

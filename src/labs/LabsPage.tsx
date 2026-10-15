@@ -12,8 +12,9 @@ const DEMOS: Record<Lab, ComponentType<{ id: string }>> = {
   sql: lazy(() => import("./sql/SqlLab")),
   site: lazy(() => import("./film/FilmLab")),
   mtdi: lazy(() => import("./mtdi/MtdiLab")),
+  email: lazy(() => import("./email/EmailLab")),
 };
-const TRY: Record<Lab, string> = { asd: "esegui il codice C originale", sql: "interroga il database", site: "naviga il sito originale", mtdi: "gioca al banco delle scelte" };
+const TRY: Record<Lab, string> = { asd: "esegui il codice C originale", sql: "interroga il database", site: "naviga il sito originale", mtdi: "gioca al banco delle scelte", email: "manda una mail" };
 const TABS: [LabsTab, string][] = [["prova", "Prova"], ["codice", "Codice"], ["documenti", "Documenti"]];
 
 export default function LabsPage({ route }: { route: LabsRoute }) {
