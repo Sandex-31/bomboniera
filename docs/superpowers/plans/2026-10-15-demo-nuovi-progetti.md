@@ -1187,7 +1187,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ### Task 6: LFT — build del jar con il driver `LabMain`
 
-<!-- spike: qui il Task 1 annota LOADER, relativo→A, /str→B, jasmin -d→C -->
+<!-- spike 2026-10-15: LOADER=https://cjrtnc.leaningtech.com/4.3/loader.js, relativo→/files/ (user.dir ignorato), /str→sì, jasmin -d→sì (stampa "Generated: …" su stdout) -->
+Esito dello spike: caso **A = `/files/`**. In `LabMain`, `rel` è `new File("/files/Output.j")`; in Node (dove `/files/` non esiste) resta valida la copia da `new File("Output.j").getAbsoluteFile()`, quindi `LabMain` prova entrambe.
 
 **Files:**
 - Create: `scripts/labs/lft/LabMain.java`, `scripts/labs/lft.mjs`
