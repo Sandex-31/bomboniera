@@ -70,7 +70,17 @@ export function createMailServer(onChange: () => void = () => {}): MailServer {
     } else if (input.startsWith("DELETE_MESSAGE")) {
       const target = input.slice("DELETE_MESSAGE\n".length).trim();
       log(`Ricevuta richiesta di cancellazione per il messaggio:\n${target}`);
-      for (let i = messages.length - 1; i >= 0; i--) if (messages[i].trim() === target) messages.splice(i, 1);
+      let removed = false;
+      for (let i = messages.length - 1; i >= 0; i--) {
+        if (messages[i].trim() !== target) continue;
+        messages.splice(i, 1);
+        removed = true;
+      }
+      if (removed) {
+        // removeMessageIdFromFile: the same text may be delivered again later
+        for (const ids of delivered.values()) ids.delete(messageId(target));
+        log("File messages.txt aggiornato");
+      } else log("Nessun messaggio corrispondente trovato");
       log("Messaggio cancellato");
     } else {
       messages.push(input);

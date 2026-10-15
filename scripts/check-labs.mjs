@@ -195,6 +195,8 @@ try {
   assert.equal(box.laura.length, 2, "logging in again refills the inbox, as the deleted delivered file did");
   srv.request("DELETE_MESSAGE\n" + box.laura[0], conn("laura"));
   assert.equal(srv.messages.filter((m) => mail.parse(m).to === "laura@example.com").length, 0, "DELETE_MESSAGE removes it");
+  mail.send("simone@example.com", "laura@example.com", "Ciao!", (i) => srv.request(i, conn("simone")));
+  assert.equal(box.laura.length, 3, "after a delete the same text is delivered again, as removeMessageIdFromFile allows");
   assert.deepEqual(mail.send("simone@example.com", "  ", "x", () => assert.fail("nothing to send")), { sent: [], invalid: [] });
   console.log("ok — email: delivery, queue, admin log, delete");
 
@@ -241,16 +243,15 @@ try {
   let java = true;
   try { execFileSync("java", ["-version"], { stdio: "ignore" }); } catch { java = false; }
   if (java) {
-    const runLft = (program, input) => {
-      const dir = mkdtempSync(pjoin(tmpdir(), "lft-"));
+    const runLft = (program, input, dir = mkdtempSync(pjoin(tmpdir(), "lft-"))) => {
       const inDir = pjoin(dir, "in") + "/";
       const work = pjoin(dir, "work") + "/";
-      mkdirSync(inDir);
-      mkdirSync(work);
+      mkdirSync(inDir, { recursive: true });
+      mkdirSync(work, { recursive: true });
       writeFileSync(inDir + "text.txt", program);
       writeFileSync(inDir + "input.txt", input);
       const cp = ["lft/lft.jar", "lft/jasmin.jar"].map((p) => fileURLToPath(labs(p))).join(delimiter);
-      execFileSync("java", ["-cp", cp, "LabMain", inDir, work], { cwd: work, timeout: 30000 });
+      execFileSync("java", ["-cp", cp, "LabMain", inDir, work], { cwd: dir, timeout: 30000 }); // cwd != work, as in CheerpJ (relative writes land in /files/)
       return { out: readFileSync(work + "out.txt", "utf8"), j: existsSync(work + "Output.j") ? readFileSync(work + "Output.j", "utf8") : "" };
     };
     const sample = readFileSync(labs("lft/code/LFT-5.2/src/text.txt"), "utf8");
@@ -261,6 +262,12 @@ try {
     assert.match(runLft(sample, "15\n").out, /^15\r?$/m);
     assert.match(runLft("read(x; print(x) end", "").out, /^ERRORE /m, "syntax errors surface");
     assert.match(runLft("read(x);\nread(y);\nprint(+(x,y))", "2\n3\n").out, /^5\r?$/m, "two read() in a row, one Scanner each");
+    // CheerpJ's /files/ survives reloads and the run counter does not: a reused work dir must not replay the old program
+    const reused = mkdtempSync(pjoin(tmpdir(), "lft-"));
+    runLft("print(+(1,1))", "", reused);
+    assert.match(runLft("print(+(5,5))", "", reused).out, /^10\r?$/m, "a reused work dir runs the new program");
+    const lexErr = runLft("read(x);\nprint(x @ 1)", "");
+    assert.match(lexErr.out, /^ERRORE /m, "a lexer error (null token → NullPointerException) is reported as an error");
     const { EXAMPLES } = await vite.ssrLoadModule("/src/labs/lft/examples.ts");
     for (const ex of EXAMPLES) {
       const r = runLft(ex.program, ex.input + "\n");

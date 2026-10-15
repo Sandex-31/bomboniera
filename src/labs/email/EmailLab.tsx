@@ -4,13 +4,15 @@ import { ADMIN, createMailServer, parse, send, USERS, type MailServer } from "./
 import { connect } from "./socket";
 
 function ClientWindow({ server, email }: { server: MailServer; email: string }) {
-  const [inbox, setInbox] = useState<string[]>([]);
+  // each message keeps its id: new mail is prepended, and the open one must stay the open one
+  const [inbox, setInbox] = useState<{ id: number; text: string }[]>([]);
   const [online, setOnline] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
   const [to, setTo] = useState("");
   const [text, setText] = useState("");
   const [error, setError] = useState("");
-  const sock = useMemo(() => connect(server, (t) => setInbox((b) => [t, ...b])), [server]);
+  const nextId = useRef(0);
+  const sock = useMemo(() => connect(server, (t) => setInbox((b) => [{ id: nextId.current++, text: t }, ...b])), [server]);
 
   const login = () => { setInbox([]); sock.send(`CLIENT:${email}\n`); setOnline(true); };
   const logout = () => { sock.close(email); setOnline(false); setInbox([]); setOpen(null); };
@@ -21,7 +23,7 @@ function ClientWindow({ server, email }: { server: MailServer; email: string }) 
   };
   const reply = (m: string) => { setTo(parse(m).from); setText("---- Reply ----\n"); };
   const forward = (m: string) => { setTo(""); setText(parse(m).body); };
-  const remove = (i: number) => { sock.send(`DELETE_MESSAGE\n${inbox[i]}`); setInbox((b) => b.filter((_, j) => j !== i)); setOpen(null); };
+  const remove = (m: { id: number; text: string }) => { sock.send(`DELETE_MESSAGE\n${m.text}`); setInbox((b) => b.filter((x) => x.id !== m.id)); setOpen(null); };
 
   return (
     <section className="mail-win" aria-label={`Client di ${email}`}>
@@ -32,17 +34,17 @@ function ClientWindow({ server, email }: { server: MailServer; email: string }) 
         <>
           <ul className="mail-list">
             {inbox.length === 0 && <li className="empty">Nessun messaggio.</li>}
-            {inbox.map((m, i) => (
-              <li key={i}>
-                <button className="mail-item" onClick={() => setOpen(open === i ? null : i)}>
-                  <span>Da {parse(m).from}</span><span className="mail-preview">{parse(m).body.split("\n")[0]}</span>
+            {inbox.map((m) => (
+              <li key={m.id}>
+                <button className="mail-item" onClick={() => setOpen(open === m.id ? null : m.id)}>
+                  <span>Da {parse(m.text).from}</span><span className="mail-preview">{parse(m.text).body.split("\n")[0]}</span>
                 </button>
-                {open === i && (
+                {open === m.id && (
                   <div className="mail-open">
-                    <pre>{parse(m).body}</pre>
-                    <button className="chip" onClick={() => reply(m)}>Rispondi</button>
-                    <button className="chip" onClick={() => forward(m)}>Inoltra</button>
-                    <button className="chip" onClick={() => remove(i)}>Elimina</button>
+                    <pre>{parse(m.text).body}</pre>
+                    <button className="chip" onClick={() => reply(m.text)}>Rispondi</button>
+                    <button className="chip" onClick={() => forward(m.text)}>Inoltra</button>
+                    <button className="chip" onClick={() => remove(m)}>Elimina</button>
                   </div>
                 )}
               </li>

@@ -30,6 +30,12 @@ public class LabMain {
     public static void main(String[] args) throws Exception {
         String in = args[0], work = args[1];
         new File(work).mkdirs();
+        // CodeGenerator writes "Output.j" relative to the working directory: the process's own
+        // on a real JVM, /files/ inside CheerpJ whatever user.dir says. CheerpJ keeps /files/
+        // across visits, so anything left by an earlier run goes first.
+        File j = new File(work + "Output.j");
+        File[] written = { new File("Output.j").getAbsoluteFile(), new File("/files/Output.j") };
+        for (File stale : new File[] { j, new File(work + "Output.class"), written[0], written[1] }) stale.delete();
         PrintStream out = new PrintStream(new FileOutputStream(work + "out.txt"), true);
         System.setOut(out);
         System.setErr(out);
@@ -39,12 +45,12 @@ public class LabMain {
         } catch (Error e) {
             out.println("ERRORE " + e.getMessage());
             return;
+        } catch (RuntimeException e) {
+            // the Lexer returns null on a character it does not know, and the parser trips on it
+            out.println("ERRORE " + e);
+            return;
         }
-        // CodeGenerator writes "Output.j" relative to the working directory: the process's own
-        // on a real JVM, /files/ inside CheerpJ whatever user.dir says
-        File j = new File(work + "Output.j");
-        for (File rel : new File[] { new File("Output.j").getAbsoluteFile(), new File("/files/Output.j") })
-            if (!j.exists() && rel.exists()) copy(rel, j);
+        for (File w : written) if (!j.exists() && w.exists()) copy(w, j);
         // Jasmin prints "Generated: ..." on stdout; keep out.txt for the program's own output
         ByteArrayOutputStream jasminLog = new ByteArrayOutputStream();
         System.setOut(new PrintStream(jasminLog, true));
