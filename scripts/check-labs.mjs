@@ -261,6 +261,11 @@ try {
     assert.match(runLft(sample, "15\n").out, /^15\r?$/m);
     assert.match(runLft("read(x; print(x) end", "").out, /^ERRORE /m, "syntax errors surface");
     assert.match(runLft("read(x);\nread(y);\nprint(+(x,y))", "2\n3\n").out, /^5\r?$/m, "two read() in a row, one Scanner each");
+    const { EXAMPLES } = await vite.ssrLoadModule("/src/labs/lft/examples.ts");
+    for (const ex of EXAMPLES) {
+      const r = runLft(ex.program, ex.input + "\n");
+      assert.ok(ex.name.includes("errore") ? /^ERRORE /m.test(r.out) : /Input OK/.test(r.out), `example "${ex.name}": ${r.out}`);
+    }
     console.log("ok — lft: Translator → Jasmin → Output on a real JVM");
   } else console.log("skip — lft: no java on PATH, only the jars were checked");
 
@@ -277,7 +282,7 @@ try {
   assert.ok(renderToString(h(LabsPage, { route: { page: "labs", id: "nope", tab: "prova" } })).includes("non esiste"));
   assert.deepEqual(
     projects.filter((p) => p.lab).map((p) => [p.id, p.lab]).sort(),
-    [["catering", "sql"], ["client-email", "email"], ["film-data", "site"], ["food-delivery-db", "sql"], ["lab-asd", "asd"], ["mtdi", "mtdi"], ["so-centrale", "so"]],
+    [["catering", "sql"], ["client-email", "email"], ["film-data", "site"], ["food-delivery-db", "sql"], ["lab-asd", "asd"], ["lft", "lft"], ["mtdi", "mtdi"], ["so-centrale", "so"]],
   );
   console.log("ok — labs page renders index, shell and unknown id");
 

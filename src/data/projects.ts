@@ -80,6 +80,7 @@ export const projects: Project[] = [
   },
   {
     id: 'lft',
+    lab: 'lft',
     title: 'Compilatore LFT',
     year: 2024,
     course: 'Linguaggi formali e traduttori',

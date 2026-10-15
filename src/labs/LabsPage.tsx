@@ -14,8 +14,9 @@ const DEMOS: Record<Lab, ComponentType<{ id: string }>> = {
   mtdi: lazy(() => import("./mtdi/MtdiLab")),
   email: lazy(() => import("./email/EmailLab")),
   so: lazy(() => import("./so/SoLab")),
+  lft: lazy(() => import("./lft/LftLab")),
 };
-const TRY: Record<Lab, string> = { asd: "esegui il codice C originale", sql: "interroga il database", site: "naviga il sito originale", mtdi: "gioca al banco delle scelte", email: "manda una mail", so: "avvia la simulazione" };
+const TRY: Record<Lab, string> = { asd: "esegui il codice C originale", sql: "interroga il database", site: "naviga il sito originale", mtdi: "gioca al banco delle scelte", email: "manda una mail", so: "avvia la simulazione", lft: "compila ed esegui il codice Java originale" };
 const TABS: [LabsTab, string][] = [["prova", "Prova"], ["codice", "Codice"], ["documenti", "Documenti"]];
 
 export default function LabsPage({ route }: { route: LabsRoute }) {

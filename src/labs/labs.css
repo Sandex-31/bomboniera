@@ -81,3 +81,8 @@
 .so-canvas { width: 100%; height: auto; background: #0b0b0b; border: 1px solid var(--line-soft); border-radius: var(--r-sm); }
 .so-stats { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font: 12px var(--font-mono); margin: 8px 0 0; }
 .so-stats dd { margin: 0; }
+.asd-form .lft-src { font-family: var(--font-mono); width: 100%; }
+.lft-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 720px) { .lft-grid { grid-template-columns: minmax(0, 1fr); } }
+.lft-j { max-height: 360px; overflow: auto; }
+.lft-err { color: #ff8a80; }
