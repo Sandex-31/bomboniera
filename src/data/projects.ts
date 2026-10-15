@@ -69,6 +69,7 @@ export const projects: Project[] = [
   },
   {
     id: 'so-centrale',
+    lab: 'so',
     title: 'Centrale nucleare',
     year: 2024,
     course: 'Sistemi Operativi',

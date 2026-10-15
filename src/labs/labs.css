@@ -74,3 +74,10 @@
 .mail-open .chip { margin-right: 6px; }
 .mail-error { color: #ff8a80; font-size: 13px; }
 .mail-console { max-height: 200px; font-size: 11px; }
+.so-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.so-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 720px) { .so-grid { grid-template-columns: minmax(0, 1fr); } }
+.so-term { height: 360px; max-height: none; font-size: 12px; font-variant-ligatures: none; }
+.so-canvas { width: 100%; height: auto; background: #0b0b0b; border: 1px solid var(--line-soft); border-radius: var(--r-sm); }
+.so-stats { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font: 12px var(--font-mono); margin: 8px 0 0; }
+.so-stats dd { margin: 0; }

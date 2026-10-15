@@ -202,6 +202,7 @@ try {
   d = { ...d0(), energy: 100, Inibitore: 1 }; so.energy(d, 10, 7);
   assert.deepEqual([d.energy, d.energyRubata], [65, 94], "inhibitor: (100+60)/1.7 stolen, int truncation");
   assert.equal(so.cRand(1, 3), so.cRand(1, 3), "same second, same rand()");
+  { const s = so.createSim({ ...so.RALLENTATA, STEP_MS: 100 }); so.step(s); assert.ok(s.born >= 100, `atoms born in the tick are counted for the canvas (${s.born})`); }
   const runTo = (over, secs = 200) => {
     const s = so.createSim({ ...so.RALLENTATA, ...over });
     for (let i = 0; i < secs * so.TICKS && !s.outcome; i++) so.step(s);
@@ -244,7 +245,7 @@ try {
   assert.ok(renderToString(h(LabsPage, { route: { page: "labs", id: "nope", tab: "prova" } })).includes("non esiste"));
   assert.deepEqual(
     projects.filter((p) => p.lab).map((p) => [p.id, p.lab]).sort(),
-    [["catering", "sql"], ["client-email", "email"], ["film-data", "site"], ["food-delivery-db", "sql"], ["lab-asd", "asd"], ["mtdi", "mtdi"]],
+    [["catering", "sql"], ["client-email", "email"], ["film-data", "site"], ["food-delivery-db", "sql"], ["lab-asd", "asd"], ["mtdi", "mtdi"], ["so-centrale", "so"]],
   );
   console.log("ok — labs page renders index, shell and unknown id");
 

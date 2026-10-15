@@ -25,7 +25,7 @@ export type Project = {
   github?: string;
   demo?: string;
   /** Kind of live demo in the lab page; artifacts live in public/labs/<id>/. No lab = code and docs only. */
-  lab?: "asd" | "sql" | "site" | "mtdi" | "email";
+  lab?: "asd" | "sql" | "site" | "mtdi" | "email" | "so";
   /** Documents only: the lab page hides the "Codice" tab. */
   noCode?: true;
 };

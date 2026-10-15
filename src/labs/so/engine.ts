@@ -28,8 +28,8 @@ export type Sim = {
   waiting: number[];
   out: string[]; outcome: Outcome | null;
   inhibitor: boolean;
-  /** fissions in the last tick, for the flash on the canvas */
-  fissions: number;
+  /** fissions and atoms born in the last tick, for the canvas: most atoms live far less than a tick */
+  fissions: number; born: number;
   // Master's locals, Attivatore's flags, Alimentazione's fractional batches
   energyTemp: number; scissioniTemp: number; scorieTemp: number; usoTot: number;
   attiva: boolean; blocked: boolean; feedCarry: number;
@@ -92,13 +92,14 @@ function atom(s: Sim, temp: number) {
 function spawn(s: Sim, temps: number[]) {
   if (!canFork(s, temps.length)) return;
   s.d.index += temps.length;
+  s.born += temps.length;
   for (const t of temps) atom(s, t);
 }
 
 export function createSim(p: Params): Sim {
   const s: Sim = {
     p, d: { energy: 0, index: 0, Scorie: 0, attivatore: 1, scissioni: 0, energyRubata: 0, logInibitore: 0, Inibitore: 0 },
-    tick: 0, waiting: [], out: ["LOADING PROCESSES"], outcome: null, inhibitor: false, fissions: 0,
+    tick: 0, waiting: [], out: ["LOADING PROCESSES"], outcome: null, inhibitor: false, fissions: 0, born: 0,
     energyTemp: 0, scissioniTemp: 0, scorieTemp: 0, usoTot: p.ENERGY_DEMAND, attiva: false, blocked: false, feedCarry: 0,
   };
   // Master: NATOM atoms, temp = rand() % (N_MAX_ATOM - 20 + 1) + 20 (all in second 0: the same temp)
@@ -148,6 +149,7 @@ export function step(s: Sim): void {
   if (s.outcome) return;
   s.tick++;
   s.fissions = 0;
+  s.born = 0;
   const sec = second(s);
   const onSecond = s.tick % TICKS === 0;
 
