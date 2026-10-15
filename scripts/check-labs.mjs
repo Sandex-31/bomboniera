@@ -284,6 +284,10 @@ try {
     projects.filter((p) => p.lab).map((p) => [p.id, p.lab]).sort(),
     [["catering", "sql"], ["client-email", "email"], ["film-data", "site"], ["food-delivery-db", "sql"], ["lab-asd", "asd"], ["lft", "lft"], ["mtdi", "mtdi"], ["so-centrale", "so"]],
   );
+  for (const p of projects.filter((x) => x.lab)) {
+    const html = renderToString(h(LabsPage, { route: { page: "labs", id: p.id, tab: "prova" } }));
+    assert.ok(html.includes('aria-selected="true"') && html.includes(">Prova<"), `${p.id}: Prova is not the open tab`);
+  }
   console.log("ok — labs page renders index, shell and unknown id");
 
   /* the runner: one fresh worker per run, stop() kills it and keeps the partial output */

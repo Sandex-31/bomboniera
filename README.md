@@ -125,6 +125,10 @@ I percorsi dei progetti sul disco stanno in `scripts/labs/sources.mjs`; per
 aggiungerne uno, una voce lì e una in `projects.ts` con il campo `lab`. L'esportazione
 del codice si ferma se trova qualcosa che sembra una password o una chiave.
 
+Le demo dei progetti arrivati dal laptop:
+- **Compilatore LFT**: il `Translator` consegnato, Jasmin e il programma generato girano nel browser con CheerpJ, caricato dalla sua CDN al primo clic. `npm run labs -- lft` ricompila `lft.jar` dai sorgenti di LFT-5.2 più `scripts/labs/lft/LabMain.java`; serve un JDK (percorso in `scripts/labs/sources.mjs`).
+- **Centrale nucleare, Client Email, MTDI**: riscritture in TypeScript (`src/labs/so`, `src/labs/email`, `src/labs/mtdi`) che seguono i sorgenti originali; la logica è testata in `scripts/check-labs.mjs`.
+
 **Passo 4 — tesi:** `src/data/thesis.ts`. I cinque `steps`
 (Problema → Ricerca → Sviluppo → Testing → Risultato) diventano la timeline
 verticale; puoi cambiarne numero e nomi.
