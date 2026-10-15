@@ -58,6 +58,7 @@ export const projects: Project[] = [
   {
     id: 'mtdi',
     noCode: true,
+    lab: 'mtdi',
     title: 'Il banco delle scelte',
     year: 2025,
     course: 'Metodologie e tecnologie didattiche per l’informatica',

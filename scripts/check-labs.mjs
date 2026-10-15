@@ -153,6 +153,20 @@ try {
   }
   console.log("ok — code explorer: sources exported, nothing secret");
 
+  /* MTDI: the switch of the exotic animals, break by break */
+  const { run: runSwitch, ANIMALI, javaLines } = await vite.ssrLoadModule("/src/labs/mtdi/switch.ts");
+  const all = ANIMALI.map(() => true);
+  for (let v = 1; v <= 10; v++) assert.deepEqual(runSwitch(v, all), [String(v)], `case ${v} alone`);
+  assert.deepEqual(runSwitch(11, all), ["default"]);
+  assert.deepEqual(runSwitch(12, all), ["default"]);
+  const no3 = all.map((b, i) => i !== 2);
+  assert.deepEqual(runSwitch(3, no3), ["3", "4"], "fall-through from 3 stops at 4's break");
+  assert.deepEqual(runSwitch(10, all.map((b, i) => i !== 9)), ["10", "default"], "no break on the last case falls into default");
+  assert.deepEqual(runSwitch(1, all.map(() => false)), [...ANIMALI.map((a) => String(a.n)), "default"]);
+  assert.ok(!javaLines(no3).some((l) => l.key === "3" && l.text.includes("break")), "case 3 lost its break");
+  assert.equal(ANIMALI[8].verso, "Fenicottero: Kraaaah", "verses come from the report");
+  console.log("ok — mtdi: switch, break and fall-through");
+
   const { renderToString } = await import("react-dom/server");
   const { createElement: h } = await import("react");
   const { default: LabsPage } = await vite.ssrLoadModule("/src/labs/LabsPage.tsx");
@@ -161,12 +175,12 @@ try {
   for (const p of projects) assert.ok(indexHtml.includes(p.title.replace(/&/g, "&amp;")), `the index is missing ${p.title}`);
   const shell = renderToString(h(LabsPage, { route: { page: "labs", id: "lab-asd", tab: "codice" } }));
   for (const t of ["Prova", "Codice", "Documenti"]) assert.ok(shell.includes(t), `tab ${t} missing`);
-  const docsOnly = renderToString(h(LabsPage, { route: { page: "labs", id: "mtdi", tab: "prova" } }));
-  assert.ok(docsOnly.includes("Documenti") && !docsOnly.includes(">Codice<") && !docsOnly.includes(">Prova<"), "mtdi shows documents only");
+  const mtdi = renderToString(h(LabsPage, { route: { page: "labs", id: "mtdi", tab: "prova" } }));
+  assert.ok(mtdi.includes(">Prova<") && mtdi.includes(">Documenti<") && !mtdi.includes(">Codice<"), "mtdi: Prova and Documenti, no Codice");
   assert.ok(renderToString(h(LabsPage, { route: { page: "labs", id: "nope", tab: "prova" } })).includes("non esiste"));
   assert.deepEqual(
     projects.filter((p) => p.lab).map((p) => [p.id, p.lab]).sort(),
-    [["catering", "sql"], ["film-data", "site"], ["food-delivery-db", "sql"], ["lab-asd", "asd"]],
+    [["catering", "sql"], ["film-data", "site"], ["food-delivery-db", "sql"], ["lab-asd", "asd"], ["mtdi", "mtdi"]],
   );
   console.log("ok — labs page renders index, shell and unknown id");
 
