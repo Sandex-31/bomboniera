@@ -4,6 +4,7 @@ const STEPS = {
   asd: () => import("./asd.mjs"),
   catering: () => import("./catering.mjs"),
   delivery: () => import("./delivery.mjs"),
+  lft: () => import("./lft.mjs"),
   film: () => import("./film/build.mjs"),
   code: () => import("./code.mjs"),
 };

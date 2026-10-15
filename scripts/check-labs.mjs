@@ -3,7 +3,11 @@
  * `npm run labs` and committed; this checks they are there and that they work.
  */
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { delimiter, join as pjoin } from "node:path";
+import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 import { createServer } from "vite";
 import { rng } from "./labs/seed.mjs";
@@ -231,6 +235,34 @@ try {
     assert.ok(re.test(rep.out[at + i]), `report line ${i}: "${rep.out[at + i]}" vs printf("${f}")`);
   });
   console.log("ok — centrale: Atomo.c energy, the four outcomes, Master.c report");
+
+  /* LFT: the original Translator + Jasmin, driven by LabMain, on a real JVM when there is one */
+  assert.ok(existsSync(labs("lft/lft.jar")) && existsSync(labs("lft/jasmin.jar")), "run npm run labs -- lft");
+  let java = true;
+  try { execFileSync("java", ["-version"], { stdio: "ignore" }); } catch { java = false; }
+  if (java) {
+    const runLft = (program, input) => {
+      const dir = mkdtempSync(pjoin(tmpdir(), "lft-"));
+      const inDir = pjoin(dir, "in") + "/";
+      const work = pjoin(dir, "work") + "/";
+      mkdirSync(inDir);
+      mkdirSync(work);
+      writeFileSync(inDir + "text.txt", program);
+      writeFileSync(inDir + "input.txt", input);
+      const cp = ["lft/lft.jar", "lft/jasmin.jar"].map((p) => fileURLToPath(labs(p))).join(delimiter);
+      execFileSync("java", ["-cp", cp, "LabMain", inDir, work], { cwd: work, timeout: 30000 });
+      return { out: readFileSync(work + "out.txt", "utf8"), j: existsSync(work + "Output.j") ? readFileSync(work + "Output.j", "utf8") : "" };
+    };
+    const sample = readFileSync(labs("lft/code/LFT-5.2/src/text.txt"), "utf8");
+    const a = runLft(sample, "25\n");
+    assert.match(a.out, /Input OK/);
+    assert.match(a.out, /^125\r?$/m, "25 is > 20 and not > 30: prints 25+100");
+    assert.equal(a.j.replace(/\r/g, ""), readFileSync(labs("lft/code/LFT-5.2/src/Output.j"), "utf8").replace(/\r/g, ""), "same Jasmin as the handed-in Output.j");
+    assert.match(runLft(sample, "15\n").out, /^15\r?$/m);
+    assert.match(runLft("read(x; print(x) end", "").out, /^ERRORE /m, "syntax errors surface");
+    assert.match(runLft("read(x);\nread(y);\nprint(+(x,y))", "2\n3\n").out, /^5\r?$/m, "two read() in a row, one Scanner each");
+    console.log("ok — lft: Translator → Jasmin → Output on a real JVM");
+  } else console.log("skip — lft: no java on PATH, only the jars were checked");
 
   const { renderToString } = await import("react-dom/server");
   const { createElement: h } = await import("react");

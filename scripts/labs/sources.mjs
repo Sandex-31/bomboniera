@@ -18,6 +18,6 @@ export const SOURCES = {
   "food-delivery-db": { pdf: "D:/Backup/PROGETTO BD SALVATORE PIERRI.pdf" },
   mtdi: { pdf: join(UNI, "Relazioni-PDF/MTDI24_Pierri.pdf"), consegne: join(UNI, "Relazioni-PDF/Pierri Consegne.pdf") },
   "so-centrale": { dir: join(UNI, "da-VM-VirtualBox-Ubuntu22.04/Progetto-SO-centrale-nucleare") },
-  lft: { dir: join(UNI, "LFT-consegne-SalvatorePierri") },
+  lft: { dir: join(UNI, "LFT-consegne-SalvatorePierri"), jdk: "C:/Program Files/Java/jdk-17/bin" },
   "client-email": { dir: join(UNI, "Prog-III-ClientEmail") },
 };
