@@ -990,10 +990,68 @@ try {
     assert.ok(dark(replayed) && dark(lamps.lit), "the jump leaves lamps burning");
     assert.ok(solvedSki(loadSki()), "the jump leaves the mountain blank");
     assert.ok(solvedTape(read(puzzle.MACHINE_KEY)), "the jump sets the levers wrong");
+    const { unlocked } = await vite5.ssrLoadModule("/src/lib/sagome.ts");
+    assert.ok(unlocked(read(puzzle.LOCK_KEY)), "the jump leaves the lock shut");
 
     console.log(`ok — ${STAGES.length + 1} jump stops, each solving exactly the puzzles above it`);
   } finally {
     await vite5.close();
     delete globalThis.localStorage;
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* The silhouettes, the word and the lock.                                   */
+/* ------------------------------------------------------------------------ */
+{
+  const vite6 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const s = await vite6.ssrLoadModule("/src/lib/sagome.ts");
+    for (const w of ["EYE", "eye", " e y e "]) assert.ok(s.bootAccepts(w), `boot refuses ${w}`);
+    for (const w of ["", "eyes", "occhio", "ey"]) assert.ok(!s.bootAccepts(w), `boot opens on ${w}`);
+
+    assert.equal(s.CHARACTERS.length, 11);
+    assert.equal(new Set(s.CHARACTERS.map((c) => c.id)).size, 11, "duplicate ids");
+    assert.equal(new Set(s.CHARACTERS.map((c) => c.file)).size, 11, "duplicate files");
+    for (const c of s.CHARACTERS) {
+      assert.match(c.file, /^media\/sagome\/\d\d\.png$/, `${c.id} file name gives it away`);
+      for (const n of c.names) assert.equal(s.judge(c.id, n), "bravo", `${c.id} refuses its name ${n}`);
+    }
+    // the files are not in the order of the list, or the order would give them away
+    assert.ok(
+      s.CHARACTERS.some((c, i) => c.file !== `media/sagome/${String(i + 1).padStart(2, "0")}.png`),
+      "the files follow the list",
+    );
+    assert.equal(s.judge(s.LOST_ID, "The Lost"), "bravo");
+    assert.equal(s.judge(s.LOST_ID, "TOMBINO"), "tombino");
+    assert.equal(s.judge(s.LOST_ID, " tombino "), "tombino");
+    assert.equal(s.judge("samus", "tombino"), "wrong");
+    assert.equal(s.judge("samus", "link"), "wrong");
+    assert.equal(s.judge(s.LOST_ID, ""), "wrong");
+
+    assert.deepEqual([...s.LOCK_CODE], [4, 7, 1, 5, 7]);
+    assert.deepEqual(s.turn([9, 0, 0, 0, 0], 0, 1), [0, 0, 0, 0, 0]);
+    assert.deepEqual(s.turn([0, 0, 0, 0, 0], 4, -1), [0, 0, 0, 0, 9]);
+    assert.ok(s.unlocked([4, 7, 1, 5, 7]) && !s.unlocked([4, 7, 1, 5, 6]));
+
+    // what comes back from storage is checked, never trusted
+    const store = new Map();
+    globalThis.localStorage = {
+      getItem: (k) => (store.has(k) ? store.get(k) : null),
+      setItem: (k, v) => store.set(k, String(v)),
+      removeItem: (k) => store.delete(k),
+    };
+    const { LOCK_KEY } = await vite6.ssrLoadModule("/src/data/puzzle.ts");
+    for (const bad of ["", "nope", "[1,2,3]", "[1,2,3,4,10]", "[1,2,3,4,1.5]", "{}"]) {
+      store.set(LOCK_KEY, bad);
+      assert.deepEqual(s.loadLock(), [0, 0, 0, 0, 0], `the lock believes ${bad}`);
+    }
+    store.set(LOCK_KEY, "[4,7,1,5,7]");
+    assert.deepEqual(s.loadLock(), [4, 7, 1, 5, 7]);
+    delete globalThis.localStorage;
+
+    console.log("ok — 11 silhouettes named, EYE boots, TOMBINO on the lost, the lock turns on 47157");
+  } finally {
+    await vite6.close();
   }
 }

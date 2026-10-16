@@ -12,12 +12,15 @@ import {
   BEAM_KEY,
   HACK_KEY,
   LAMPS_KEY,
+  LOCK_KEY,
   LOST_KEY,
   MACHINE_KEY,
   MAZE_KEY,
   PLAN_KEY,
   PUZZLE_KEY,
+  SAGOME_KEY,
   SKI_KEY,
+  TOMBINO_KEY,
 } from "../data/puzzle";
 import { buildMaze, solve } from "./maze";
 import { FLOORS } from "./beam";
@@ -25,6 +28,7 @@ import { SPOTS, cellFor } from "../data/room";
 import { ANSWER } from "./lamps";
 import { STATIONS } from "./ski";
 import { SLOTS, solvedTape } from "./tape";
+import { LOCK_CODE } from "./sagome";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
 function levers(): boolean[] {
@@ -67,6 +71,9 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "macchinario", key: MACHINE_KEY, solved: levers },
   { label: "terminale", key: HACK_KEY, solved: () => "1" },
   { label: "figura", key: LOST_KEY, solved: () => "1" },
+  { label: "avvio", key: SAGOME_KEY, solved: () => "1" },
+  { label: "tombino", key: TOMBINO_KEY, solved: () => "1" },
+  { label: "lucchetto", key: LOCK_KEY, solved: () => [...LOCK_CODE] },
 ];
 
 /**

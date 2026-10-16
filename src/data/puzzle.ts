@@ -91,6 +91,15 @@ export const HACK_KEY = 'bomboniera.puzzle.terminale';
 /** Whether the five fragments have been laid over the maze and line up. */
 export const LOST_KEY = 'bomboniera.puzzle.figura';
 
+/** Whether the window of silhouettes has been started with the word off the eye. */
+export const SAGOME_KEY = 'bomboniera.puzzle.sagome';
+
+/** Whether the word under the crying ghost has been found. */
+export const TOMBINO_KEY = 'bomboniera.puzzle.tombino';
+
+/** Where the five wheels of the lock were left. */
+export const LOCK_KEY = 'bomboniera.puzzle.lucchetto';
+
 /**
  * The one thing the keeper says once the star has finished drawing itself.
  *
@@ -117,6 +126,12 @@ export const tapeLine = 'Rotom: TODO — la battuta che nomina Animal Well.';
  */
 export const wiredLine =
   "Rotom: ...Va bene. Non me l'aspettavo. Hai letto il nastro, hai il nome giusto, sei dentro il DB. Ti stendo i cavi: da qui in poi le finestre passano da uno schermo all'altro. Non rompere niente. Pff.";
+
+/** What it says to anyone who names a silhouette right: right, and useless. */
+export const bravoLine = 'Rotom: Bravo! giusto ma non ti servirá a un bel niente hahahahah';
+
+/** And what it says when the word under the crying ghost is the right one. */
+export const tombinoLine = 'Rotom: Complimenti, hai trovato anche questo.';
 
 /**
  * What the keeper says once the rhythm is right, one line per tap forward.
