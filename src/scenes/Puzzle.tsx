@@ -37,6 +37,7 @@ import Ski from "../components/Ski";
 import Machine from "../components/Machine";
 import Hack from "../components/Hack";
 import Sagome from "../components/Sagome";
+import Lock from "../components/Lock";
 import Piece from "../components/Piece";
 import {
   PIECES,
@@ -56,6 +57,7 @@ import { DOOR_W, DOOR_Z, HALF, PALETTE } from "../data/room";
 import Window from "../components/Window";
 import { usePersistentFlag } from "../hooks";
 import { STAGES, jumpTo } from "../lib/stages";
+import { loadLock, unlocked } from "../lib/sagome";
 import {
   DONE_GAP,
   HACK_KEY,
@@ -108,6 +110,18 @@ const HACK_DESK = 1;
  */
 const SAGOME = 7;
 const SAGOME_DESK = 4;
+
+/**
+ * The lock: not a screen and not a window, a small pane of its own floating
+ * beside the keeper, turned to face whoever stands where the island is seen
+ * from. It only turns up once the ghost's word has been found.
+ */
+const LOCK = 8;
+/* to the keeper's right as the island is seen, and a little towards the
+   viewer: beside it, not in front of it — in front it hid the keeper */
+const LOCK_POS: [number, number, number] = [0.88, 1.1, -0.46];
+const LOCK_W = 0.7;
+const LOCK_H = 0.5;
 
 /**
  * The fragments of the figure: one on every screen, numbered from here.
@@ -431,6 +445,15 @@ const ISLAND_VIEW: View = {
 };
 
 /** Standing inside the ring, looking out at one screen. */
+/** Up against the lock, square on. */
+const lockView: View = {
+  target: LOCK_POS,
+  azimuth: Math.PI / 4,
+  polar: 1.35,
+  zoom: 3.2,
+  spread: { azimuth: 0.2, polar: 0.12 },
+};
+
 const panelView = (i: number): View => ({
   target: panelPos(i),
   /* brought back into -PI..PI, which is the only range the controls can
@@ -677,6 +700,46 @@ function Panel({
 }
 
 
+/* ----------------------------------------------------------------- the lock */
+
+function LockPane({
+  picked,
+  dimmed,
+  onPick,
+  onUnlock,
+}: {
+  picked: boolean;
+  dimmed: boolean;
+  onPick: () => void;
+  onUnlock: () => void;
+}) {
+  const tap = useTap(onPick);
+  return (
+    <group position={LOCK_POS} rotation-y={Math.PI / 4}>
+      {/* the glass is what is tapped from afar; the lock itself asks too */}
+      <mesh {...tap}>
+        <planeGeometry args={[LOCK_W, LOCK_H]} />
+        <meshBasicMaterial color={GLASS} transparent opacity={dimmed ? 0.35 : 0.8} side={DoubleSide} depthWrite={false} />
+      </mesh>
+      <mesh position={[0, 0, -0.02]}>
+        <planeGeometry args={[LOCK_W + 0.26, LOCK_H + 0.26]} />
+        <meshBasicMaterial
+          map={glowTexture()}
+          color={EDGE}
+          transparent
+          opacity={picked ? 0.3 : 0.14}
+          blending={AdditiveBlending}
+          depthWrite={false}
+          side={DoubleSide}
+        />
+      </mesh>
+      <Html transform position={[0, 0, 0.01]} scale={0.14} zIndexRange={[20, 10]}>
+        <Lock active={picked} onFocus={onPick} onOpen={onUnlock} />
+      </Html>
+    </group>
+  );
+}
+
 /* ---------------------------------------------------------------- the wires
  * What the database pays out: five cables laid across the floor of the island,
  * from under the keeper to the foot of every screen. They are laid once, with
@@ -800,6 +863,7 @@ const Island = memo(function Island({
   hacked,
   linked,
   tombino,
+  onUnlock,
 }: {
   reduced: boolean;
   onExit: () => void;
@@ -817,6 +881,8 @@ const Island = memo(function Island({
   linked: boolean;
   /** Whether the word under the crying ghost has been found. */
   tombino: boolean;
+  /** The lock has just come open, with its five wheels right. */
+  onUnlock: () => void;
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const [flying, setFlying] = useState(false);
@@ -840,6 +906,11 @@ const Island = memo(function Island({
   /** And its word about the ghost's word, once the camera is back on it. */
   const [aboutTombino, setAboutTombino] = useState(false);
   const tombinoBefore = useRef(tombino);
+  /**
+   * Whether the lock stands beside the keeper: once its word about the ghost
+   * has been said — or straight away, if that was in an earlier visit.
+   */
+  const [lockShown, setLockShown] = useState(tombino);
   /** Already open when the visitor arrived: the screens are simply there. */
   const risenAt = useRef(open ? -Infinity : 0);
   /** The same for the cables: laid in front of the visitor, or long since. */
@@ -855,7 +926,10 @@ const Island = memo(function Island({
    * is handed is a new object. Building one inline every render means a new
    * object every frame, so the camera arrives and immediately sets off again.
    */
-  const view = useMemo(() => (picked === null ? ISLAND_VIEW : panelView(picked)), [picked]);
+  const view = useMemo(
+    () => (picked === null ? ISLAND_VIEW : picked === LOCK ? lockView : panelView(picked)),
+    [picked],
+  );
 
   const onZap = () => {
     const now = performance.now();
@@ -1060,6 +1134,15 @@ const Island = memo(function Island({
 
       {linked && <Wires at={wiredAt.current} reduced={reduced} />}
 
+      {lockShown && (
+        <LockPane
+          picked={picked === LOCK}
+          dimmed={picked !== null && picked !== LOCK}
+          onPick={() => setPicked(LOCK)}
+          onUnlock={onUnlock}
+        />
+      )}
+
       {aboutWires && (
         /* over the windows, not under them: this is the one line said while
            the desktop is still full, since the windows no longer close */
@@ -1082,7 +1165,10 @@ const Island = memo(function Island({
             line={tombinoLine}
             last
             reduced={reduced}
-            onNext={() => setAboutTombino(false)}
+            onNext={() => {
+              setAboutTombino(false);
+              setLockShown(true);
+            }}
           />
         </Html>
       )}
@@ -1202,6 +1288,10 @@ function Desk({
    * behind them, and flying back to it would close the window they are using.
    */
   const [bravoAt, setBravoAt] = useState(0);
+  /** Whether the lock is open. Task 5 hangs the tower on it. */
+  const [, setOpened] = useState(() => unlocked(loadLock()));
+  /** Stable, because the island is memoised and the lock watches it. */
+  const unlock = useCallback(() => setOpened(true), []);
   /**
    * A fragment that has been laid in the right place stops being a window at
    * all: its window closes and the maze draws it from then on, so it moves,
@@ -1307,6 +1397,7 @@ function Desk({
         hacked={laying}
         linked={linked}
         tombino={tombino}
+        onUnlock={unlock}
       />
 
       {/* the desktop: each screen its own window, stacked in the order they

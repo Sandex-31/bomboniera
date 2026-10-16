@@ -824,8 +824,9 @@ try {
     // a view built inline is a new object every render, and the rig reads a new
     // object as a new place to fly to: the camera then never stops arriving
     assert.ok(
-      (await read("src/scenes/Puzzle.tsx")).includes(
-        "useMemo(() => (picked === null ? ISLAND_VIEW : panelView(picked)), [picked])",
+      // one view per pick, built once: a new object every render restarts the flight
+      /const view = useMemo\(\s*\(\) =>[^;]*?ISLAND_VIEW[^;]*?\[picked\],?\s*\)/.test(
+        await read("src/scenes/Puzzle.tsx"),
       ),
       "the puzzle camera view is rebuilt every render — the flight will loop",
     );
