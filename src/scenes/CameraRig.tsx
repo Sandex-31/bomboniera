@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Spherical, Vector3 } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -58,10 +58,26 @@ export default function CameraRig({
     t: number;
     fromTarget: Vector3;
     fromAzimuth: number;
+    toAzimuth: number;
     fromPolar: number;
     fromZoom: number;
   } | null>(null);
   const first = useRef(true);
+
+  /*
+   * The new view's angle limits reach the controls the moment React commits,
+   * and the effect below can let a frame through before the flight takes
+   * over. In that frame the controls would clamp the camera — still standing
+   * at the old view — into the new view's limits, a visible jump, and the
+   * flight would set off from the clamped spot. A layout effect runs before
+   * any frame, so the controls are switched off here. (Only off: on the very
+   * first view the controls are not attached yet, which is why the flight
+   * itself still starts in the ordinary effect.)
+   */
+  useLayoutEffect(() => {
+    const c = controls.current;
+    if (c && !first.current && !reduced) c.enabled = false;
+  }, [goal, controls, reduced]);
 
   useEffect(() => {
     const c = controls.current;
@@ -85,6 +101,11 @@ export default function CameraRig({
       t: 0,
       fromTarget: c.target.clone(),
       fromAzimuth: from.theta,
+      /* the same direction by the short way round: an angle and the same
+         angle plus a turn are one view, but flying between them is a spin */
+      toAzimuth:
+        from.theta +
+        Math.atan2(Math.sin(goal.azimuth - from.theta), Math.cos(goal.azimuth - from.theta)),
       fromPolar: from.phi,
       fromZoom: camera.zoom,
     };
@@ -116,7 +137,7 @@ export default function CameraRig({
       .setFromSphericalCoords(
         FLY_RADIUS,
         t.fromPolar + (goal.polar - t.fromPolar) * e,
-        t.fromAzimuth + (goal.azimuth - t.fromAzimuth) * e,
+        t.fromAzimuth + (t.toAzimuth - t.fromAzimuth) * e,
       )
       .add(c.target);
     camera.lookAt(c.target);

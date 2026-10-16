@@ -866,23 +866,30 @@ button { font: inherit; color: inherit; }
   85%           { transform: translateY(3px); }
 }
 
-/* debug only: wipes the puzzle back to an untouched state */
+/* debug only: wipes the puzzle, or jumps to any point of it */
 .void-reset {
   position: fixed; z-index: 2; left: max(14px, env(safe-area-inset-left));
   bottom: max(20px, env(safe-area-inset-bottom));
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.void-reset > * {
   padding: 8px 12px; border: 1px dashed rgba(255, 255, 255, 0.22);
   border-radius: 999px; background: transparent; color: var(--faint);
   font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
   cursor: pointer;
 }
-.void-reset:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.4); }
+.void-reset > *:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.4); }
+.void-reset option { background: #0B121C; color: var(--text); }
 
 /* ---------------------------------------------------- the puzzle's windows
  * Movable, stackable, and never pinned to anything: whatever a screen shows
  * can be dragged out of the way of whatever the next screen shows.
  */
 .win {
-  position: fixed; touch-action: none;
+  /* its own layer, so dragging it only moves pixels already drawn: without
+     it every frame of a drag re-rasterises the window, and the maze's nine
+     hundred walls took the frame from 6ms to 14ms */
+  position: fixed; touch-action: none; will-change: transform;
   border: 1px solid rgba(138, 216, 255, 0.28); border-radius: 10px;
   background: rgba(9, 15, 24, 0.96);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(138, 216, 255, 0.08);
@@ -923,6 +930,14 @@ button { font: inherit; color: inherit; }
 }
 .maze__in { fill: #E3B04B; }
 .maze__out { fill: #6FE0A8; }
+/* the fragments laid home are drawn by the maze, and the skull stands above
+   it: neither the drawing nor its window may clip them */
+.maze { overflow: visible; }
+.win:has(.maze) { overflow: visible; }
+.win:has(.maze) .win__bar { border-radius: 10px 10px 0 0; }
+/* the figure is a handle on the window: a wide line nobody sees, to hit */
+.maze .piece { cursor: grab; }
+.piece__hit { stroke: transparent; stroke-width: 1.4; pointer-events: stroke; }
 
 /* ------------------------------------------------------- three floors of it
  * The grid of mirrors. Finished floors stay underneath in their own colour,

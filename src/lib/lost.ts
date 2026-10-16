@@ -256,6 +256,13 @@ function emit() {
   listeners.forEach((fn) => fn());
 }
 
+/**
+ * The maze has changed size without its drawing knowing — pinched, which is a
+ * transform, and a transform is not a resize — so the fragments still loose
+ * are told to read its scale again.
+ */
+export const remeasure = emit;
+
 /** Where the maze grid sits on the glass, and how big a cell is there. */
 function grid() {
   const box = board.maze?.getBoundingClientRect();
@@ -310,16 +317,6 @@ function drift(index: number, at: { x: number; y: number }, win: HTMLElement | n
     dx: g.x + vx * g.cell - (at.x + box.left - frame.left),
     dy: g.y + vy * g.cell - (at.y + box.top - frame.top),
   };
-}
-
-/**
- * Where the window would have to sit for fragment `index` to be home, given
- * where it is now. Used to put the fragments back over the maze by themselves
- * once the figure has been finished once.
- */
-export function home(index: number, at: { x: number; y: number }, win: HTMLElement | null) {
-  const off = drift(index, at, win);
-  return off && { x: at.x + off.dx, y: at.y + off.dy };
 }
 
 /**

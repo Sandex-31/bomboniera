@@ -1,5 +1,6 @@
 import {
   Suspense,
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -39,9 +40,9 @@ import Piece from "../components/Piece";
 import {
   PIECES,
   drop as dropPiece,
-  home as pieceHome,
   isDone as isFigureDone,
   isHome as isAttached,
+  remeasure,
   revision as boardRevision,
   setDone as setFigureDone,
   subscribe as watchBoard,
@@ -53,21 +54,16 @@ import { FLOORS, SIZE } from "../lib/beam";
 import { DOOR_W, DOOR_Z, HALF, PALETTE } from "../data/room";
 import Window from "../components/Window";
 import { usePersistentFlag } from "../hooks";
+import { STAGES, jumpTo } from "../lib/stages";
 import {
-  BEAM_KEY,
   DONE_GAP,
   HACK_KEY,
-  LAMPS_KEY,
   LOST_KEY,
-  MACHINE_KEY,
-  MAZE_KEY,
-  PLAN_KEY,
   PUZZLE_KEY,
   groupTaps,
   keeperLines,
   onTrack,
   solved,
-  SKI_KEY,
   starLine,
   tapeLine,
   wiredLine,
@@ -421,7 +417,10 @@ const ISLAND_VIEW: View = {
 /** Standing inside the ring, looking out at one screen. */
 const panelView = (i: number): View => ({
   target: panelPos(i),
-  azimuth: angleOf(i) + Math.PI,
+  /* brought back into -PI..PI, which is the only range the controls can
+     clamp in: past it their limits wrap once and still miss, and the camera
+     was pinned to the wrong edge the moment it landed */
+  azimuth: Math.atan2(Math.sin(angleOf(i) + Math.PI), Math.cos(angleOf(i) + Math.PI)),
   polar: 1.45,
   zoom: 2.6,
   spread: { azimuth: 0.2, polar: 0.12 },
@@ -770,7 +769,12 @@ function Wires({ at, reduced }: { at: number; reduced: boolean }) {
 
 /* ------------------------------------------------------------------ scene */
 
-function Island({
+/**
+ * Memoised, because it sits under the desktop: dragging the maze moves the
+ * fragments riding on it, which re-renders the desktop on every pointer move,
+ * and none of that is any business of the 3D scene.
+ */
+const Island = memo(function Island({
   reduced,
   onExit,
   onOpen,
@@ -1088,16 +1092,15 @@ function Island({
         dampingFactor={0.08}
         minPolarAngle={view.polar - view.spread.polar}
         maxPolarAngle={view.polar + view.spread.polar}
-        {...(view.spread.azimuth >= Math.PI
-          ? {}
-          : {
-              minAzimuthAngle: view.azimuth - view.spread.azimuth,
-              maxAzimuthAngle: view.azimuth + view.spread.azimuth,
-            })}
+        /* always passed, never left out: a limit dropped from the props is
+           not lifted but reset to zero, which pinned the island to one angle
+           and yanked the camera there as soon as it landed */
+        minAzimuthAngle={view.spread.azimuth >= Math.PI ? -Infinity : view.azimuth - view.spread.azimuth}
+        maxAzimuthAngle={view.spread.azimuth >= Math.PI ? Infinity : view.azimuth + view.spread.azimuth}
       />
     </Canvas>
   );
-}
+});
 
 /**
  * The other side of the portal.
@@ -1106,12 +1109,30 @@ function Island({
  * screens standing around it. The screens are empty: what goes on them is the
  * puzzle, and it gets built one at a time.
  */
-export default function Puzzle({ reduced, onExit }: { reduced: boolean; onExit: () => void }) {
+export default function Puzzle(props: { reduced: boolean; onExit: () => void }) {
   /**
-   * Bumping this remounts the island, which is the whole reset: every piece
-   * of progress lives inside it, refs included, so nothing can be left over.
+   * Bumping this remounts everything below, which is the whole reset: every
+   * piece of progress is read back from storage on mount, refs included, so
+   * nothing can be left over from before the jump.
    */
   const [run, setRun] = useState(0);
+  const jump = (upTo: number) => {
+    jumpTo(upTo);
+    setRun((n) => n + 1);
+  };
+  return <Desk key={run} {...props} onJump={jump} />;
+}
+
+function Desk({
+  reduced,
+  onExit,
+  onJump,
+}: {
+  reduced: boolean;
+  onExit: () => void;
+  /** Debug: wipe the chain and land with its first `upTo` stops solved. */
+  onJump: (upTo: number) => void;
+}) {
   /** Open windows, bottom of the pile first. */
   const [stack, setStack] = useState<number[]>([]);
   /** The star has finished drawing itself, and the keeper wants a word. */
@@ -1130,24 +1151,13 @@ export default function Puzzle({ reduced, onExit }: { reduced: boolean; onExit: 
   /** Whether the five fragments have been laid over the maze. */
   const [figure, setFigure] = usePersistentFlag(LOST_KEY);
   /**
-   * A fragment that has been laid in the right place stops belonging to the
-   * screen it came from: it is part of the maze window from then on. It rides
-   * with it, it opens and closes with it, and its own screen no longer hands
-   * it out. Which fragments those are lives on the board, because the drag
-   * that decides it happens outside React.
+   * A fragment that has been laid in the right place stops being a window at
+   * all: its window closes and the maze draws it from then on, so it moves,
+   * shrinks and closes with the maze, and dragging it drags the maze. Its own
+   * screen no longer hands it out. Which fragments those are lives on the
+   * board, because the drag that decides it happens outside React.
    */
   useSyncExternalStore(watchBoard, boardRevision);
-  /** How far the maze window has been dragged, all told. */
-  const [ride, setRide] = useState({ x: 0, y: 0 });
-  /** Where that stood when each fragment was attached, so it rides from there. */
-  const since = useRef<Record<number, { x: number; y: number }>>({});
-  const mazeAt = useRef<{ x: number; y: number } | null>(null);
-
-  /** How far fragment `i` has to move to keep up with the maze window. */
-  const rideOf = (i: number) => {
-    const from = since.current[i];
-    return from ? { x: ride.x - from.x, y: ride.y - from.y } : { x: 0, y: 0 };
-  };
   /** The wires being laid, which is a thing to watch and then it is over. */
   const [laying, setLaying] = useState(false);
 
@@ -1165,6 +1175,26 @@ export default function Puzzle({ reduced, onExit }: { reduced: boolean; onExit: 
     }
   };
 
+  /**
+   * What goes inside each window, built once. The desktop re-renders on every
+   * pointer move while the maze is dragged, and handing a window the very same
+   * element lets React skip its contents — the maze alone is nine hundred
+   * walls. The callback reads the latest `solvedOn` through a ref, so building
+   * once does not freeze it.
+   */
+  const solvedRef = useRef(solvedOn);
+  solvedRef.current = solvedOn;
+  const bodies = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.keys(SCREENS).map((k) => [
+          k,
+          SCREENS[Number(k)].body({ onSolved: () => solvedRef.current(Number(k)) }),
+        ]),
+      ),
+    [],
+  );
+
   useEffect(() => setFigureDone(figure), [figure]);
 
   // the wires draw themselves once, then they are simply how things are
@@ -1174,16 +1204,7 @@ export default function Puzzle({ reduced, onExit }: { reduced: boolean; onExit: 
     return () => clearTimeout(t);
   }, [laying, reduced]);
 
-  /** Is this window one of the fragments that now belong to the maze? */
-  const ofMaze = (n: number) => n >= PIECE && isAttached(n - PIECE);
-
-  /** Shutting a window. The maze and what is attached to it go as one. */
-  const shut = (index: number) =>
-    setStack((open) =>
-      index === MAZE || ofMaze(index)
-        ? open.filter((n) => n !== MAZE && !ofMaze(n))
-        : open.filter((n) => n !== index),
-    );
+  const shut = (index: number) => setStack((open) => open.filter((n) => n !== index));
 
   const raise = (index: number) =>
     setStack((open) =>
@@ -1208,7 +1229,6 @@ export default function Puzzle({ reduced, onExit }: { reduced: boolean; onExit: 
         ...(index === MACHINE_DESK && hasMachine ? [MACHINE] : []),
         ...(index === HACK_DESK ? [HACK] : []),
         ...(linked && index < PIECES.length && !isAttached(index) ? [PIECE + index] : []),
-        ...(index === MAZE ? PIECES.flatMap((_, i) => (isAttached(i) ? [PIECE + i] : [])) : []),
       ];
       setStack((open) =>
         linked ? [...open.filter((n) => !arriving.includes(n)), ...arriving] : arriving,
@@ -1218,39 +1238,9 @@ export default function Puzzle({ reduced, onExit }: { reduced: boolean; onExit: 
     [hasMachine, linked, boardRevision()],
   );
 
-  const restart = () => {
-    try {
-      localStorage.removeItem(PUZZLE_KEY);
-      localStorage.removeItem(MAZE_KEY);
-      localStorage.removeItem(BEAM_KEY);
-      localStorage.removeItem(PLAN_KEY);
-      localStorage.removeItem(LAMPS_KEY);
-      localStorage.removeItem(SKI_KEY);
-      localStorage.removeItem(MACHINE_KEY);
-      localStorage.removeItem(HACK_KEY);
-      localStorage.removeItem(LOST_KEY);
-    } catch {
-      /* storage unavailable — the remount still clears the session */
-    }
-    setStack([]);
-    setStarred(false);
-    setTaped(false);
-    setHasMachine(false);
-    setCalling(false);
-    setLinked(false);
-    setLaying(false);
-    setFigure(false);
-    setFigureDone(false);
-    setRide({ x: 0, y: 0 });
-    since.current = {};
-    mazeAt.current = null;
-    setRun((n) => n + 1);
-  };
-
   return (
     <div className="stage">
       <Island
-        key={run}
         reduced={reduced}
         onExit={onExit}
         onOpen={show}
@@ -1275,59 +1265,45 @@ export default function Puzzle({ reduced, onExit }: { reduced: boolean; onExit: 
             z={depth}
             onFocus={() => raise(index)}
             onClose={() => shut(index)}
-            offset={piece !== null && isAttached(piece) ? rideOf(piece) : undefined}
-            onMove={
-              index !== MAZE
-                ? undefined
-                : (at) => {
-                    const last = mazeAt.current;
-                    mazeAt.current = at;
-                    // whatever is attached to the drawing comes along with it
-                    if (last) setRide((r) => ({ x: r.x + at.x - last.x, y: r.y + at.y - last.y }));
-                  }
-            }
-            settle={
-              index === MAZE
-                ? (at) => {
-                    mazeAt.current = at;
-                    return null;
-                  }
-                : piece === null || !isAttached(piece)
-                  ? undefined
-                  : (at, win) => {
-                      // attached: it opens back on the maze, wherever that is
-                      since.current[piece] = ride;
-                      return pieceHome(piece, at, win);
-                    }
-            }
+            // the fragments are drawn at the maze's scale, so they hear about it
+            onScale={index === MAZE ? remeasure : undefined}
             onDrop={
               piece === null
                 ? undefined
                 : (at, win) => {
-                    /* in the coordinates it is drawn at, which is not where it
-                       is kept once it rides with the maze window */
-                    const off = rideOf(piece);
-                    const ridden = { x: at.x + off.x, y: at.y + off.y };
-                    const landed = dropPiece(piece, ridden, win);
-                    // from here it either travels with the maze or is loose again
-                    if (isAttached(piece)) since.current[piece] = ride;
-                    else delete since.current[piece];
+                    const landed = dropPiece(piece, at, win);
+                    // home: it is part of the maze drawing now, not a window
+                    if (isAttached(piece)) shut(index);
                     if (isFigureDone()) setFigure(true);
-                    return { x: landed.x - off.x, y: landed.y - off.y };
+                    return landed;
                   }
             }
           >
-            {SCREENS[index].body({ onSolved: () => solvedOn(index) })}
+            {bodies[index]}
           </Window>
         );
       })}
       <button className="void-exit ghost-btn" onClick={onExit}>
         Torna nella stanza
       </button>
-      {/* debug: one tap back to an untouched puzzle */}
-      <button className="void-reset" onClick={restart}>
-        ⟲ ricomincia il puzzle
-      </button>
+      {/* debug: back to an untouched puzzle, or straight to any point of it */}
+      <div className="void-reset">
+        <button onClick={() => onJump(0)}>⟲ ricomincia il puzzle</button>
+        <select
+          aria-label="Salta a un punto del puzzle"
+          value=""
+          onChange={(e) => onJump(Number(e.target.value))}
+        >
+          <option value="" disabled>
+            ⇥ salta a…
+          </option>
+          {STAGES.map(({ label }, i) => (
+            <option key={label} value={i + 1}>
+              risolti fino a: {label}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 }

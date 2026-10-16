@@ -1,7 +1,25 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type KeyboardEvent,
+  type PointerEvent,
+} from "react";
 import { COLS, ROWS, buildMaze, passable, validTrail, type Cell, type Maze as Grid } from "../lib/maze";
 import { MAZE_KEY } from "../data/puzzle";
-import { CELL, PAD, holdMaze } from "../lib/lost";
+import {
+  CELL,
+  PAD,
+  PIECES,
+  boxPath,
+  holdMaze,
+  isDone,
+  isHome,
+  revision,
+  subscribe,
+} from "../lib/lost";
 
 const same = (a: Cell, b: Cell) => a[0] === b[0] && a[1] === b[1];
 
@@ -118,6 +136,8 @@ export default function Maze() {
   };
 
   const onDown = (e: PointerEvent<SVGSVGElement>) => {
+    // the figure is a handle on the window, not a place to draw
+    if ((e.target as Element).closest("[data-grab]")) return;
     const cell = cellUnder(e.clientX, e.clientY);
     if (!cell) return;
     // picking up the trail anywhere along it rubs out everything after it
@@ -160,6 +180,12 @@ export default function Maze() {
   };
 
   const solved = same(trail[trail.length - 1], maze.exit);
+
+  /* the fragments laid in the right place: they are part of this drawing
+     from then on, so they move, shrink and close with it */
+  useSyncExternalStore(subscribe, revision);
+  const home = PIECES.flatMap((piece, i) => (isHome(i) ? [piece] : []));
+  const done = isDone();
 
   /* the fragments on the other screens line themselves up against this
      drawing, so it has to say where it is and whether it has been traced */
@@ -213,6 +239,32 @@ export default function Maze() {
         r={CELL * 0.22}
         className="maze__out"
       />
+
+      {home.length > 0 && (
+        /* in the fragments' own units, one per cell, so they are drawn from
+           the very same paths as their windows were */
+        <svg
+          x={PAD}
+          y={PAD}
+          width={COLS * CELL}
+          height={ROWS * CELL}
+          viewBox={`0 0 ${COLS} ${ROWS}`}
+          overflow="visible"
+          className={`piece is-home${done ? " is-done" : ""}`}
+          data-grab
+        >
+          {home.map((piece) => (
+            <g key={piece.title + piece.view.join()}>
+              {piece.paths?.map((d, i) => <path key={i} d={d} />)}
+              {piece.boxes?.map((box, i) => (
+                <path key={i} className="piece__ink" d={boxPath(box)} />
+              ))}
+              {/* a wider line nobody sees, so a finger can actually hit it */}
+              {piece.paths?.map((d, i) => <path key={`hit${i}`} className="piece__hit" d={d} />)}
+            </g>
+          ))}
+        </svg>
+      )}
 
       {/* the head of the trail, so a finger knows where it left off */}
       <circle

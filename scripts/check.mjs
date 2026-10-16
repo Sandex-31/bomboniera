@@ -309,10 +309,6 @@ try {
   }
   assert.ok(!puzzleSrc.includes("SPOTS"), "the screen face knows where things stand");
   assert.ok(planSrc.includes("onSolved"), "nothing tells the keeper the star is drawn");
-  assert.ok(
-    puzzleSrc.includes("localStorage.removeItem(PLAN_KEY)"),
-    "the reset button leaves the plan filled in",
-  );
   const { starLine, tapeLine } = await vite.ssrLoadModule("/src/data/puzzle.ts");
   assert.ok(starLine.length > 0, "the keeper has nothing to say about the star");
   assert.ok(tapeLine.length > 0, "the keeper never names what the machine drew");
@@ -403,10 +399,6 @@ try {
   for (const secret of ["CODE", "ANSWER"]) {
     assert.ok(!lampsSrc.includes(secret), `the lamps panel imports ${secret}`);
   }
-  assert.ok(
-    puzzleSrc.includes("localStorage.removeItem(LAMPS_KEY)"),
-    "the reset button leaves the lamps as they were",
-  );
 
   console.log(
     `ok — ${LAMPS} lamps, ${LIT.filter(Boolean).length} lit, one way out of ${2 ** LAMPS}`,
@@ -485,10 +477,6 @@ try {
     "the machine forgets it was earned between visits",
   );
   assert.ok(puzzleSrc.includes("setPicked(MACHINE_DESK)"), "the machine opens out of sight");
-  assert.ok(
-    puzzleSrc.includes("localStorage.removeItem(MACHINE_KEY)"),
-    "the reset button leaves the levers pulled",
-  );
   assert.ok(!machineSrc.includes("CODE"), "the machine knows the code it is not for");
 
   /* ---- the tape has one reading ---------------------------------------- */
@@ -924,8 +912,6 @@ try {
     const { readFile } = await import("node:fs/promises");
     const puzzle = await readFile(new URL("../src/scenes/Puzzle.tsx", import.meta.url), "utf8");
 
-    // the reset has to undo this one too, or the wires can never be unlaid
-    assert.ok(/removeItem\(HACK_KEY\)/.test(puzzle), "restarting the puzzle leaves the database open");
 
     // and the whole point of the wires: a window stops belonging to a screen
     assert.ok(
@@ -947,5 +933,67 @@ try {
     console.log("ok — the terminal takes the word 4 ways, refuses 5 near-misses, 5 fragments drawn");
   } finally {
     await vite4.close();
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* The debug jump: every stop lands with exactly the puzzles above it solved. */
+/* ------------------------------------------------------------------------ */
+{
+  const store = new Map();
+  globalThis.localStorage = {
+    getItem: (k) => (store.has(k) ? store.get(k) : null),
+    setItem: (k, v) => store.set(k, String(v)),
+    removeItem: (k) => store.delete(k),
+  };
+  const vite5 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const { STAGES, jumpTo } = await vite5.ssrLoadModule("/src/lib/stages.ts");
+    const puzzle = await vite5.ssrLoadModule("/src/data/puzzle.ts");
+    const { buildMaze, validTrail } = await vite5.ssrLoadModule("/src/lib/maze.ts");
+    const { FLOORS, complete } = await vite5.ssrLoadModule("/src/lib/beam.ts");
+    const { solvedPlan } = await vite5.ssrLoadModule("/src/data/room.ts");
+    const { START, COLS, dark, press } = await vite5.ssrLoadModule("/src/lib/lamps.ts");
+    const { solvedSki, loadSki } = await vite5.ssrLoadModule("/src/lib/ski.ts");
+    const { solvedTape } = await vite5.ssrLoadModule("/src/lib/tape.ts");
+
+    // the reset is stop 0, so every key the puzzle keeps has to be on the list
+    const keys = Object.entries(puzzle).filter(([n]) => n.endsWith("_KEY")).map(([, v]) => v);
+    assert.deepEqual(new Set(STAGES.map((st) => st.key)), new Set(keys), "a puzzle key is missing from the stops");
+
+    for (let n = 0; n <= STAGES.length; n++) {
+      store.set("leftover", "x");
+      STAGES.forEach(({ key }) => store.set(key, "stale"));
+      jumpTo(n);
+      STAGES.forEach(({ key }, i) =>
+        assert.equal(store.has(key), i < n, `stop ${n} gets ${key} wrong`),
+      );
+    }
+
+    // and what the last stop writes is what each screen accepts as solved
+    jumpTo(STAGES.length);
+    const read = (k) => JSON.parse(store.get(k));
+    const maze = buildMaze();
+    const trail = read(puzzle.MAZE_KEY);
+    assert.ok(validTrail(maze, trail), "the jump draws an impossible maze line");
+    assert.deepEqual(trail.at(-1), maze.exit, "the jump stops short of the maze exit");
+    const beams = read(puzzle.BEAM_KEY);
+    FLOORS.forEach((f, i) =>
+      assert.ok(complete(f, new Map(Object.entries(beams[i]))), `the jump leaves floor ${i} dark`),
+    );
+    assert.ok(solvedPlan(read(puzzle.PLAN_KEY)), "the jump lays out the wrong room");
+    const lamps = read(puzzle.LAMPS_KEY);
+    const replayed = lamps.pressed.reduce(
+      (b, on, i) => (on ? press(b, Math.floor(i / COLS), i % COLS) : b),
+      [...START],
+    );
+    assert.ok(dark(replayed) && dark(lamps.lit), "the jump leaves lamps burning");
+    assert.ok(solvedSki(loadSki()), "the jump leaves the mountain blank");
+    assert.ok(solvedTape(read(puzzle.MACHINE_KEY)), "the jump sets the levers wrong");
+
+    console.log(`ok — ${STAGES.length + 1} jump stops, each solving exactly the puzzles above it`);
+  } finally {
+    await vite5.close();
+    delete globalThis.localStorage;
   }
 }
