@@ -36,6 +36,7 @@ import Lamps from "../components/Lamps";
 import Ski from "../components/Ski";
 import Machine from "../components/Machine";
 import Hack from "../components/Hack";
+import Sagome from "../components/Sagome";
 import Piece from "../components/Piece";
 import {
   PIECES,
@@ -59,6 +60,7 @@ import {
   DONE_GAP,
   HACK_KEY,
   LOST_KEY,
+  TOMBINO_KEY,
   PUZZLE_KEY,
   groupTaps,
   keeperLines,
@@ -67,6 +69,8 @@ import {
   starLine,
   tapeLine,
   wiredLine,
+  bravoLine,
+  tombinoLine,
 } from "../data/puzzle";
 import type { View } from "./focus";
 
@@ -97,6 +101,13 @@ const MACHINE_DESK = 0;
  */
 const HACK = 6;
 const HACK_DESK = 1;
+
+/**
+ * The window of silhouettes, on the desk of the ski map: the map's code is
+ * what the lock it leads to opens with, so they belong on one screen.
+ */
+const SAGOME = 7;
+const SAGOME_DESK = 4;
 
 /**
  * The fragments of the figure: one on every screen, numbered from here.
@@ -357,7 +368,7 @@ const SCREENS: Record<
   {
     title: string;
     /** Built on demand, because some of them have something to report back. */
-    body: (bus: { onSolved: () => void }) => ReactNode;
+    body: (bus: { onSolved: () => void; onBravo: () => void }) => ReactNode;
     /** What the screen shows from across the island. The machine has no screen. */
     face?: () => CanvasTexture;
     width?: number;
@@ -379,6 +390,11 @@ const SCREENS: Record<
     width: 460,
   },
   /* not screens: things that sit on the desk of one */
+  [SAGOME]: {
+    title: "sagome.exe",
+    body: ({ onSolved, onBravo }) => <Sagome onTombino={onSolved} onBravo={onBravo} />,
+    width: 420,
+  },
   [HACK]: {
     title: "rotom.db",
     body: ({ onSolved }) => <Hack onSolved={onSolved} />,
@@ -783,6 +799,7 @@ const Island = memo(function Island({
   taped,
   hacked,
   linked,
+  tombino,
 }: {
   reduced: boolean;
   onExit: () => void;
@@ -798,6 +815,8 @@ const Island = memo(function Island({
   hacked: boolean;
   /** Whether the cables are down at all — they outlive the moment they arrive. */
   linked: boolean;
+  /** Whether the word under the crying ghost has been found. */
+  tombino: boolean;
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const [flying, setFlying] = useState(false);
@@ -818,6 +837,9 @@ const Island = memo(function Island({
   const [aboutTape, setAboutTape] = useState(false);
   /** And the one it has about the cables, once they are down. */
   const [aboutWires, setAboutWires] = useState(false);
+  /** And its word about the ghost's word, once the camera is back on it. */
+  const [aboutTombino, setAboutTombino] = useState(false);
+  const tombinoBefore = useRef(tombino);
   /** Already open when the visitor arrived: the screens are simply there. */
   const risenAt = useRef(open ? -Infinity : 0);
   /** The same for the cables: laid in front of the visitor, or long since. */
@@ -902,6 +924,15 @@ const Island = memo(function Island({
     );
     return () => clearTimeout(t);
   }, [hacked, reduced]);
+
+  /* the ghost's word is found in a window too: step back to the keeper first */
+  useEffect(() => {
+    if (!tombino || tombinoBefore.current) return;
+    tombinoBefore.current = true;
+    setPicked(null);
+    const t = setTimeout(() => setAboutTombino(true), reduced ? 0 : 900);
+    return () => clearTimeout(t);
+  }, [tombino, reduced]);
 
   /* the same for the machine: it finishes on a desk, so step back first */
   useEffect(() => {
@@ -1043,6 +1074,19 @@ const Island = memo(function Island({
         </Html>
       )}
 
+      {aboutTombino && (
+        /* over the windows: by now the screens are wired and theirs stay open */
+        <Html position={[0, 2.1, 0]} center zIndexRange={[80, 60]}>
+          <Keeper
+            key="tombino"
+            line={tombinoLine}
+            last
+            reduced={reduced}
+            onNext={() => setAboutTombino(false)}
+          />
+        </Html>
+      )}
+
       {!reduced && rings.map((t) => <Zap key={t} at={t} />)}
       {!open && counts.length > 0 && <Dots counts={counts} failedAt={failedAt} />}
 
@@ -1150,6 +1194,14 @@ function Desk({
   const [linked, setLinked] = usePersistentFlag(HACK_KEY);
   /** Whether the five fragments have been laid over the maze. */
   const [figure, setFigure] = usePersistentFlag(LOST_KEY);
+  /** Whether the word under the crying ghost has been found. */
+  const [tombino, setTombino] = usePersistentFlag(TOMBINO_KEY);
+  /**
+   * When a silhouette was last named right. The laugh is said on the glass,
+   * not over the keeper: the visitor is up against a screen with the keeper
+   * behind them, and flying back to it would close the window they are using.
+   */
+  const [bravoAt, setBravoAt] = useState(0);
   /**
    * A fragment that has been laid in the right place stops being a window at
    * all: its window closes and the maze draws it from then on, so it moves,
@@ -1169,6 +1221,7 @@ function Desk({
       setCalling(true);
     }
     if (index === MACHINE) setTaped(true);
+    if (index === SAGOME) setTombino(true);
     if (index === HACK) {
       setLinked(true);
       setLaying(true);
@@ -1189,7 +1242,10 @@ function Desk({
       Object.fromEntries(
         Object.keys(SCREENS).map((k) => [
           k,
-          SCREENS[Number(k)].body({ onSolved: () => solvedRef.current(Number(k)) }),
+          SCREENS[Number(k)].body({
+            onSolved: () => solvedRef.current(Number(k)),
+            onBravo: () => setBravoAt(performance.now()),
+          }),
         ]),
       ),
     [],
@@ -1228,6 +1284,7 @@ function Desk({
         index,
         ...(index === MACHINE_DESK && hasMachine ? [MACHINE] : []),
         ...(index === HACK_DESK ? [HACK] : []),
+        ...(index === SAGOME_DESK ? [SAGOME] : []),
         ...(linked && index < PIECES.length && !isAttached(index) ? [PIECE + index] : []),
       ];
       setStack((open) =>
@@ -1249,6 +1306,7 @@ function Desk({
         taped={taped}
         hacked={laying}
         linked={linked}
+        tombino={tombino}
       />
 
       {/* the desktop: each screen its own window, stacked in the order they
@@ -1283,6 +1341,17 @@ function Desk({
           </Window>
         );
       })}
+      {bravoAt > 0 && (
+        <div className="keeper-float">
+          <Keeper
+            key={bravoAt}
+            line={bravoLine}
+            last
+            reduced={reduced}
+            onNext={() => setBravoAt(0)}
+          />
+        </div>
+      )}
       <button className="void-exit ghost-btn" onClick={onExit}>
         Torna nella stanza
       </button>

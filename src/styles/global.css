@@ -821,6 +821,12 @@ button { font: inherit; color: inherit; }
   .keeper, .keeper__caret, .keeper.is-said .keeper__next { animation: none; }
 }
 
+/* what the keeper says on the glass, when it is behind the visitor */
+.keeper-float {
+  position: fixed; z-index: 90; left: 50%; top: max(16px, env(safe-area-inset-top));
+  transform: translateX(-50%);
+}
+
 /* what the keeper says, anchored over its head inside the canvas */
 .keeper {
   width: min(70vw, 300px); padding: 14px 16px 12px;
@@ -1370,3 +1376,82 @@ button { font: inherit; color: inherit; }
 .card-wrap { display: grid; gap: 6px; }
 .card__lab { font: 12px var(--font-mono); color: var(--gold); justify-self: end; text-decoration: none; }
 .focus-card__more--lab { display: inline-block; margin-right: 18px; text-decoration: none; }
+
+/* ------------------------------------------------- the window of silhouettes
+ * A lightbox: black shapes need light behind them. Before it starts it is a
+ * dark terminal like the one on the eye's desk, asking for its word.
+ */
+.sagome {
+  margin: -12px; padding: 14px 14px 16px;
+  font-family: var(--font-mono); color: #3A2A12;
+  background: #0B0D12;
+  display: grid; gap: 12px;
+}
+.sagome--boot {
+  min-height: 220px; align-content: center; text-align: center;
+  color: #F2C46D;
+  background: radial-gradient(120% 90% at 50% 0%, #1A1206 0%, #07070A 70%);
+}
+.sagome__boot {
+  margin: 0 0 8px; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: rgba(242, 196, 109, 0.55);
+}
+.sagome__light {
+  position: relative; height: 300px; border-radius: 8px; overflow: hidden;
+  outline: none; touch-action: pan-y; user-select: none;
+  background:
+    radial-gradient(80% 70% at 50% 45%, #FFF8E6 0%, #F3E4BE 55%, #D9C390 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 0 40px rgba(120, 80, 20, 0.25);
+}
+.sagome__light:focus-visible { box-shadow: 0 0 0 2px var(--gold), inset 0 0 40px rgba(120, 80, 20, 0.25); }
+.sagome__shape {
+  position: absolute; inset: 18px; width: calc(100% - 36px); height: calc(100% - 36px);
+  object-fit: contain; pointer-events: none;
+  opacity: 0; transform: scale(0.96); transition: opacity 220ms var(--ease), transform 220ms var(--ease);
+}
+.sagome__shape.is-on { opacity: 1; transform: none; }
+.sagome__bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sagome__arrow {
+  width: 40px; height: 34px; border-radius: 8px; cursor: pointer;
+  border: 1px solid rgba(242, 196, 109, 0.35); background: rgba(242, 196, 109, 0.08);
+  color: #F2C46D; font-size: 22px; line-height: 1;
+}
+.sagome__arrow:hover { background: rgba(242, 196, 109, 0.18); }
+.sagome__dots { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.sagome__dots li { width: 6px; height: 6px; border-radius: 50%; background: rgba(242, 196, 109, 0.25); }
+.sagome__dots li.is-on { background: #F2C46D; box-shadow: 0 0 8px rgba(242, 196, 109, 0.7); }
+.sagome__accept {
+  justify-self: center; padding: 8px 22px; border-radius: 999px; cursor: pointer;
+  border: 1px solid #F2C46D; background: #F2C46D; color: #1A1206;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+}
+.sagome__accept:disabled { opacity: 0.4; cursor: default; }
+
+/* asked over the lightbox, which dims behind it */
+.sagome__ask {
+  position: absolute; inset: 0; display: grid; align-content: center; gap: 10px;
+  padding: 18px; text-align: center;
+  background: rgba(10, 8, 4, 0.72); backdrop-filter: blur(2px);
+  color: #F2C46D;
+}
+.sagome__word { display: grid; gap: 8px; }
+.sagome__label { font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase; color: rgba(242, 196, 109, 0.6); }
+.sagome__hint { margin: 0; font-size: 12px; color: #FFE3A6; }
+.sagome__input {
+  width: 100%; padding: 8px 4px; border: 0; border-bottom: 1px solid rgba(242, 196, 109, 0.5);
+  background: transparent; color: #FFF4D8; outline: none;
+  font-family: var(--font-mono); font-size: 20px; letter-spacing: 0.3em; text-align: center; text-transform: uppercase;
+}
+.sagome__status { margin: 0; font-size: 10px; letter-spacing: 0.2em; color: rgba(242, 196, 109, 0.45); }
+.sagome__word.is-wrong { animation: hack-shake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+.sagome__word.is-wrong .sagome__input { color: #FF6B5A; border-bottom-color: #FF6B5A; }
+.sagome__word.is-wrong .sagome__status { color: #FF6B5A; }
+.sagome__cancel {
+  justify-self: center; border: 0; background: none; cursor: pointer;
+  color: rgba(242, 196, 109, 0.55); font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.24em; text-transform: uppercase;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sagome__shape { transition: none; }
+  .sagome__word.is-wrong { animation: none; }
+}
