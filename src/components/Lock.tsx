@@ -90,7 +90,11 @@ export default function Lock({
   return (
     <div
       className={`lock${open ? " is-open" : ""}${active ? " is-active" : ""}`}
-      onPointerDown={stop}
+      onPointerDown={(e) => {
+        stop(e);
+        // from afar the whole of it asks to come closer, not just the wheels
+        if (!active) onFocus();
+      }}
       onPointerUp={stop}
       onClick={stop}
       onWheel={stop}

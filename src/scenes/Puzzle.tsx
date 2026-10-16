@@ -973,6 +973,16 @@ const Island = memo(function Island({
     return () => clearTimeout(t);
   }, [openAt, reduced]);
 
+  /*
+   * The open shaft is the way back to the tower shot. From the island the
+   * tower is out of sight underneath, so without this one tap in the void —
+   * or a reload — would lose it for good.
+   */
+  const toTower = useTap(() => {
+    setPicked(null);
+    setAtTower(true);
+  });
+
   // going to a screen is leaving the tower shot
   useEffect(() => {
     if (picked !== null) setAtTower(false);
@@ -1137,11 +1147,15 @@ const Island = memo(function Island({
         }}
         {...zap}
       >
-        {/* a pad the size of a fingertip, since the thing itself is small */}
-        <mesh position={[0, 1.12, 0]}>
-          <boxGeometry args={[1.3, 1.5, 1.3]} />
-          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-        </mesh>
+        {/* a pad the size of a fingertip, since the thing itself is small —
+            only while the rhythm is being tapped: after that it would sit on
+            the manhole, and the keeper itself is still there to tap */}
+        {!open && (
+          <mesh position={[0, 1.12, 0]}>
+            <boxGeometry args={[1.3, 1.5, 1.3]} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+          </mesh>
+        )}
         <Suspense fallback={null}>
           <Rotom reduced={reduced} zapAt={zapAt} awake={!open && saying === null} />
         </Suspense>
@@ -1187,7 +1201,23 @@ const Island = memo(function Island({
 
       {opened && (
         <>
-          <Manhole openAt={openAt + 300} reduced={reduced} />
+          <group
+            {...toTower}
+            onPointerOver={(e) => {
+              e.stopPropagation();
+              document.body.style.cursor = "pointer";
+            }}
+            onPointerOut={() => {
+              document.body.style.cursor = "auto";
+            }}
+          >
+            {/* a pad wider than the shaft, since a finger is wider than it */}
+            <mesh rotation-x={-Math.PI / 2} position={[0, 0.03, 0]}>
+              <circleGeometry args={[0.45, 24]} />
+              <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+            </mesh>
+            <Manhole openAt={openAt + 300} reduced={reduced} />
+          </group>
           <Tower />
         </>
       )}
@@ -1354,6 +1384,8 @@ function Desk({
   const unlock = useCallback(() => {
     setOpened(true);
     setOpenAt(performance.now());
+    // nothing in front of the reveal
+    setStack([]);
   }, []);
   /**
    * A fragment that has been laid in the right place stops being a window at
@@ -1374,7 +1406,12 @@ function Desk({
       setCalling(true);
     }
     if (index === MACHINE) setTaped(true);
-    if (index === SAGOME) setTombino(true);
+    if (index === SAGOME) {
+      setTombino(true);
+      // the keeper is about to talk and the lock to turn up beside it: with
+      // the screens wired the windows would stay open on top of both
+      setStack([]);
+    }
     if (index === HACK) {
       setLinked(true);
       setLaying(true);
