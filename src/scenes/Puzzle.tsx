@@ -28,6 +28,7 @@ import CameraRig from "./CameraRig";
 import { glowTexture } from "./glow";
 import Hotspot, { useTap } from "./Hotspot";
 import Portal from "./Portal";
+import { Manhole, Tower } from "./Tower";
 import Rotom from "./Rotom";
 import Maze from "../components/Maze";
 import Mirrors from "../components/Mirrors";
@@ -433,6 +434,19 @@ const panelPos = (i: number): [number, number, number] => [
   PANEL_Y,
   Math.cos(angleOf(i)) * RING_R,
 ];
+
+/**
+ * Far out and a little from the side: the island turns out to be the top of
+ * something, and this is the shot that shows what. Zoom is a fraction of the
+ * one that frames the island, which is how far out this is.
+ */
+const TOWER_VIEW: View = {
+  target: [0, -3.4, 0],
+  azimuth: Math.PI / 4,
+  polar: 1.22,
+  zoom: 0.55,
+  spread: { azimuth: Math.PI, polar: 0.3 },
+};
 
 const ISLAND_VIEW: View = {
   target: [0, 1.05, 0],
@@ -864,6 +878,8 @@ const Island = memo(function Island({
   linked,
   tombino,
   onUnlock,
+  opened,
+  openAt,
 }: {
   reduced: boolean;
   onExit: () => void;
@@ -883,6 +899,10 @@ const Island = memo(function Island({
   tombino: boolean;
   /** The lock has just come open, with its five wheels right. */
   onUnlock: () => void;
+  /** Whether the lock is open — and so the manhole, and the tower beneath. */
+  opened: boolean;
+  /** When it opened during this visit, or -Infinity if it already was. */
+  openAt: number;
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const [flying, setFlying] = useState(false);
@@ -926,10 +946,37 @@ const Island = memo(function Island({
    * is handed is a new object. Building one inline every render means a new
    * object every frame, so the camera arrives and immediately sets off again.
    */
+  /** Standing back far enough to see the tower, once it has been revealed. */
+  const [atTower, setAtTower] = useState(false);
   const view = useMemo(
-    () => (picked === null ? ISLAND_VIEW : picked === LOCK ? lockView : panelView(picked)),
-    [picked],
+    () =>
+      picked === null
+        ? atTower
+          ? TOWER_VIEW
+          : ISLAND_VIEW
+        : picked === LOCK
+          ? lockView
+          : panelView(picked),
+    [picked, atTower],
   );
+
+  /*
+   * The lock has just opened: back to the keeper, the manhole slides off,
+   * and then the camera keeps going back until the island is a thing on top
+   * of a tower. A lock that was open already reveals nothing — the tower is
+   * simply there, and so is the open shaft.
+   */
+  useEffect(() => {
+    if (!Number.isFinite(openAt)) return;
+    setPicked(null);
+    const t = setTimeout(() => setAtTower(true), reduced ? 0 : 1400);
+    return () => clearTimeout(t);
+  }, [openAt, reduced]);
+
+  // going to a screen is leaving the tower shot
+  useEffect(() => {
+    if (picked !== null) setAtTower(false);
+  }, [picked]);
 
   const onZap = () => {
     const now = performance.now();
@@ -1048,18 +1095,22 @@ const Island = memo(function Island({
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (picked !== null) setPicked(null);
+      else if (atTower) setAtTower(false);
       else onExit();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [picked, onExit]);
+  }, [picked, atTower, onExit]);
 
   return (
     <Canvas
       orthographic
       dpr={[1, 1.75]}
       camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
-      onPointerMissed={() => setPicked(null)}
+      onPointerMissed={() => {
+        setPicked(null);
+        setAtTower(false);
+      }}
     >
       <color attach="background" args={["#05060A"]} />
       <ambientLight intensity={0.45} color="#6E7FB0" />
@@ -1133,6 +1184,13 @@ const Island = memo(function Island({
       )}
 
       {linked && <Wires at={wiredAt.current} reduced={reduced} />}
+
+      {opened && (
+        <>
+          <Manhole openAt={openAt + 300} reduced={reduced} />
+          <Tower />
+        </>
+      )}
 
       {lockShown && (
         <LockPane
@@ -1288,10 +1346,15 @@ function Desk({
    * behind them, and flying back to it would close the window they are using.
    */
   const [bravoAt, setBravoAt] = useState(0);
-  /** Whether the lock is open. Task 5 hangs the tower on it. */
-  const [, setOpened] = useState(() => unlocked(loadLock()));
+  /** Whether the lock is open, which is what the tower hangs on. */
+  const [opened, setOpened] = useState(() => unlocked(loadLock()));
+  /** When it opened in this visit; -Infinity is before it, or long since. */
+  const [openAt, setOpenAt] = useState(-Infinity);
   /** Stable, because the island is memoised and the lock watches it. */
-  const unlock = useCallback(() => setOpened(true), []);
+  const unlock = useCallback(() => {
+    setOpened(true);
+    setOpenAt(performance.now());
+  }, []);
   /**
    * A fragment that has been laid in the right place stops being a window at
    * all: its window closes and the maze draws it from then on, so it moves,
@@ -1398,6 +1461,8 @@ function Desk({
         linked={linked}
         tombino={tombino}
         onUnlock={unlock}
+        opened={opened}
+        openAt={openAt}
       />
 
       {/* the desktop: each screen its own window, stacked in the order they

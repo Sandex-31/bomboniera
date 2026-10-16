@@ -825,7 +825,7 @@ try {
     // object as a new place to fly to: the camera then never stops arriving
     assert.ok(
       // one view per pick, built once: a new object every render restarts the flight
-      /const view = useMemo\(\s*\(\) =>[^;]*?ISLAND_VIEW[^;]*?\[picked\],?\s*\)/.test(
+      /const view = useMemo\(\s*\(\) =>[^;]*?ISLAND_VIEW[^;]*?\[picked[^\]]*\],?\s*\)/.test(
         await read("src/scenes/Puzzle.tsx"),
       ),
       "the puzzle camera view is rebuilt every render — the flight will loop",
