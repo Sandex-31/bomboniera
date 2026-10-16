@@ -6,3 +6,4 @@ dist
 !.vscode/extensions.json
 .superpowers/
 scripts/labs/cache/tmp/
+scripts/sagome-src/

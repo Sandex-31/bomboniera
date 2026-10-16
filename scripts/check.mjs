@@ -1050,6 +1050,50 @@ try {
     assert.deepEqual(s.loadLock(), [4, 7, 1, 5, 7]);
     delete globalThis.localStorage;
 
+    // the codec the silhouettes are made with gives back what it was given
+    const { decode, encode } = await import("./png.mjs");
+    const tiny = { width: 3, height: 2, data: Uint8Array.from({ length: 24 }, (_, i) => (i * 37) % 256) };
+    const back = decode(encode(tiny));
+    assert.equal(back.width, 3);
+    assert.equal(back.height, 2);
+    assert.deepEqual([...back.data], [...tiny.data], "the png codec loses pixels");
+
+    // a packed 4-bit palette, which is how pixel-art sprites come: three
+    // pixels, indices 1, 0, 2, with index 0 see-through
+    const { SIGNATURE, chunk } = await import("./png.mjs");
+    const { deflateSync } = await import("node:zlib");
+    const ihdr = Buffer.from([0, 0, 0, 3, 0, 0, 0, 1, 4, 3, 0, 0, 0]);
+    const sprite = decode(
+      Buffer.concat([
+        SIGNATURE,
+        chunk("IHDR", ihdr),
+        chunk("PLTE", Buffer.from([0, 0, 0, 255, 0, 0, 0, 255, 0])),
+        chunk("tRNS", Buffer.from([0])),
+        chunk("IDAT", deflateSync(Buffer.from([0, 0x10, 0x20]))),
+        chunk("IEND", Buffer.alloc(0)),
+      ]),
+    );
+    assert.deepEqual([...sprite.data], [255, 0, 0, 255, 0, 0, 0, 0, 0, 255, 0, 255], "a packed palette reads wrong");
+
+    // and every silhouette is black, all of it, and actually a shape
+    const { readFileSync } = await import("node:fs");
+    for (const c of s.CHARACTERS) {
+      const img = decode(readFileSync(new URL(`../public/${c.file}`, import.meta.url)));
+      assert.ok(img.width > 0 && img.height > 0 && img.height <= 480, `${c.id} is the wrong size`);
+      let solid = 0;
+      for (let i = 0; i < img.data.length; i += 4) {
+        if (img.data[i + 3] === 0) continue;
+        solid++;
+        assert.ok(
+          img.data[i] === 0 && img.data[i + 1] === 0 && img.data[i + 2] === 0,
+          `${c.id} has colour in it`,
+        );
+      }
+      const all = img.width * img.height;
+      assert.ok(solid >= all * 0.05, `${c.id} is barely there`);
+      assert.ok(all - solid >= all * 0.05, `${c.id} is a block, not a shape`);
+    }
+
     console.log("ok — 11 silhouettes named, EYE boots, TOMBINO on the lost, the lock turns on 47157");
   } finally {
     await vite6.close();
