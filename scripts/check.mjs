@@ -1343,3 +1343,20 @@ try {
     await vite10.close();
   }
 }
+
+/* ---------------------------------------------------------- the hieroglyphs
+ * Drawn, not typed: 21 paths, one per letter, shared by the terminal (SVG)
+ * and the wall (Path2D), so they have to be plain path data.
+ */
+{
+  const vite11 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const { HIEROGLYPHS } = await vite11.ssrLoadModule("/src/lib/hieroglyphs.ts");
+    assert.equal(HIEROGLYPHS.length, 21);
+    for (const d of HIEROGLYPHS) assert.match(d, /^[MmLlHhVvCcSsQqTtAaZz0-9.,\s-]+$/);
+    assert.equal(new Set(HIEROGLYPHS).size, 21, "two hieroglyphs are the same drawing");
+    console.log("ok — 21 hieroglyphs");
+  } finally {
+    await vite11.close();
+  }
+}
