@@ -1613,7 +1613,12 @@ button { font: inherit; color: inherit; }
   background: radial-gradient(120% 90% at 50% 0%, #04140D 0%, #01070B 70%);
   font-family: var(--font-mono); color: #6FE0A8;
 }
-.chats__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.chats__list {
+  list-style: none; margin: 0; padding: 0 2px 0 0; display: grid; gap: 6px;
+  /* by the last phase there are more chats than fit: the list scrolls */
+  /* the window opens 74px down; its bar and padding take ~70 more */
+  max-height: min(calc(100dvh - 190px), 440px); overflow-y: auto; overscroll-behavior: contain;
+}
 .chats__row {
   display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px;
   border: 1px solid rgba(111, 224, 168, 0.22); border-radius: 8px;
@@ -1675,3 +1680,4 @@ button { font: inherit; color: inherit; }
 }
 .sarc__slot:focus { border-color: rgba(242, 227, 204, 0.7); }
 .sarc__slot.is-right { color: #FFFFFF; border-color: #FFFFFF; box-shadow: 0 0 12px rgba(255, 255, 255, 0.35); }
+.chats__list, .chats__lines { scrollbar-width: thin; scrollbar-color: rgba(111, 224, 168, 0.4) transparent; }
