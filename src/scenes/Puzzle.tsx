@@ -31,6 +31,7 @@ import Portal from "./Portal";
 import { Manhole, Tower } from "./Tower";
 import Rotom from "./Rotom";
 import Babel from "./Babel";
+import Engine from "./Engine";
 import Keeper from "./Keeper";
 import Maze from "../components/Maze";
 import Mirrors from "../components/Mirrors";
@@ -68,6 +69,8 @@ import {
   TOMBINO_KEY,
   FLOOR_KEY,
   floorFrom,
+  DEPTH_KEY,
+  depthFrom,
   PUZZLE_KEY,
   groupTaps,
   keeperLines,
@@ -1505,16 +1508,24 @@ function Desk({
       return 0;
     }
   });
-  /** Whether the visitor has ever been down the shaft: then it is the short way. */
-  const [descended, setDescended] = useState(() => {
+  /**
+   * The deepest floor the visitor has ever reached: a trip down to it or
+   * above it is the short way. Never shallower than where they stand, so a
+   * debug jump straight to a floor counts as having come down to it.
+   */
+  const [depth, setDepth] = useState(() => {
     try {
-      return localStorage.getItem(FLOOR_KEY) !== null;
+      const at = localStorage.getItem(FLOOR_KEY);
+      return Math.max(
+        depthFrom(localStorage.getItem(DEPTH_KEY)),
+        at === null ? 0 : Math.max(1, floorFrom(at)),
+      );
     } catch {
-      return false;
+      return 0;
     }
   });
-  /** When the visitor last came through the shaft, and whether it was the first time. */
-  const [arrival, setArrival] = useState({ at: -Infinity, first: false });
+  /** When the visitor last came through the shaft, from which floor, and whether it was the first time. */
+  const [arrival, setArrival] = useState({ at: -Infinity, first: false, from: 0 });
   /** The dark of the shaft, drawn over the cut from one floor to the next. */
   const [veil, setVeil] = useState(false);
   /**
@@ -1523,9 +1534,11 @@ function Desk({
    */
   const goTo = useCallback(
     (n: number, first: boolean) => {
+      const deepest = Math.max(depth, n);
       const land = () => {
         try {
           localStorage.setItem(FLOOR_KEY, String(n));
+          localStorage.setItem(DEPTH_KEY, String(deepest));
         } catch {
           /* storage unavailable — the floor still changes for this visit */
         }
@@ -1533,8 +1546,8 @@ function Desk({
         // The scene flag is left alone: the floor arriving reports its own,
         // and clearing it here flashed the windows for a frame in between
         setOpenAt(-Infinity);
-        setDescended(true);
-        setArrival({ at: performance.now(), first });
+        setDepth(deepest);
+        setArrival({ at: performance.now(), first, from: floor });
         setFloor(n);
         setVeil(false);
       };
@@ -1542,10 +1555,12 @@ function Desk({
       setVeil(true);
       setTimeout(land, VEIL_MS);
     },
-    [reduced],
+    [reduced, depth, floor],
   );
   const toIsland = useCallback(() => goTo(0, false), [goTo]);
   const toBabel = useCallback((first: boolean) => goTo(1, first), [goTo]);
+  const upToBabel = useCallback(() => goTo(1, false), [goTo]);
+  const toEngine = useCallback((first: boolean) => goTo(2, first), [goTo]);
   /** Whether the lock is open, which is what the tower hangs on. */
   const [opened, setOpened] = useState(() => unlocked(loadLock()));
   /** When it opened in this visit; -Infinity is before it, or long since. */
@@ -1676,15 +1691,26 @@ function Desk({
           bravoAt={bravoAt}
           onBravoDone={endBravo}
           onScene={setScene}
-          descended={descended}
+          descended={depth >= 1}
           onDescend={toBabel}
           arrivedAt={arrival.at}
         />
-      ) : (
+      ) : floor === 1 ? (
         <Babel
           reduced={reduced}
           onScene={setScene}
           onUp={toIsland}
+          onDown={toEngine}
+          deep={depth >= 2}
+          arrivedAt={arrival.at}
+          first={arrival.first}
+          fromBelow={arrival.from === 2}
+        />
+      ) : (
+        <Engine
+          reduced={reduced}
+          onScene={setScene}
+          onUp={upToBabel}
           arrivedAt={arrival.at}
           first={arrival.first}
         />

@@ -101,20 +101,28 @@ export const TOMBINO_KEY = 'bomboniera.puzzle.tombino';
 export const LOCK_KEY = 'bomboniera.puzzle.lucchetto';
 
 /**
- * Which floor of the tower the visitor is on: 0 the island, 1 the one below.
- * Missing means they have never been down, which is what makes the first
- * descent the long one.
+ * Which floor of the tower the visitor is on: 0 the island, 1 Babel, 2 the
+ * machine room. Missing means they have never been down.
  */
 export const FLOOR_KEY = 'bomboniera.puzzle.piano';
 
 /** How many floors are built so far, the island included. */
-export const FLOORS = 2;
+export const FLOORS = 3;
 
 /** The stored floor, read back: anything that is not a floor is the island. */
 export function floorFrom(stored: string | null): number {
   const n = Number(stored);
   return stored !== null && stored !== '' && Number.isInteger(n) && n >= 0 && n < FLOORS ? n : 0;
 }
+
+/**
+ * The deepest floor the visitor has ever reached. The first trip down to a
+ * floor is the long one, every trip after is the short way.
+ */
+export const DEPTH_KEY = 'bomboniera.puzzle.profondita';
+
+/** The stored depth, read back: anything that is not a floor is none. */
+export const depthFrom = floorFrom;
 
 /** Which of the six wall phrases of Babel have been read, by index. */
 export const LANG_KEY = 'bomboniera.puzzle.lingue';

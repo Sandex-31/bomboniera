@@ -341,6 +341,12 @@ export default function Babel({
   onScene: (on: boolean) => void;
   /** The hole in the ceiling was tapped: back up to the island. */
   onUp: () => void;
+  /** Rotom has gone down into the open sarcophagus: on to the machine room. */
+  onDown: (first: boolean) => void;
+  /** Whether the visitor has been down to the machine room before. */
+  deep: boolean;
+  /** Whether they came up from the machine room, not down from the island. */
+  fromBelow: boolean;
   /** When the visitor came down, or -Infinity if they were already here. */
   arrivedAt: number;
   /** Whether that was the first time down, which is the long way. */

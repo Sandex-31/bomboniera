@@ -12,6 +12,7 @@ import {
   BEAM_KEY,
   FLOOR_KEY,
   CHAT_KEY,
+  DEPTH_KEY,
   HACK_KEY,
   LANG_KEY,
   LAMPS_KEY,
@@ -33,6 +34,7 @@ import { ANSWER } from "./lamps";
 import { STATIONS } from "./ski";
 import { SLOTS, solvedTape } from "./tape";
 import { LOCK_CODE } from "./sagome";
+import { PHRASES } from "../data/babel";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
 function levers(): boolean[] {
@@ -81,13 +83,15 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "secondo piano", key: FLOOR_KEY, solved: () => "1" },
   { label: "lingue: 3 frasi", key: LANG_KEY, solved: () => [0, 1, 2] },
   { label: "sarcofago", key: LANG_KEY, solved: () => [0, 1, 2, 3, 4, 5] },
+  { label: "titoli", key: TITLES_KEY, solved: () => PHRASES.map((p) => p.titles[0]) },
+  { label: "terzo piano", key: FLOOR_KEY, solved: () => "2" },
 ];
 
 /**
- * What the puzzle keeps that is not a stop of its own: the titles half typed
- * into the sarcophagus, and which chats have been opened. Wiped with the rest.
+ * What the puzzle keeps that is not a stop of its own: which chats have been
+ * opened, and how deep the visitor has been. Wiped with the rest.
  */
-export const WIPED = [TITLES_KEY, CHAT_KEY];
+export const WIPED = [CHAT_KEY, DEPTH_KEY];
 
 /**
  * Wipes the whole chain, then solves the first `upTo` stops of it.
