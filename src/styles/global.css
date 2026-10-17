@@ -1513,3 +1513,93 @@ button { font: inherit; color: inherit; }
 .lock.is-open .lock__digit:not(.is-near) { color: #9DFFC6; text-shadow: 0 0 12px rgba(111, 224, 168, 0.8); }
 .lock.is-open .lock__wheel { cursor: default; }
 @media (prefers-reduced-motion: reduce) { .lock__shackle { transition: none; } }
+
+/* babel folk: the two people of a chat acting out its subject. Limbs hang at
+   their joints and swing by rotation; negative is forward, toward the other */
+.folk { display: block; width: 100%; height: auto; overflow: visible; }
+.folk__arm, .folk__leg, .folk__pose, .folk__move { transform-box: view-box; transform-origin: 0 0; }
+.folk__sword { display: none; }
+.folk__fig--blocchi * { animation-timing-function: steps(4) !important; }
+.folk__fig--stelle { filter: drop-shadow(0 0 3px rgba(255, 233, 168, 0.7)); }
+.folk--still * { animation-play-state: paused !important; animation-delay: -0.6s !important; }
+
+@keyframes folk-walk { 0%, 100% { transform: rotate(28deg); } 50% { transform: rotate(-28deg); } }
+@keyframes folk-walk-back { 0%, 100% { transform: rotate(-28deg); } 50% { transform: rotate(28deg); } }
+@keyframes folk-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes folk-cheer { 0%, 100% { transform: rotate(-150deg); } 50% { transform: rotate(-190deg); } }
+@keyframes folk-drum { 0%, 100% { transform: rotate(-30deg); } 50% { transform: rotate(-75deg); } }
+@keyframes folk-eat { 0%, 30%, 100% { transform: rotate(-40deg); } 55%, 75% { transform: rotate(-165deg); } }
+@keyframes folk-approach { 0%, 100% { transform: translateX(0); } 45%, 60% { transform: translateX(24px); } }
+@keyframes folk-strike { 0%, 40%, 100% { transform: rotate(-60deg); } 55% { transform: rotate(-170deg); } 70% { transform: rotate(-20deg); } }
+@keyframes folk-lie { 0%, 100% { transform: translate(-6px, 24px) rotate(-90deg); } }
+@keyframes folk-shake { 0%, 100% { transform: rotate(-110deg); } 25% { transform: rotate(-150deg); } 75% { transform: rotate(-70deg); } }
+@keyframes folk-scratch { 0%, 100% { transform: rotate(-170deg); } 50% { transform: rotate(-150deg); } }
+@keyframes folk-sneak { 0%, 100% { transform: translateX(0) scale(0.62); } 45%, 60% { transform: translateX(46px) scale(0.62); } }
+@keyframes folk-grab { 0%, 40%, 100% { transform: rotate(-20deg); } 50%, 60% { transform: rotate(-80deg); } }
+@keyframes folk-look-around { 0%, 100% { transform: rotate(0deg); } 30% { transform: rotate(-6deg); } 70% { transform: rotate(6deg); } }
+@keyframes folk-point-up { 0%, 100% { transform: rotate(-160deg); } 50% { transform: rotate(-145deg); } }
+@keyframes folk-lean-back { 0%, 100% { transform: rotate(8deg); } }
+@keyframes folk-hold { 0%, 100% { transform: rotate(-70deg); } 50% { transform: rotate(-80deg); } }
+@keyframes folk-row { 0%, 100% { transform: rotate(-50deg); } 50% { transform: rotate(-110deg); } }
+@keyframes folk-wrist { 0%, 100% { transform: rotate(-90deg); } 50% { transform: rotate(-100deg); } }
+@keyframes folk-float { 0% { transform: translateY(8px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-14px); opacity: 0; } }
+@keyframes folk-blink { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+@keyframes folk-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+@keyframes folk-loot { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
+@keyframes folk-scroll { to { stroke-dashoffset: -36; } }
+@keyframes folk-flow { to { transform: translateX(40px); } }
+@keyframes folk-sun { 0% { transform: translate(0, 30px); } 50% { transform: translate(100px, -20px); } 100% { transform: translate(200px, 30px); } }
+@keyframes folk-monkey { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+.folk__float { animation: folk-float 2.4s ease-out infinite; }
+.folk__float--late { animation-delay: 1.2s; }
+.folk__blink { animation: folk-blink 1.4s ease-in-out infinite; }
+.folk__pulse { transform-box: fill-box; transform-origin: center; animation: folk-pulse 0.9s ease-in-out infinite; }
+.folk__pulse--late { animation-delay: 0.45s; }
+
+/* musica: one drums, the other dances */
+.folk--musica .folk__fig--a .folk__arm--front { animation: folk-drum 0.4s ease-in-out infinite; }
+.folk--musica .folk__fig--b .folk__move { animation: folk-bounce 0.5s ease-in-out infinite; }
+.folk--musica .folk__fig--b .folk__arm { animation: folk-cheer 0.5s ease-in-out infinite; }
+/* sonno: one sleeps on the ground, the other shakes them awake */
+.folk--sonno .folk__fig--b .folk__pose { animation: folk-lie 1s infinite; }
+.folk--sonno .folk__fig--a .folk__move { animation: folk-approach 3s ease-in-out infinite; }
+.folk--sonno .folk__fig--a .folk__arm--front { animation: folk-shake 0.5s ease-in-out infinite; }
+/* cibo: both eat from the table */
+.folk--cibo .folk__arm--front { animation: folk-eat 1.6s ease-in-out infinite; }
+.folk--cibo .folk__fig--b .folk__arm--front { animation-delay: 0.8s; }
+/* furto: a little one sneaks up and takes the gold, the other looks round */
+.folk--furto .folk__fig--b .folk__move { animation: folk-sneak 4s ease-in-out infinite; }
+.folk--furto .folk__fig--b .folk__arm--front { animation: folk-grab 4s ease-in-out infinite; }
+.folk--furto .folk__fig--a .folk__pose { animation: folk-look-around 2s ease-in-out infinite; }
+.folk--furto .folk__loot { animation: folk-loot 4s step-end infinite; }
+/* oblio: one asks, the other scratches their head */
+.folk--oblio .folk__fig--a .folk__arm--front { animation: folk-hold 2s ease-in-out infinite; }
+.folk--oblio .folk__fig--b .folk__arm--front { animation: folk-scratch 0.6s ease-in-out infinite; }
+/* guerra: swords out, they close in and strike */
+.folk--guerra .folk__sword { display: inline; }
+.folk--guerra .folk__move { animation: folk-approach 2.4s ease-in-out infinite; }
+.folk--guerra .folk__arm--front { animation: folk-strike 2.4s ease-in-out infinite; }
+.folk--guerra .folk__fig--b .folk__arm--front { animation-delay: 0.3s; }
+/* scimmia: a monkey in the tree, one points, the other laughs */
+.folk--scimmia .folk__monkey { animation: folk-monkey 0.8s ease-in-out infinite; }
+.folk--scimmia .folk__fig--a .folk__arm--front { animation: folk-point-up 1.5s ease-in-out infinite; }
+.folk--scimmia .folk__fig--b .folk__move { animation: folk-bounce 0.35s ease-in-out infinite; }
+/* cuore: a heart over one, a brain over the other, hands to the chest */
+.folk--cuore .folk__arm--front { animation: folk-hold 1.8s ease-in-out infinite; }
+/* cielo: both lean back and point at the sky */
+.folk--cielo .folk__pose { animation: folk-lean-back 1s infinite; }
+.folk--cielo .folk__arm--front { animation: folk-point-up 2s ease-in-out infinite; }
+/* nascita: one holds a baby, the other cheers */
+.folk--nascita .folk__fig--a .folk__arm { animation: folk-hold 1.6s ease-in-out infinite; }
+.folk--nascita .folk__fig--b .folk__arm { animation: folk-cheer 0.7s ease-in-out infinite; }
+/* viaggio: walking side by side, the road going by */
+.folk--viaggio .folk__leg--front, .folk--viaggio .folk__arm--back { animation: folk-walk 0.8s ease-in-out infinite; }
+.folk--viaggio .folk__leg--back, .folk--viaggio .folk__arm--front { animation: folk-walk-back 0.8s ease-in-out infinite; }
+.folk--viaggio .folk__road { animation: folk-scroll 0.8s linear infinite; }
+/* fiume: the water runs on, one rows */
+.folk--fiume .folk__river { animation: folk-flow 1.2s linear infinite; }
+.folk--fiume .folk__fig--a .folk__arm { animation: folk-row 1.4s ease-in-out infinite; }
+/* tempo: the sun crosses the sky, one taps their wrist */
+.folk--tempo .folk__sun { animation: folk-sun 6s linear infinite; }
+.folk--tempo .folk__fig--b .folk__arm--front { animation: folk-wrist 0.5s ease-in-out infinite; }

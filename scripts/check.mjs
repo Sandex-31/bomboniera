@@ -1360,3 +1360,17 @@ try {
     await vite11.close();
   }
 }
+
+/* ---------------------------------------------------------- the folk
+ * Every scene a chat can name has an animation to act it out.
+ */
+{
+  const { readFileSync } = await import("node:fs");
+  const data = readFileSync(new URL("../src/data/babel.ts", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../src/styles/global.css", import.meta.url), "utf8");
+  const union = data.match(/export type SceneKind =([^;]+);/)[1];
+  const kinds = [...union.matchAll(/"(\w+)"/g)].map((m) => m[1]);
+  assert.ok(kinds.length >= 10, "the scene list did not parse");
+  for (const k of kinds) assert.ok(css.includes(`.folk--${k} `), `no animation for the scene «${k}»`);
+  console.log(`ok — all ${kinds.length} scenes are acted out`);
+}
