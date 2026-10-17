@@ -821,11 +821,20 @@ button { font: inherit; color: inherit; }
   .keeper, .keeper__caret, .keeper.is-said .keeper__next { animation: none; }
 }
 
-/* what the keeper says on the glass, when it is behind the visitor */
-.keeper-float {
-  position: fixed; z-index: 90; left: 50%; top: max(16px, env(safe-area-inset-top));
-  transform: translateX(-50%);
+/* a scene is playing: nothing in front of it, and nothing under the finger.
+   Hidden, never closed — the windows come back where they were. The view's
+   taps and drags are heard on the div that wraps the canvas, so that is the
+   one switched off; the keeper's bubble sits inside it and switches back on. */
+.stage .win, .stage .void-exit, .stage .void-reset {
+  transition: opacity 260ms ease, visibility 0s;
 }
+.stage.is-scene .win, .stage.is-scene .void-exit, .stage.is-scene .void-reset {
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 260ms ease, visibility 0s 260ms;
+}
+/* important: React Three Fiber writes pointer-events: auto inline on it */
+.stage.is-scene div:has(> div > canvas) { pointer-events: none !important; }
+.stage.is-scene .keeper { pointer-events: auto; }
 
 /* what the keeper says, anchored over its head inside the canvas */
 .keeper {

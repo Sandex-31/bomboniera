@@ -75,7 +75,7 @@ import {
   bravoLine,
   tombinoLine,
 } from "../data/puzzle";
-import type { View } from "./focus";
+import { FLIGHT, type View } from "./focus";
 
 /** Projected width of the island, the way ROOM_W frames the room. */
 const VOID_W = 7;
@@ -880,6 +880,9 @@ const Island = memo(function Island({
   onUnlock,
   opened,
   openAt,
+  bravoAt,
+  onBravoDone,
+  onScene,
 }: {
   reduced: boolean;
   onExit: () => void;
@@ -903,6 +906,12 @@ const Island = memo(function Island({
   opened: boolean;
   /** When it opened during this visit, or -Infinity if it already was. */
   openAt: number;
+  /** When a silhouette was last named right, or 0: the keeper laughs about it. */
+  bravoAt: number;
+  /** And it has finished laughing. */
+  onBravoDone: () => void;
+  /** Whether a scene is playing: the desktop gets out of its way. */
+  onScene: (on: boolean) => void;
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const [flying, setFlying] = useState(false);
@@ -966,12 +975,52 @@ const Island = memo(function Island({
    * of a tower. A lock that was open already reveals nothing — the tower is
    * simply there, and so is the open shaft.
    */
+  /** The reveal is in the air, from the lock opening to the tower shot landing. */
+  const [revealing, setRevealing] = useState(false);
   useEffect(() => {
     if (!Number.isFinite(openAt)) return;
     setPicked(null);
+    setRevealing(true);
     const t = setTimeout(() => setAtTower(true), reduced ? 0 : 1400);
-    return () => clearTimeout(t);
+    const done = setTimeout(() => setRevealing(false), reduced ? 0 : 1400 + FLIGHT * 1000);
+    return () => {
+      clearTimeout(t);
+      clearTimeout(done);
+    };
   }, [openAt, reduced]);
+
+  /*
+   * A silhouette named right is laughed at by the keeper, so the camera goes
+   * to the keeper — and back to the screen the visitor was using once it has
+   * finished, where the windows come back exactly as they were.
+   */
+  const [aboutBravo, setAboutBravo] = useState(false);
+  const bravoFrom = useRef<number | null>(null);
+  useEffect(() => {
+    if (!bravoAt) return;
+    setPicked((at) => {
+      bravoFrom.current = at;
+      return null;
+    });
+    const t = setTimeout(() => setAboutBravo(true), reduced ? 0 : 900);
+    return () => clearTimeout(t);
+  }, [bravoAt, reduced]);
+
+  /*
+   * Anything the keeper says is a scene, and so is the reveal: the desktop
+   * hides and the view stops taking input until it is over. The flights that
+   * lead up to a line count too, or the windows would vanish a beat late.
+   */
+  const scene =
+    revealing ||
+    bravoAt > 0 ||
+    saying !== null ||
+    aboutStar ||
+    aboutTape ||
+    aboutWires ||
+    aboutTombino ||
+    aboutBravo;
+  useEffect(() => onScene(scene), [scene, onScene]);
 
   /*
    * The open shaft is the way back to the tower shot. From the island the
@@ -1103,14 +1152,15 @@ const Island = memo(function Island({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
+      // a scene plays to its end: Escape would fly the camera out from under it
+      if (e.key !== "Escape" || scene) return;
       if (picked !== null) setPicked(null);
       else if (atTower) setAtTower(false);
       else onExit();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [picked, atTower, onExit]);
+  }, [picked, atTower, onExit, scene]);
 
   return (
     <Canvas
@@ -1261,6 +1311,22 @@ const Island = memo(function Island({
         </Html>
       )}
 
+      {aboutBravo && (
+        <Html position={[0, 2.1, 0]} center zIndexRange={[80, 60]}>
+          <Keeper
+            key={bravoAt}
+            line={bravoLine}
+            last
+            reduced={reduced}
+            onNext={() => {
+              setAboutBravo(false);
+              setPicked(bravoFrom.current);
+              onBravoDone();
+            }}
+          />
+        </Html>
+      )}
+
       {!reduced && rings.map((t) => <Zap key={t} at={t} />)}
       {!open && counts.length > 0 && <Dots counts={counts} failedAt={failedAt} />}
 
@@ -1371,11 +1437,15 @@ function Desk({
   /** Whether the word under the crying ghost has been found. */
   const [tombino, setTombino] = usePersistentFlag(TOMBINO_KEY);
   /**
-   * When a silhouette was last named right. The laugh is said on the glass,
-   * not over the keeper: the visitor is up against a screen with the keeper
-   * behind them, and flying back to it would close the window they are using.
+   * When a silhouette was last named right, or 0. The island flies to the
+   * keeper to laugh and back again; by then the screens are wired, so the
+   * window being used only hides for the length of the line.
    */
   const [bravoAt, setBravoAt] = useState(0);
+  /** Stable, because the island is memoised. */
+  const endBravo = useCallback(() => setBravoAt(0), []);
+  /** A scene is playing on the island: the desktop steps out of the way. */
+  const [scene, setScene] = useState(false);
   /** Whether the lock is open, which is what the tower hangs on. */
   const [opened, setOpened] = useState(() => unlocked(loadLock()));
   /** When it opened in this visit; -Infinity is before it, or long since. */
@@ -1486,7 +1556,7 @@ function Desk({
   );
 
   return (
-    <div className="stage">
+    <div className={scene ? "stage is-scene" : "stage"}>
       <Island
         reduced={reduced}
         onExit={onExit}
@@ -1500,6 +1570,9 @@ function Desk({
         onUnlock={unlock}
         opened={opened}
         openAt={openAt}
+        bravoAt={bravoAt}
+        onBravoDone={endBravo}
+        onScene={setScene}
       />
 
       {/* the desktop: each screen its own window, stacked in the order they
@@ -1534,17 +1607,6 @@ function Desk({
           </Window>
         );
       })}
-      {bravoAt > 0 && (
-        <div className="keeper-float">
-          <Keeper
-            key={bravoAt}
-            line={bravoLine}
-            last
-            reduced={reduced}
-            onNext={() => setBravoAt(0)}
-          />
-        </div>
-      )}
       <button className="void-exit ghost-btn" onClick={onExit}>
         Torna nella stanza
       </button>
