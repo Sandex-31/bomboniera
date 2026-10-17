@@ -141,10 +141,8 @@ export function langFrom(stored: string | null): number[] {
 
 /**
  * What it says once the sarcophagus has its six titles and opens.
- *
- * TODO: da scrivere — questa riga è segnaposto.
  */
-export const sarcLine = 'Rotom: TODO — la battuta del sarcofago.';
+export const sarcLine = 'Rotom: mi ritrasformooooo!!!';
 
 /**
  * The one thing the keeper says once the star has finished drawing itself.

@@ -533,13 +533,20 @@ export default function Babel({
             <cylinderGeometry args={[0.55, 0.55, 0.12, 24]} />
             <meshStandardMaterial color={STONE_DARK} roughness={0.85} />
           </mesh>
-          <group position={[0, 1.0, 0.43]} {...screen}>
+          {/* a flat panel set into a round column (r ≈ 0.474 here): its back
+              meets the stone at its edges (0.41 at x = ±0.24) and its face is
+              just clear of it in the middle, so it sits flush, not hung on */}
+          <group position={[0, 1.0, 0.45]} {...screen}>
             <mesh>
-              <boxGeometry args={[0.52, 0.38, 0.06]} />
+              <boxGeometry args={[0.48, 0.4, 0.08]} />
+              <meshStandardMaterial color={STONE_DARK} roughness={0.85} />
+            </mesh>
+            <mesh position={[0, 0, 0.041]}>
+              <planeGeometry args={[0.42, 0.34]} />
               <meshStandardMaterial color="#1E2622" metalness={0.4} roughness={0.5} />
             </mesh>
-            <mesh position={[0, 0, 0.032]}>
-              <planeGeometry args={[0.44, 0.3]} />
+            <mesh position={[0, 0, 0.043]}>
+              <planeGeometry args={[0.36, 0.27]} />
               <meshStandardMaterial color="#04140D" emissive="#2BD88A" emissiveIntensity={0.35} />
             </mesh>
           </group>

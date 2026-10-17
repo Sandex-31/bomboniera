@@ -1362,17 +1362,29 @@ try {
 }
 
 /* ---------------------------------------------------------- the folk
- * Every scene a chat can name has an animation to act it out.
+ * Every message of every chat has a beat for the figures to act it out, and
+ * every loop a beat can name has an animation.
  */
 {
   const { readFileSync } = await import("node:fs");
-  const data = readFileSync(new URL("../src/data/babel.ts", import.meta.url), "utf8");
   const css = readFileSync(new URL("../src/styles/global.css", import.meta.url), "utf8");
-  const union = data.match(/export type SceneKind =([^;]+);/)[1];
-  const kinds = [...union.matchAll(/"(\w+)"/g)].map((m) => m[1]);
-  assert.ok(kinds.length >= 10, "the scene list did not parse");
-  for (const k of kinds) assert.ok(css.includes(`.folk--${k} `), `no animation for the scene «${k}»`);
-  console.log(`ok — all ${kinds.length} scenes are acted out`);
+  const vite13 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const { CHATS } = await vite13.ssrLoadModule("/src/data/babel.ts");
+    const { BEATS, LOOPS, actAt } = await vite13.ssrLoadModule("/src/data/acting.ts");
+    for (const c of CHATS) assert.equal(BEATS[c.id]?.length, c.lines.length, `chat «${c.id}»: one beat per message`);
+    assert.deepEqual(Object.keys(BEATS).sort(), CHATS.map((c) => c.id).sort(), "beats for a chat that is not there");
+    for (const l of LOOPS) assert.ok(css.includes(`.folk__fig--l-${l} `), `no animation for the loop «${l}»`);
+    // what a figure does carries on until a beat changes it
+    const beats = [{ a: { p: "point", h: "sword" }, show: ["army"] }, { a: { f: "sad" } }, { a: { h: null }, show: [] }];
+    assert.deepEqual(actAt(beats, 1).a, { p: "point", f: "sad", x: 0, h: "sword", l: null });
+    assert.deepEqual(actAt(beats, 1).show, ["army"]);
+    assert.deepEqual(actAt(beats, 2), { a: { p: "point", f: "sad", x: 0, h: null, l: null }, b: actAt([], 0).b, show: [] });
+    assert.equal(actAt(beats, -1).a.p, "stand");
+    console.log(`ok — every message acted out, ${LOOPS.length} loops animated`);
+  } finally {
+    await vite13.close();
+  }
 }
 
 /* ---------------------------------------------------------- windows below

@@ -191,8 +191,8 @@ fin dall'inizio, ma senza le chat della propria fase non si riescono a leggere.
   - I titoli contengono k, w e y. Lì vanno bene, perché si scrivono con la tastiera e non con gli
     alfabeti.
 - **Quando sono giusti tutti e sei** il coperchio scivola via. Rotom dice una battuta e dentro il
-  sarcofago si apre la discesa al piano sotto. La battuta è da scrivere: *segnaposto mio*
-  «Rotom: TODO — la battuta del sarcofago», come `starLine`.
+  sarcofago si apre la discesa al piano sotto. La battuta, di Salvo, è
+  «Rotom: mi ritrasformooooo!!!».
 - **Il terzo piano non esiste ancora.** Il sarcofago resta aperto e buio, e toccarlo non fa niente.
   Il collegamento si aggiunge quando costruiremo il terzo piano.
 

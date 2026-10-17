@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { BEATS } from "../data/acting";
 import { unlockedChats, type Chat } from "../data/babel";
 import { CHAT_KEY } from "../data/puzzle";
 import Folk, { FolkHead } from "./Folk";
@@ -7,11 +8,16 @@ import Glyphs from "./Glyphs";
 /*
  * The terminal in the column: conversations overheard between the peoples of
  * Babel, each in their own script, never translated. What they are about is
- * only ever shown, by the two figures acting it out over the messages.
+ * only ever shown, by the two figures acting out each message as it comes.
  */
 
-/** How long between one message and the next, as if typed. */
-const LINE_MS = 1100;
+/** A moment to see who is there before anyone speaks. */
+const FIRST_MS = 1400;
+/**
+ * How long a message stays the newest: long enough to watch what it is acted
+ * out with, and longer for a longer one.
+ */
+const lineMs = (text: string) => Math.min(5200, 2600 + 60 * text.length);
 
 function loadSeen(): string[] {
   try {
@@ -30,7 +36,7 @@ export default function Chats({ solved, reduced }: { solved: number[]; reduced: 
 
   const enter = (chat: Chat) => {
     setOpen(chat);
-    setShown(reduced ? chat.lines.length : 1);
+    setShown(reduced ? chat.lines.length : 0);
     if (seen.includes(chat.id)) return;
     const next = [...seen, chat.id];
     setSeen(next);
@@ -49,7 +55,7 @@ export default function Chats({ solved, reduced }: { solved: number[]; reduced: 
 
   useEffect(() => {
     if (!open || shown >= open.lines.length) return;
-    const t = setTimeout(() => setShown((n) => n + 1), LINE_MS);
+    const t = setTimeout(() => setShown((n) => n + 1), shown ? lineMs(open.lines[shown - 1].text) : FIRST_MS);
     return () => clearTimeout(t);
   }, [open, shown]);
 
@@ -76,11 +82,17 @@ export default function Chats({ solved, reduced }: { solved: number[]; reduced: 
         <button onClick={() => setOpen(null)} aria-label="Torna alla lista">
           ←
         </button>
-        <button onClick={() => setShown(reduced ? open.lines.length : 1)} aria-label="Ricomincia la conversazione">
+        <button onClick={() => setShown(reduced ? open.lines.length : 0)} aria-label="Ricomincia la conversazione">
           ↻
         </button>
       </div>
-      <Folk who={open.who} scene={open.scene} reduced={reduced} />
+      <Folk
+        who={open.who}
+        beats={BEATS[open.id]}
+        step={shown - 1}
+        talking={shown && !reduced ? open.lines[shown - 1].by : null}
+        reduced={reduced}
+      />
       <ol className="chats__lines" ref={lines}>
         {open.lines.slice(0, shown).map((l, i) => (
           <li key={i} className={`chats__line chats__line--${l.by ? "b" : "a"}`}>

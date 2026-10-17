@@ -52,29 +52,12 @@ export const PHRASES: { script: Script; text: string; titles: string[] }[] = [
   },
 ];
 
-/** What the two figures act out over a chat, with no words. */
-export type SceneKind =
-  | "musica"
-  | "sonno"
-  | "cibo"
-  | "furto"
-  | "oblio"
-  | "guerra"
-  | "scimmia"
-  | "cuore"
-  | "cielo"
-  | "nascita"
-  | "viaggio"
-  | "fiume"
-  | "tempo";
-
 export type Chat = {
   id: string;
   /** Phase 0 is there from the start; phase k turns up once phrase k (one-based) is read. */
   phase: number;
   /** Who is talking, left and right. Each writes in their own script. */
   who: [Script, Script];
-  scene: SceneKind;
   lines: { by: 0 | 1; text: string }[];
 };
 
@@ -87,7 +70,6 @@ export const CHATS: Chat[] = [
     id: "e-musica",
     phase: 0,
     who: ["egizi", "egizi"],
-    scene: "musica",
     lines: talk(
       "Senti la musica?",
       "Sì, la sento sempre.",
@@ -101,7 +83,6 @@ export const CHATS: Chat[] = [
     id: "e-sonno",
     phase: 0,
     who: ["egizi", "egizi"],
-    scene: "sonno",
     lines: talk(
       "Perché suoni? Dormo!",
       "Perché è mattina. Sveglia!",
@@ -114,7 +95,6 @@ export const CHATS: Chat[] = [
     id: "e-cibo",
     phase: 0,
     who: ["egizi", "egizi"],
-    scene: "cibo",
     lines: talk(
       "Hai fame?",
       "Sì, tanta fame. Mangiamo pane.",
@@ -130,7 +110,6 @@ export const CHATS: Chat[] = [
     id: "s-furto",
     phase: 1,
     who: ["stelle", "stelle"],
-    scene: "furto",
     lines: talk(
       "Guarda, un piccolo pigmeo!",
       "Dove? Non lo vedo.",
@@ -144,7 +123,6 @@ export const CHATS: Chat[] = [
     id: "s-oblio",
     phase: 1,
     who: ["stelle", "stelle"],
-    scene: "oblio",
     lines: talk(
       "Come ti chiami?",
       "L'ho dimenticato.",
@@ -158,7 +136,6 @@ export const CHATS: Chat[] = [
     id: "se-musica",
     phase: 1,
     who: ["stelle", "egizi"],
-    scene: "musica",
     lines: talk(
       "Musica?",
       "Musica! Senti?",
@@ -173,7 +150,6 @@ export const CHATS: Chat[] = [
     id: "b-guerra",
     phase: 2,
     who: ["blocchi", "blocchi"],
-    scene: "guerra",
     lines: talk(
       "La guerra è qui.",
       "Combatti con me?",
@@ -187,7 +163,6 @@ export const CHATS: Chat[] = [
     id: "b-duello",
     phase: 2,
     who: ["blocchi", "blocchi"],
-    scene: "guerra",
     lines: talk(
       "Tu non puoi vincere.",
       "Io vinco sempre.",
@@ -201,7 +176,6 @@ export const CHATS: Chat[] = [
     id: "be-pane",
     phase: 2,
     who: ["blocchi", "egizi"],
-    scene: "guerra",
     lines: talk(
       "Guerra!",
       "Guerra? Perché?",
@@ -214,7 +188,6 @@ export const CHATS: Chat[] = [
     id: "bs-oro",
     phase: 2,
     who: ["blocchi", "stelle"],
-    scene: "furto",
     lines: talk(
       "Il pigmeo ha rubato l'oro.",
       "L'oro? Il mio oro?",
@@ -229,7 +202,6 @@ export const CHATS: Chat[] = [
     id: "t-scimmia",
     phase: 3,
     who: ["tubi", "tubi"],
-    scene: "scimmia",
     lines: talk(
       "Guarda, una scimmia sull'albero.",
       "È felice, mangia banane.",
@@ -243,7 +215,6 @@ export const CHATS: Chat[] = [
     id: "t-mostro",
     phase: 3,
     who: ["tubi", "tubi"],
-    scene: "cuore",
     lines: talk(
       "Il mostro ha un cuore?",
       "No, è senza cuore.",
@@ -257,7 +228,6 @@ export const CHATS: Chat[] = [
     id: "te-cuore",
     phase: 3,
     who: ["tubi", "egizi"],
-    scene: "cuore",
     lines: talk(
       "Cuore.",
       "Cuore? La musica è nel cuore.",
@@ -269,7 +239,6 @@ export const CHATS: Chat[] = [
     id: "tb-mostro",
     phase: 3,
     who: ["tubi", "blocchi"],
-    scene: "guerra",
     lines: talk(
       "Un mostro! Aiuto!",
       "Un mostro? Combatto io.",
@@ -284,7 +253,6 @@ export const CHATS: Chat[] = [
     id: "o-cielo",
     phase: 4,
     who: ["onde", "onde"],
-    scene: "cielo",
     lines: talk(
       "Guarda le stelle.",
       "Laggiù c'è la terra. Siamo nati là.",
@@ -298,7 +266,6 @@ export const CHATS: Chat[] = [
     id: "o-nascita",
     phase: 4,
     who: ["onde", "onde"],
-    scene: "nascita",
     lines: talk(
       "Un bambino è nato!",
       "Nato oggi? Quanto è piccolo.",
@@ -312,7 +279,6 @@ export const CHATS: Chat[] = [
     id: "os-stelle",
     phase: 4,
     who: ["onde", "stelle"],
-    scene: "cielo",
     lines: talk(
       "Stelle.",
       "Stelle! Siamo noi.",
@@ -324,7 +290,6 @@ export const CHATS: Chat[] = [
     id: "ot-terra",
     phase: 4,
     who: ["onde", "tubi"],
-    scene: "viaggio",
     lines: talk(
       "Terra!",
       "Terra? Dove?",
@@ -340,7 +305,6 @@ export const CHATS: Chat[] = [
     id: "x-fiume",
     phase: 5,
     who: ["esagrammi", "esagrammi"],
-    scene: "fiume",
     lines: talk(
       "Guarda il fiume.",
       "Scorre sempre, non si ferma.",
@@ -354,7 +318,6 @@ export const CHATS: Chat[] = [
     id: "x-viaggio",
     phase: 5,
     who: ["esagrammi", "esagrammi"],
-    scene: "viaggio",
     lines: talk(
       "Dove vanno le persone?",
       "Si muovono, sempre avanti.",
@@ -368,7 +331,6 @@ export const CHATS: Chat[] = [
     id: "xo-tempo",
     phase: 5,
     who: ["esagrammi", "onde"],
-    scene: "tempo",
     lines: talk(
       "Tempo.",
       "Tempo? Non ho tempo.",
@@ -381,7 +343,6 @@ export const CHATS: Chat[] = [
     id: "xe-fiume",
     phase: 5,
     who: ["esagrammi", "egizi"],
-    scene: "fiume",
     lines: talk(
       "Fiume.",
       "Il fiume! Remo sul fiume.",
