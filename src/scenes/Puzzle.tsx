@@ -1468,7 +1468,7 @@ const Island = memo(function Island({
 
       <OrbitControls
         ref={controls}
-        enabled={!flying}
+        enabled={!flying && !scene}
         enablePan={false}
         enableZoom={false}
         enableDamping
@@ -1577,9 +1577,9 @@ function Desk({
         } catch {
           /* storage unavailable — the floor still changes for this visit */
         }
-        // whatever was playing upstairs stopped when its floor did, and a
-        // reveal from earlier in the visit must not replay on the way back
-        setScene(false);
+        // a reveal from earlier in the visit must not replay on the way back.
+        // The scene flag is left alone: the floor arriving reports its own,
+        // and clearing it here flashed the windows for a frame in between
         setOpenAt(-Infinity);
         setDescended(true);
         setArrival({ at: performance.now(), first });

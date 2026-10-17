@@ -303,7 +303,7 @@ export default function Babel({
       />
       <OrbitControls
         ref={controls}
-        enabled={!flying}
+        enabled={!flying && !scene}
         enablePan={false}
         enableZoom={false}
         enableDamping

@@ -1187,3 +1187,19 @@ try {
     await vite8.close();
   }
 }
+
+/* ----------------------------------------------------------- scenes hold
+ * During a scene the camera does not move for the visitor. The wrapper div
+ * stops taps, but a drag that starts on the keeper's bubble bubbles up to the
+ * controls' own listener, so the controls themselves have to be switched off
+ * for as long as the scene lasts, on every floor.
+ */
+{
+  const { readFileSync } = await import("node:fs");
+  for (const file of ["src/scenes/Puzzle.tsx", "src/scenes/Babel.tsx"]) {
+    const src = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
+    const controls = src.match(/<OrbitControls\s[\s\S]*?\/>/)?.[0] ?? "";
+    assert.match(controls, /enabled=\{!flying && !scene\}/, `${file}: the camera can be turned during a scene`);
+  }
+  console.log("ok — no floor lets the camera turn during a scene");
+}
