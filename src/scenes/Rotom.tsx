@@ -12,10 +12,11 @@ import {
   Vector3,
   type Group,
   type Mesh,
+  type PointLight,
   type Texture,
 } from "three";
 import { buildGeo, type Geo } from "../lib/bedrock";
-import { moveMs, travel, type Move } from "../lib/descent";
+import { burn, moveMs, travel, type Move } from "../lib/descent";
 import baseGeo from "../assets/rotom/cobblemon/rotom.geo.json";
 import washGeo from "../assets/rotom/cobblemon/rotom_wash.geo.json";
 import baseSkin from "../assets/rotom/cobblemon/rotom.png?url";
@@ -137,6 +138,14 @@ function buildForm(form: RotomForm, map: Texture, glowSheet: Texture) {
 
 const ORDER: RotomForm[] = ["base", "wash", "heat"];
 
+/** The flames round it when it catches fire: an outer ring and an inner one. */
+const TONGUES = [
+  // the big outer flames, deep orange, all round it
+  ...Array.from({ length: 8 }, (_, k) => ({ a: (k / 8) * Math.PI * 2, r: 0.34, w: 0.17, h: 1.0, color: "#FF5A14" })),
+  // and the hotter, smaller yellow ones inside them
+  ...Array.from({ length: 6 }, (_, k) => ({ a: ((k + 0.5) / 6) * Math.PI * 2, r: 0.24, w: 0.12, h: 0.7, color: "#FFC83A" })),
+];
+
 export default function Rotom({
   reduced,
   zapAt,
@@ -144,6 +153,7 @@ export default function Rotom({
   form,
   move,
   from,
+  fire,
 }: {
   reduced: boolean;
   /** Time of the last tap, in `performance.now()` ms. Drives the flinch. */
@@ -155,6 +165,8 @@ export default function Rotom({
   move?: Move;
   /** The form it arrives in, before the flash turns it into `form`. */
   from?: RotomForm;
+  /** Instead of the flash, it catches fire and changes behind the smoke. */
+  fire?: boolean;
 }) {
   const group = useRef<Group>(null);
   const flash = useRef<Mesh>(null);
@@ -185,6 +197,11 @@ export default function Rotom({
 
   /** What it looks like right now: `from` until the flash of an arrival peaks. */
   const arriving = move?.kind === "in" && from !== undefined && !reduced;
+  /** Landing to catch fire, the first time into the machine room. */
+  const burning = arriving && !!fire;
+  const tongues = useRef<(Group | null)[]>([]);
+  const clouds = useRef<(Mesh | null)[]>([]);
+  const fireLight = useRef<PointLight>(null);
   const [shown, setShown] = useState<RotomForm>(arriving ? from : form);
   useEffect(() => setShown(arriving ? from : form), [arriving, from, form]);
 
@@ -196,7 +213,10 @@ export default function Rotom({
 
     const p = move && !reduced ? (now - move.at) / moveMs(move.fast) : 1;
     const trip = move && !reduced ? travel(p, move.kind, move.dir) : { dy: 0, scale: 1, spin: 0, flash: 0 };
-    if (arriving && p >= 0.525 && shown !== form) setShown(form);
+    // catching fire changes it behind the smoke, so it lands without the flash
+    const blaze = burning ? burn(now - move!.at - moveMs(move!.fast)) : null;
+    if (blaze) trip.flash = 0;
+    if (arriving && (blaze ? blaze.swapped : p >= 0.525) && shown !== form) setShown(form);
 
     // face the camera, but only around y: a plasma ghost that rolls is a bug
     g.rotation.y =
@@ -216,7 +236,36 @@ export default function Rotom({
     );
 
     const buzz = reduced || !awake ? 0 : (Math.sin(t * 17) + 1) * 0.15;
-    forms[shown].material.emissiveIntensity = 0.6 + buzz + jolt * 1.4 + trip.flash * 3;
+    const heat = blaze?.heat ?? 0;
+    const { material } = forms[shown];
+    material.emissiveIntensity = 0.6 + buzz + jolt * 1.4 + trip.flash * 3 + heat * 1.6;
+    // red-hot: the glow goes from white towards #FF3A10
+    material.emissive.setRGB(1, 1 - heat * 0.77, 1 - heat * 0.94);
+    g.position.x = blaze ? Math.sin(t * 70) * blaze.shake * 0.03 : 0;
+
+    const flames = blaze?.flames ?? 0;
+    tongues.current.forEach((tongue, k) => {
+      if (!tongue) return;
+      tongue.visible = flames > 0;
+      const lick = 0.75 + 0.25 * Math.sin(t * (13 + k * 3) + k * 2);
+      tongue.scale.set(flames, flames * lick, flames);
+    });
+    if (fireLight.current) fireLight.current.intensity = flames * (3 + Math.sin(t * 23) * 0.8);
+
+    // the smoke it vanishes in; on the short way into the oven, a puff with the flash
+    const puff = !burning && arriving && form === "heat" ? trip.flash * 0.6 : 0;
+    const smoke = Math.max(blaze?.smoke ?? 0, puff);
+    // once it has changed, the cloud lifts off it as it thins
+    const lift = blaze?.swapped ? (1 - smoke) * 0.9 : 0;
+    clouds.current.forEach((cloud, k) => {
+      if (!cloud) return;
+      cloud.visible = smoke > 0;
+      const a = (k / clouds.current.length) * Math.PI * 2;
+      const out = 0.18 + smoke * 0.22;
+      cloud.position.set(Math.cos(a) * out, -0.15 + (k % 3) * 0.2 + lift + Math.sin(t * 2 + k) * 0.03, Math.sin(a) * out);
+      cloud.scale.setScalar(0.18 + smoke * 0.2);
+      (cloud.material as MeshBasicMaterial).opacity = smoke * 0.9;
+    });
 
     if (flash.current) {
       flash.current.visible = trip.flash > 0;
@@ -242,6 +291,26 @@ export default function Rotom({
           blending={AdditiveBlending}
         />
       </mesh>
+      {/* the flames it catches fire in, licking up round it from below */}
+      {TONGUES.map(({ a, r, w, h, color }, k) => (
+        <group key={k} position={[Math.cos(a) * r, -0.36, Math.sin(a) * r]}>
+          <group ref={(m) => void (tongues.current[k] = m)} visible={false}>
+            {/* lifted by half its height, so it grows up from its base */}
+            <mesh position={[0, h / 2, 0]}>
+              <coneGeometry args={[w, h, 8]} />
+              <meshBasicMaterial color={color} transparent opacity={0.85} depthWrite={false} blending={AdditiveBlending} />
+            </mesh>
+          </group>
+        </group>
+      ))}
+      <pointLight ref={fireLight} position={[0, 0, 0.6]} color="#FF7A2A" intensity={0} distance={3} />
+      {/* and the smoke that swallows it while it changes */}
+      {Array.from({ length: 8 }, (_, k) => (
+        <mesh key={k} ref={(m) => void (clouds.current[k] = m)} visible={false}>
+          <sphereGeometry args={[1, 12, 10]} />
+          <meshBasicMaterial color="#4A4A4A" transparent opacity={0} depthWrite={false} />
+        </mesh>
+      ))}
       {/* its own glow, out in front where it lights the face: from inside a
           body made of boxes it would only light the backs of their faces */}
       <pointLight color={FORMS[shown].light} intensity={6} distance={5} />

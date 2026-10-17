@@ -16,7 +16,7 @@ import CameraRig from "./CameraRig";
 import { useTap } from "./Hotspot";
 import Rotom from "./Rotom";
 import { FLIGHT, type View } from "./focus";
-import { moveMs, type Move } from "../lib/descent";
+import { BURN_MS, moveMs, type Move } from "../lib/descent";
 
 /*
  * The third floor: the machine room, in the terrace below Babel. Dark brick
@@ -41,9 +41,6 @@ const FIRE = "#FF6A1A";
 
 /** Width the camera fits, as on the other floors, so phones see all of it. */
 const FIT_W = 7;
-
-/** How long Rotom takes to catch fire and come out of the smoke. Task 5 hands it over to `burn`. */
-const BURN_MS = 4500;
 
 const HALL_VIEW: View = {
   target: [0, 0.95, 0],
@@ -443,7 +440,7 @@ export default function Engine({
 
       <group {...zap}>
         <Suspense fallback={null}>
-          <Rotom form="heat" from="wash" move={move} reduced={reduced} zapAt={zapAt} awake />
+          <Rotom form="heat" from="wash" fire={first} move={move} reduced={reduced} zapAt={zapAt} awake />
         </Suspense>
       </group>
 

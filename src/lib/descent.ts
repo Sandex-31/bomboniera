@@ -63,3 +63,35 @@ export function travel(p: number, kind: "out" | "in", dir: "down" | "up") {
     flash,
   };
 }
+
+/** How long Rotom takes to catch fire and come out of the smoke changed, once it has landed. */
+export const BURN_MS = 4500;
+/** When it changes form: with the smoke at its thickest. */
+const SWAP_AT = 2600;
+
+/** 0 before `from`, 1 after `to`, eased in between. */
+function ramp(t: number, from: number, to: number) {
+  const p = Math.min(1, Math.max(0, (t - from) / (to - from)));
+  return p * p * (3 - 2 * p);
+}
+
+/**
+ * Rotom catching fire on its first arrival in the machine room, `ms` after
+ * it came to rest: how red-hot it glows (`heat`), how hard it shakes, how
+ * high the flames round it reach, how thick the smoke that swallows it is
+ * (all 0 to 1), and whether it has changed form yet — which it does only
+ * once the smoke has hidden it. It heats and shakes, the flames climb, they
+ * burst into smoke, and the smoke lifts off a few last flames that die away.
+ */
+export function burn(ms: number) {
+  const t = Math.min(BURN_MS, Math.max(0, ms));
+  const flames =
+    t < SWAP_AT ? ramp(t, 800, 2400) : (1 - 0.75 * ramp(t, SWAP_AT, 3000)) * (1 - ramp(t, 3800, BURN_MS));
+  return {
+    heat: ramp(t, 0, 1200) * (1 - ramp(t, SWAP_AT, 3400)),
+    shake: ramp(t, 0, 1200) * (1 - ramp(t, 2400, SWAP_AT)),
+    flames,
+    smoke: ramp(t, 2200, SWAP_AT) * (1 - ramp(t, 2900, BURN_MS)),
+    swapped: t >= SWAP_AT,
+  };
+}

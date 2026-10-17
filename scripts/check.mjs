@@ -1199,7 +1199,25 @@ try {
     assert.deepEqual(travel(-1, "in", "up"), travel(0, "in", "up"), "p is not clamped");
     assert.ok(moveMs(true) < moveMs(false), "the short way is not shorter");
 
-    console.log("ok — the dive leaves from the float, ends out of sight, and arrivals flash");
+    // catching fire in the machine room: it heats, burns, vanishes in smoke,
+    // and only behind the smoke does it change
+    const { burn, BURN_MS } = await vite8.ssrLoadModule("/src/lib/descent.ts");
+    assert.deepEqual(burn(0), { heat: 0, shake: 0, flames: 0, smoke: 0, swapped: false }, "it starts as itself");
+    const end = burn(BURN_MS);
+    assert.deepEqual(
+      [end.heat, end.shake, end.flames, end.smoke],
+      [0, 0, 0, 0],
+      "something is left burning",
+    );
+    assert.ok(end.swapped, "it comes out of the smoke unchanged");
+    const swap = Array.from({ length: BURN_MS }, (_, ms) => ms).find((ms) => burn(ms).swapped);
+    assert.ok(burn(swap).smoke >= 0.9, "the form changes where it can be seen");
+    assert.ok(burn(1800).flames > 0.5 && burn(1800).heat > 0.5, "it is not burning before the smoke");
+    assert.ok(BURN_MS >= 4000 && BURN_MS <= 5000, "not the four to five seconds of the spec");
+    assert.deepEqual(burn(-5), burn(0), "ms is not clamped");
+    assert.deepEqual(burn(BURN_MS + 999), end, "ms is not clamped");
+
+    console.log("ok — the dive leaves from the float, ends out of sight, arrivals flash, and the burn hides its swap");
   } finally {
     await vite8.close();
   }
