@@ -1203,3 +1203,33 @@ try {
   }
   console.log("ok — no floor lets the camera turn during a scene");
 }
+
+/* ---------------------------------------------------------- the alphabets
+ * The six scripts of the second floor: one symbol per letter of the Italian
+ * alphabet, none shared, none that could pass for punctuation.
+ */
+{
+  const vite9 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const { ALPHABETS, LETTERS, tokens, bare, glyph } = await vite9.ssrLoadModule("/src/lib/scripts.ts");
+    assert.equal(LETTERS, "abcdefghilmnopqrstuvz");
+    const seen = new Set();
+    for (const [name, symbols] of Object.entries(ALPHABETS)) {
+      assert.equal(symbols.length, 21, `${name} has not 21 symbols`);
+      assert.equal(new Set(symbols).size, 21, `${name} repeats a symbol`);
+      for (const s of symbols) {
+        assert.ok(!seen.has(s), `${s} is in two alphabets`);
+        assert.ok(!" ,.…?!'’-".includes(s), `${name}: ${s} looks like punctuation`);
+        seen.add(s);
+      }
+    }
+    assert.equal(ALPHABETS.blocchi[14], "▤", "the r of the blocks is not ▤");
+    assert.deepEqual(tokens("Così!"), [{ letter: 2 }, { letter: 12 }, { letter: 16 }, { letter: 8 }, { text: "!" }]);
+    assert.throws(() => tokens("k"), "a letter the alphabets lack got through");
+    assert.equal(bare("L'umanità è"), "lumanitae");
+    assert.equal(glyph("stelle", 0), "✳");
+    console.log("ok — the alphabets");
+  } finally {
+    await vite9.close();
+  }
+}
