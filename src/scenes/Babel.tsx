@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -8,13 +8,20 @@ import { useTap } from "./Hotspot";
 import Rotom from "./Rotom";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
+import { PHRASES } from "../data/babel";
+import { LANG_KEY, langFrom } from "../data/puzzle";
+import { drawGlyphs, glyphLines } from "../components/Glyphs";
+import Window from "../components/Window";
+import Chats from "../components/Chats";
+import Plaque from "../components/Plaque";
 
 /*
  * The second floor: a round hall inside the first terrace of the upside-down
- * tower, the same warm stone and the same arches as its outside. Its walls
- * are written over in every script there is — this is Babel, where the
- * languages came apart — and for now they are only that: the puzzle of the
- * languages comes later and may read them, or rewrite them.
+ * tower, the same warm stone and the same arches as its outside. This is
+ * Babel, where the languages came apart. Six slabs in the wall carry six
+ * phrases in six scripts nobody explains; a terminal in the great column
+ * plays back conversations in those scripts, and what they are about can
+ * only be told from the people acting them out.
  */
 
 /** How wide the hall is, and how high its wall stands. */
@@ -42,24 +49,40 @@ const HALL_VIEW: View = {
 };
 
 /**
- * One band of writing per script, each the same few words in its own hand:
- * enough to read as language without saying anything in particular yet.
- * Runes and the rest come from the system's fonts, so a phone without one
- * shows its own fallback — the walls are scenery, not a clue, for now.
+ * The great column with the terminal: on the far side, but off to the left
+ * of where the camera first looks — straight across, Rotom floats in front
+ * of it and hides the screen.
  */
-const SCRIPTS = [
-  "Ἐν ἀρχῇ ἦν ὁ λόγος καὶ ὁ λόγος ἦν πρὸς τὸν θεόν",
-  "בְּרֵאשִׁית בָּרָא אֱלֹהִים אֵת הַשָּׁמַיִם וְאֵת הָאָרֶץ",
-  "في البدء كان الكلمة والكلمة كان عند الله",
-  "В начале было Слово, и Слово было у Бога",
-  "आदि में वचन था और वचन परमेश्वर के साथ था",
-  "初めに言があった。言は神と共にあった。",
-  "ᚠᚢᚦᚨᚱᚲ ᚷᚹᚺᚾᛁᛃ ᛇᛈᛉᛊ ᛏᛒᛖᛗ ᛚᛜᛞᛟ",
-  "Nel principio era il Verbo e il Verbo era presso Dio",
-];
+const COLUMN = -Math.PI / 2;
 
-/** The writing round the inside of the wall, drawn once into a canvas. */
-function inscriptions() {
+/**
+ * Where the six slabs hang: evenly round the wall, leaving the quarter the
+ * column stands in to the column.
+ */
+const SLABS = PHRASES.map((_, k) => COLUMN + Math.PI / 4 + (k * (3 * Math.PI)) / (2 * (PHRASES.length - 1)));
+const SLAB_Y = 1.15;
+const SLAB_W = 0.95;
+const SLAB_H = 0.6;
+
+/** Facing one slab square on, from across the hall. */
+function slabView(angle: number): View {
+  return {
+    target: [Math.cos(angle) * (HALL_R - 0.1), SLAB_Y, Math.sin(angle) * (HALL_R - 0.1)],
+    // OrbitControls' azimuth: 0 looks from +z. The camera stands on the side
+    // of the hall opposite the slab, looking out at it.
+    azimuth: Math.atan2(-Math.cos(angle), -Math.sin(angle)),
+    // from a little above: Rotom floats in the middle, right in the line of
+    // sight, and so does the rim of the shaft over it. This high, Rotom drops
+    // below the slab and the rim rises above it; much further either way and
+    // one of them is back over the writing, so there is little give
+    polar: 1.25,
+    zoom: 2.6,
+    spread: { azimuth: 0.2, polar: 0.04 },
+  };
+}
+
+/** The wall: courses of stone, so it reads as built and not poured. */
+function stonework() {
   const w = 2048;
   const h = 512;
   const canvas = document.createElement("canvas");
@@ -68,36 +91,98 @@ function inscriptions() {
   const ctx = canvas.getContext("2d")!;
   ctx.fillStyle = STONE;
   ctx.fillRect(0, 0, w, h);
-  // courses of stone, so the wall reads as built and not poured
   ctx.strokeStyle = STONE_DARK;
   ctx.lineWidth = 3;
-  for (let y = 0; y <= h; y += h / SCRIPTS.length) {
+  const course = h / 8;
+  for (let y = 0; y <= h; y += course) {
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(w, y);
     ctx.stroke();
-  }
-  const band = h / SCRIPTS.length;
-  ctx.textBaseline = "middle";
-  ctx.font = `${Math.round(band * 0.55)}px serif`;
-  SCRIPTS.forEach((line, i) => {
-    // carved: a light lip under a dark cut
-    const y = band * (i + 0.5);
-    let x = (i * 173) % 400;
-    while (x < w) {
-      ctx.fillStyle = STONE_LIGHT;
-      ctx.fillText(line, x + 1.5, y + 1.5);
-      ctx.fillStyle = SHADOW;
-      ctx.fillText(line, x, y);
-      x += ctx.measureText(line).width + 60;
+    // and the joints between the blocks, staggered course to course
+    for (let x = (y / course) % 2 ? 0 : 128; x < w; x += 256) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y + course);
+      ctx.stroke();
     }
-  });
+  }
   const t = new CanvasTexture(canvas);
   t.colorSpace = SRGBColorSpace;
-  // seen from inside the cylinder, so read the other way round
   t.wrapS = RepeatWrapping;
-  t.repeat.x = -2;
+  t.repeat.x = 2;
   return t;
+}
+
+/**
+ * One slab's face: the phrase cut into the stone, or — once it has been read
+ * — standing out in white. `glow` is the light of it alone, white writing on
+ * black, for the emissive map: with the face itself the whole slab would
+ * glow, stone and all, and the writing would wash out into it.
+ */
+function slabFace(index: number, look: "carved" | "lit" | "glow") {
+  const w = 640;
+  const h = 400;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = look === "glow" ? "#000000" : STONE_LIGHT;
+  ctx.fillRect(0, 0, w, h);
+  if (look !== "glow") {
+    ctx.strokeStyle = STONE_DARK;
+    ctx.lineWidth = 10;
+    ctx.strokeRect(5, 5, w - 10, h - 10);
+  }
+  const { script, text } = PHRASES[index];
+  const room = w - 70;
+  // as big as fits: the long phrases go down a size until their lines do
+  let size = 54;
+  while (size > 22 && glyphLines(ctx, script, text, size, room) * size * 1.35 > h - 70) size -= 2;
+  const rows = glyphLines(ctx, script, text, size, room);
+  const top = h / 2 - ((rows - 1) * size * 1.35) / 2;
+  if (look === "carved") {
+    // a light lip under a dark cut
+    ctx.fillStyle = ctx.strokeStyle = "#F2DDB8";
+    drawGlyphs(ctx, script, text, w / 2 + 2, top + 2, size, room);
+    ctx.fillStyle = ctx.strokeStyle = SHADOW;
+  } else {
+    ctx.shadowColor = "rgba(255,255,255,0.8)";
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = ctx.strokeStyle = "#FFFFFF";
+  }
+  drawGlyphs(ctx, script, text, w / 2, top, size, room);
+  const t = new CanvasTexture(canvas);
+  t.colorSpace = SRGBColorSpace;
+  t.anisotropy = 4;
+  return t;
+}
+
+function Slab({ index, lit, onPick }: { index: number; lit: boolean; onPick: () => void }) {
+  const face = useMemo(() => slabFace(index, lit ? "lit" : "carved"), [index, lit]);
+  const glow = useMemo(() => (lit ? slabFace(index, "glow") : null), [index, lit]);
+  useEffect(() => () => face.dispose(), [face]);
+  useEffect(() => () => glow?.dispose(), [glow]);
+  const tap = useTap(onPick);
+  const a = SLABS[index];
+  return (
+    <mesh
+      // in from the wall: the slab is flat and the wall curves, so at the wall
+      // itself its two ends would sink into the stone
+      position={[Math.cos(a) * (HALL_R - 0.08), SLAB_Y, Math.sin(a) * (HALL_R - 0.08)]}
+      rotation-y={-a - Math.PI / 2}
+      {...tap}
+    >
+      <planeGeometry args={[SLAB_W, SLAB_H]} />
+      <meshStandardMaterial
+        map={face}
+        roughness={0.9}
+        emissive="#FFFFFF"
+        emissiveMap={glow}
+        emissiveIntensity={glow ? 0.6 : 0}
+      />
+    </mesh>
+  );
 }
 
 /** A bowl of fire on a short pillar, its light never quite steady. */
@@ -137,6 +222,17 @@ const CEILING_VIEW: View = {
   spread: { azimuth: 0.1, polar: 0.05 },
 };
 
+/** The windows this floor opens: the terminal, and a slab up close. */
+type Pane = "chats" | `slab-${number}`;
+
+function loadSolved() {
+  try {
+    return langFrom(localStorage.getItem(LANG_KEY));
+  } catch {
+    return [];
+  }
+}
+
 export default function Babel({
   reduced,
   onScene,
@@ -157,8 +253,8 @@ export default function Babel({
   const controls = useRef<OrbitControlsImpl>(null);
   const [flying, setFlying] = useState(false);
   const [zapAt, setZapAt] = useState(0);
-  const writing = useMemo(inscriptions, []);
-  useEffect(() => () => writing.dispose(), [writing]);
+  const walls = useMemo(stonework, []);
+  useEffect(() => () => walls.dispose(), [walls]);
 
   /*
    * Coming in: the camera waits under the shaft, Rotom drops out of it in
@@ -193,126 +289,188 @@ export default function Babel({
   });
   const zap = useTap(() => setZapAt(performance.now()));
 
+  /** Which phrases have been read. Kept as they are read, nothing else to it. */
+  const [solved, setSolved] = useState(loadSolved);
+  const read = useCallback((i: number) => {
+    setSolved((was) => {
+      if (was.includes(i)) return was;
+      const now = [...was, i];
+      try {
+        localStorage.setItem(LANG_KEY, JSON.stringify(now));
+      } catch {
+        /* storage unavailable — the slab still lights for this visit */
+      }
+      return now;
+    });
+  }, []);
+
+  /** The windows open on this floor, last touched on top. */
+  const [stack, setStack] = useState<Pane[]>([]);
+  const raise = (p: Pane) => setStack((open) => [...open.filter((q) => q !== p), p]);
+  const shut = (p: Pane) => {
+    setStack((open) => open.filter((q) => q !== p));
+    // leaving a slab puts the camera back on the whole hall
+    if (p.startsWith("slab-")) setView(HALL_VIEW);
+  };
+  const pickSlab = (i: number) => {
+    // one slab at a time: the camera can only face one
+    setStack((open) => [...open.filter((q) => !q.startsWith("slab-")), `slab-${i}`]);
+    setView(slabView(SLABS[i]));
+  };
+  const screen = useTap(() => raise("chats"));
+
   /** Niches round the foot of the wall, as the tower has arches round its terraces. */
   const niches = useMemo(() => {
     const n = 14;
     return Array.from({ length: n }, (_, k) => (k / n) * Math.PI * 2 + 0.11);
   }, []);
-  /** The way down, sealed: on the far side, where the camera first looks. */
-  const door = (-3 * Math.PI) / 4;
 
   return (
-    <Canvas
-      orthographic
-      dpr={[1, 1.75]}
-      camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
-    >
-      <color attach="background" args={["#05060A"]} />
-      <ambientLight intensity={0.35} color="#FFD9A8" />
-      <hemisphereLight args={["#FFE2B8", "#2A1A10", 0.5]} />
-
-      {/* the floor, paved in rings */}
-      <mesh rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[HALL_R, 48]} />
-        <meshStandardMaterial color={STONE_DARK} roughness={0.95} />
-      </mesh>
-      {[0.8, 1.5, 2.1].map((r) => (
-        <mesh key={r} rotation-x={-Math.PI / 2} position={[0, 0.003, 0]}>
-          <ringGeometry args={[r, r + 0.03, 48]} />
-          <meshBasicMaterial color={SHADOW} transparent opacity={0.35} />
-        </mesh>
-      ))}
-
-      {/* the wall, drawn from the inside only: the near half is never in the
-          way of the camera, the far half is always facing it */}
-      <mesh position={[0, WALL_H / 2, 0]}>
-        <cylinderGeometry args={[HALL_R, HALL_R, WALL_H, 64, 1, true]} />
-        <meshStandardMaterial map={writing} side={BackSide} roughness={0.95} />
-      </mesh>
-      <mesh position={[0, WALL_H, 0]} rotation-x={-Math.PI / 2}>
-        <ringGeometry args={[HALL_R, HALL_R + 0.12, 64]} />
-        <meshStandardMaterial color={STONE_LIGHT} roughness={0.85} />
-      </mesh>
-
-      {niches.map((a) =>
-        Math.abs(Math.atan2(Math.sin(a - door), Math.cos(a - door))) < 0.4 ? null : (
-          <mesh
-            key={a}
-            position={[Math.cos(a) * (HALL_R - 0.02), 0.3, Math.sin(a) * (HALL_R - 0.02)]}
-            rotation-y={-a - Math.PI / 2}
-          >
-            <planeGeometry args={[0.2, 0.42]} />
-            <meshStandardMaterial color={SHADOW} roughness={1} />
-          </mesh>
-        ),
-      )}
-
-      {/* the sealed way down: an arch in the wall, a slab across it */}
-      <group
-        position={[Math.cos(door) * (HALL_R - 0.03), 0, Math.sin(door) * (HALL_R - 0.03)]}
-        rotation-y={-door - Math.PI / 2}
+    <>
+      <Canvas
+        orthographic
+        dpr={[1, 1.75]}
+        camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
       >
-        <mesh position={[0, 0.5, 0]}>
-          <planeGeometry args={[0.8, 1.0]} />
-          <meshStandardMaterial color={SHADOW} roughness={1} />
-        </mesh>
-        <mesh position={[0, 1.0, 0.001]}>
-          <circleGeometry args={[0.4, 24, 0, Math.PI]} />
-          <meshStandardMaterial color={SHADOW} roughness={1} />
-        </mesh>
-        <mesh position={[0, 0.62, 0.05]}>
-          <boxGeometry args={[0.7, 1.24, 0.08]} />
-          <meshStandardMaterial color="#6E5E4E" roughness={0.9} />
-        </mesh>
-      </group>
+        <color attach="background" args={["#05060A"]} />
+        <ambientLight intensity={0.35} color="#FFD9A8" />
+        <hemisphereLight args={["#FFE2B8", "#2A1A10", 0.5]} />
 
-      {[Math.PI / 4, (3 * Math.PI) / 4, (5 * Math.PI) / 4, (7 * Math.PI) / 4].map((a) => (
-        <Brazier key={a} angle={a} reduced={reduced} />
-      ))}
-
-      {/* the shaft from the island, coming through where the ceiling would
-          be: a rim and a fall of pale light, so the hall stays open to the
-          camera. Tapping it goes back up. */}
-      <group position={[0, HOLE_Y, 0]} {...up}>
+        {/* the floor, paved in rings */}
         <mesh rotation-x={-Math.PI / 2}>
-          <ringGeometry args={[HOLE_R, HOLE_R + 0.06, 40]} />
-          <meshStandardMaterial color="#3A3E45" metalness={0.6} roughness={0.5} />
+          <circleGeometry args={[HALL_R, 48]} />
+          <meshStandardMaterial color={STONE_DARK} roughness={0.95} />
         </mesh>
-        <mesh rotation-x={-Math.PI / 2}>
-          <circleGeometry args={[HOLE_R + 0.15, 24]} />
-          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        {[0.8, 1.5, 2.1].map((r) => (
+          <mesh key={r} rotation-x={-Math.PI / 2} position={[0, 0.003, 0]}>
+            <ringGeometry args={[r, r + 0.03, 48]} />
+            <meshBasicMaterial color={SHADOW} transparent opacity={0.35} />
+          </mesh>
+        ))}
+
+        {/* the wall, drawn from the inside only: the near half is never in the
+            way of the camera, the far half is always facing it */}
+        <mesh position={[0, WALL_H / 2, 0]}>
+          <cylinderGeometry args={[HALL_R, HALL_R, WALL_H, 64, 1, true]} />
+          <meshStandardMaterial map={walls} side={BackSide} roughness={0.95} />
         </mesh>
-      </group>
-      <mesh position={[0, HOLE_Y - 0.5, 0]}>
-        <cylinderGeometry args={[HOLE_R, HOLE_R * 1.6, 1, 24, 1, true]} />
-        <meshBasicMaterial color="#8AD8FF" transparent opacity={0.08} depthWrite={false} />
-      </mesh>
+        <mesh position={[0, WALL_H, 0]} rotation-x={-Math.PI / 2}>
+          <ringGeometry args={[HALL_R, HALL_R + 0.12, 64]} />
+          <meshStandardMaterial color={STONE_LIGHT} roughness={0.85} />
+        </mesh>
 
-      <group {...zap}>
-        <Suspense fallback={null}>
-          <Rotom form="wash" from="base" move={move} reduced={reduced} zapAt={zapAt} awake />
-        </Suspense>
-      </group>
+        {niches.map((a) =>
+          Math.abs(Math.atan2(Math.sin(a - COLUMN), Math.cos(a - COLUMN))) < 0.4 ? null : (
+            <mesh
+              key={a}
+              position={[Math.cos(a) * (HALL_R - 0.02), 0.3, Math.sin(a) * (HALL_R - 0.02)]}
+              rotation-y={-a - Math.PI / 2}
+            >
+              <planeGeometry args={[0.2, 0.42]} />
+              <meshStandardMaterial color={SHADOW} roughness={1} />
+            </mesh>
+          ),
+        )}
 
-      <CameraRig
-        view={view}
-        controls={controls}
-        reduced={reduced}
-        onFlight={setFlying}
-        fit={[FIT_W, FIT_W]}
-      />
-      <OrbitControls
-        ref={controls}
-        enabled={!flying && !scene}
-        enablePan={false}
-        enableZoom={false}
-        enableDamping
-        dampingFactor={0.08}
-        minPolarAngle={view.polar - view.spread.polar}
-        maxPolarAngle={view.polar + view.spread.polar}
-        minAzimuthAngle={view.spread.azimuth >= Math.PI ? -Infinity : view.azimuth - view.spread.azimuth}
-        maxAzimuthAngle={view.spread.azimuth >= Math.PI ? Infinity : view.azimuth + view.spread.azimuth}
-      />
-    </Canvas>
+        {PHRASES.map((_, i) => (
+          <Slab key={i} index={i} lit={solved.includes(i)} onPick={() => pickSlab(i)} />
+        ))}
+
+        {/* the great column, half sunk in the wall, with the terminal in it */}
+        <group
+          position={[Math.cos(COLUMN) * (HALL_R - 0.2), 0, Math.sin(COLUMN) * (HALL_R - 0.2)]}
+          rotation-y={-COLUMN - Math.PI / 2}
+        >
+          <mesh position={[0, WALL_H / 2, 0]}>
+            <cylinderGeometry args={[0.45, 0.5, WALL_H, 24]} />
+            <meshStandardMaterial color={STONE_LIGHT} roughness={0.85} />
+          </mesh>
+          <mesh position={[0, WALL_H - 0.06, 0]}>
+            <cylinderGeometry args={[0.55, 0.55, 0.12, 24]} />
+            <meshStandardMaterial color={STONE_DARK} roughness={0.85} />
+          </mesh>
+          <group position={[0, 1.0, 0.43]} {...screen}>
+            <mesh>
+              <boxGeometry args={[0.52, 0.38, 0.06]} />
+              <meshStandardMaterial color="#1E2622" metalness={0.4} roughness={0.5} />
+            </mesh>
+            <mesh position={[0, 0, 0.032]}>
+              <planeGeometry args={[0.44, 0.3]} />
+              <meshStandardMaterial color="#04140D" emissive="#2BD88A" emissiveIntensity={0.35} />
+            </mesh>
+          </group>
+        </group>
+
+        {[Math.PI / 4, (3 * Math.PI) / 4, (5 * Math.PI) / 4, (7 * Math.PI) / 4].map((a) => (
+          <Brazier key={a} angle={a} reduced={reduced} />
+        ))}
+
+        {/* the shaft from the island, coming through where the ceiling would
+            be: a rim and a fall of pale light, so the hall stays open to the
+            camera. Tapping it goes back up. */}
+        <group position={[0, HOLE_Y, 0]} {...up}>
+          <mesh rotation-x={-Math.PI / 2}>
+            <ringGeometry args={[HOLE_R, HOLE_R + 0.06, 40]} />
+            <meshStandardMaterial color="#3A3E45" metalness={0.6} roughness={0.5} />
+          </mesh>
+          <mesh rotation-x={-Math.PI / 2}>
+            <circleGeometry args={[HOLE_R + 0.15, 24]} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+          </mesh>
+        </group>
+        <mesh position={[0, HOLE_Y - 0.5, 0]}>
+          <cylinderGeometry args={[HOLE_R, HOLE_R * 1.6, 1, 24, 1, true]} />
+          <meshBasicMaterial color="#8AD8FF" transparent opacity={0.08} depthWrite={false} />
+        </mesh>
+
+        <group {...zap}>
+          <Suspense fallback={null}>
+            <Rotom form="wash" from="base" move={move} reduced={reduced} zapAt={zapAt} awake />
+          </Suspense>
+        </group>
+
+        <CameraRig
+          view={view}
+          controls={controls}
+          reduced={reduced}
+          onFlight={setFlying}
+          fit={[FIT_W, FIT_W]}
+        />
+        <OrbitControls
+          ref={controls}
+          enabled={!flying && !scene}
+          enablePan={false}
+          enableZoom={false}
+          enableDamping
+          dampingFactor={0.08}
+          minPolarAngle={view.polar - view.spread.polar}
+          maxPolarAngle={view.polar + view.spread.polar}
+          minAzimuthAngle={view.spread.azimuth >= Math.PI ? -Infinity : view.azimuth - view.spread.azimuth}
+          maxAzimuthAngle={view.spread.azimuth >= Math.PI ? Infinity : view.azimuth + view.spread.azimuth}
+        />
+      </Canvas>
+
+      {stack.map((pane, depth) => {
+        const slab = pane.startsWith("slab-") ? Number(pane.slice(5)) : null;
+        return (
+          <Window
+            key={pane}
+            className="win--floor"
+            title={slab === null ? "terminale" : `lastra ${slab + 1}`}
+            start={{ x: 16 + depth * 24, y: 74 + depth * 24 }}
+            width={slab === null ? 400 : 380}
+            z={depth}
+            onFocus={() => raise(pane)}
+            onClose={() => shut(pane)}
+          >
+            {slab === null ? (
+              <Chats solved={solved} reduced={reduced} />
+            ) : (
+              <Plaque index={slab} solved={solved.includes(slab)} onSolved={() => read(slab)} />
+            )}
+          </Window>
+        );
+      })}
+    </>
   );
 }

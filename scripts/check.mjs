@@ -1374,3 +1374,19 @@ try {
   for (const k of kinds) assert.ok(css.includes(`.folk--${k} `), `no animation for the scene «${k}»`);
   console.log(`ok — all ${kinds.length} scenes are acted out`);
 }
+
+/* ---------------------------------------------------------- windows below
+ * Downstairs the island's windows are put out of sight, not closed. The
+ * floor's own windows must not go with them — but must still clear out of
+ * the way of a scene like every other window.
+ */
+{
+  const { readFileSync } = await import("node:fs");
+  const css = readFileSync(new URL("../src/styles/global.css", import.meta.url), "utf8");
+  const babel = readFileSync(new URL("../src/scenes/Babel.tsx", import.meta.url), "utf8");
+  assert.ok(css.includes(".stage.is-below .win:not(.win--floor)"), "downstairs hides the floor's own windows too");
+  const wins = babel.match(/<Window\b[\s\S]*?>/g) ?? [];
+  assert.ok(wins.length >= 1, "the floor opens no windows");
+  for (const w of wins) assert.match(w, /className="win--floor"/, "a window of the floor is hidden downstairs");
+  console.log(`ok — the floor's ${wins.length} windows show downstairs`);
+}

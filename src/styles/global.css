@@ -833,7 +833,7 @@ button { font: inherit; color: inherit; }
   transition: opacity 260ms ease, visibility 0s 260ms;
 }
 /* important: React Three Fiber writes pointer-events: auto inline on it */
-.stage.is-below .win { visibility: hidden; pointer-events: none; }
+.stage.is-below .win:not(.win--floor) { visibility: hidden; pointer-events: none; }
 
 /* the dark of the shaft between two floors of the tower: it closes over the
    one being left, the next one is swapped in under it, and it lifts */
@@ -1534,7 +1534,8 @@ button { font: inherit; color: inherit; }
 @keyframes folk-lie { 0%, 100% { transform: translate(-6px, 24px) rotate(-90deg); } }
 @keyframes folk-shake { 0%, 100% { transform: rotate(-110deg); } 25% { transform: rotate(-150deg); } 75% { transform: rotate(-70deg); } }
 @keyframes folk-scratch { 0%, 100% { transform: rotate(-170deg); } 50% { transform: rotate(-150deg); } }
-@keyframes folk-sneak { 0%, 100% { transform: translateX(0) scale(0.62); } 45%, 60% { transform: translateX(46px) scale(0.62); } }
+/* shrunk about the hips, so shifted down by what the legs lost: feet on the ground */
+@keyframes folk-sneak { 0%, 100% { transform: translate(0, 10px) scale(0.62); } 45%, 60% { transform: translate(46px, 10px) scale(0.62); } }
 @keyframes folk-grab { 0%, 40%, 100% { transform: rotate(-20deg); } 50%, 60% { transform: rotate(-80deg); } }
 @keyframes folk-look-around { 0%, 100% { transform: rotate(0deg); } 30% { transform: rotate(-6deg); } 70% { transform: rotate(6deg); } }
 @keyframes folk-point-up { 0%, 100% { transform: rotate(-160deg); } 50% { transform: rotate(-145deg); } }
@@ -1624,7 +1625,11 @@ button { font: inherit; color: inherit; }
   color: inherit; font: inherit; padding: 2px 10px; cursor: pointer;
 }
 .chats .folk { margin: 0 auto 8px; max-width: 320px; background: rgba(0, 0, 0, 0.35); border-radius: 8px; }
-.chats__lines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.chats__lines {
+  list-style: none; margin: 0; padding: 0 2px 2px 0; display: flex; flex-direction: column; gap: 8px;
+  /* the scene stays put; a long conversation scrolls under it */
+  max-height: min(42vh, 340px); overflow-y: auto; overscroll-behavior: contain;
+}
 .chats__line {
   max-width: 82%; padding: 8px 10px; border-radius: 10px; line-height: 1.5;
   background: rgba(111, 224, 168, 0.08); border: 1px solid rgba(111, 224, 168, 0.18);
@@ -1637,3 +1642,23 @@ button { font: inherit; color: inherit; }
 .glyphs { display: inline; color: #EAF6EF; }
 .glyphs__word { display: inline-flex; align-items: center; white-space: nowrap; margin-right: 0.45em; }
 .glyphs__word svg { flex: none; }
+
+/* babel: a slab of the wall up close, and the line to read it into */
+.plaque { margin: -12px; padding: 16px; background: #2A1D14; color: #F2E3CC; }
+.plaque__text { margin: 0 0 14px; text-align: center; line-height: 1.7; }
+.plaque__text .glyphs { color: #F2E3CC; }
+.plaque.is-solved .plaque__text .glyphs { color: #FFFFFF; text-shadow: 0 0 10px rgba(255, 255, 255, 0.55); }
+.plaque.is-solved .plaque__text svg { filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6)); }
+.plaque__it { margin: 0; text-align: center; font-style: italic; color: #E8D6B8; }
+.plaque__form { display: flex; gap: 8px; }
+.plaque__input {
+  flex: 1; min-width: 0; padding: 9px 10px; border-radius: 8px;
+  border: 1px solid rgba(242, 227, 204, 0.3); background: rgba(0, 0, 0, 0.35);
+  color: inherit; font: inherit; font-size: 16px; outline: none;
+}
+.plaque__input:focus { border-color: rgba(242, 227, 204, 0.7); }
+.plaque__go {
+  padding: 0 14px; border-radius: 8px; border: 1px solid rgba(242, 227, 204, 0.4);
+  background: rgba(242, 227, 204, 0.12); color: inherit; font: inherit; cursor: pointer;
+}
+.plaque__form.is-wrong { animation: hack-shake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97); }

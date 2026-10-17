@@ -79,6 +79,7 @@ export default function Window({
   start,
   width = 360,
   glass = false,
+  className,
   z,
   onFocus,
   onClose,
@@ -96,6 +97,8 @@ export default function Window({
    * Glass is drawn at the scale of what it is laid over, so it is not pinched.
    */
   glass?: boolean;
+  /** Extra classes on the window, for whoever needs to pick it out from the rest. */
+  className?: string;
   z: number;
   onFocus: () => void;
   onClose: () => void;
@@ -214,7 +217,7 @@ export default function Window({
   return (
     <section
       ref={box}
-      className={`win${glass ? " win--glass" : ""}`}
+      className={["win", glass && "win--glass", className].filter(Boolean).join(" ")}
       style={{
         left: at.x,
         top: at.y,

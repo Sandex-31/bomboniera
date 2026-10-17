@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { unlockedChats, type Chat } from "../data/babel";
 import { CHAT_KEY } from "../data/puzzle";
 import Folk, { FolkHead } from "./Folk";
@@ -41,6 +41,12 @@ export default function Chats({ solved, reduced }: { solved: number[]; reduced: 
     }
   };
 
+  // the newest message in view, as a chat does
+  const lines = useRef<HTMLOListElement>(null);
+  useEffect(() => {
+    lines.current?.scrollTo({ top: lines.current.scrollHeight, behavior: reduced ? "auto" : "smooth" });
+  }, [shown, reduced]);
+
   useEffect(() => {
     if (!open || shown >= open.lines.length) return;
     const t = setTimeout(() => setShown((n) => n + 1), LINE_MS);
@@ -75,7 +81,7 @@ export default function Chats({ solved, reduced }: { solved: number[]; reduced: 
         </button>
       </div>
       <Folk who={open.who} scene={open.scene} reduced={reduced} />
-      <ol className="chats__lines">
+      <ol className="chats__lines" ref={lines}>
         {open.lines.slice(0, shown).map((l, i) => (
           <li key={i} className={`chats__line chats__line--${l.by ? "b" : "a"}`}>
             <Glyphs script={open.who[l.by]} text={l.text} size={20} />

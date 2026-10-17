@@ -39,7 +39,8 @@ function Head({ script }: { script: Script }) {
     case "tubi":
       return <rect x={-6} y={-48} width={12} height={12} fill="none" stroke={ink} strokeWidth={2} />;
     case "onde":
-      return <path d="M-6 -48 A8 8 0 1 0 6 -36 A6 6 0 1 1 -6 -48 Z" fill={ink} />;
+      // a crescent: round at the back, hollow toward the one they face
+      return <path d="M0 -49 A7 7 0 1 0 0 -35 A4 7 0 0 1 0 -49 Z" fill={ink} />;
     case "egizi":
       // in profile: the nose points the way they face
       return <path d="M-6 -42 A7 7 0 1 1 6 -40 L9 -42 L6 -38 A7 7 0 0 1 -6 -42 Z" fill={ink} />;
