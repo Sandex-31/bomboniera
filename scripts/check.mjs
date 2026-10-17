@@ -1139,7 +1139,7 @@ try {
       down: [6, 4, 2, -4],
     });
 
-    for (const name of ["rotom", "rotom_wash"]) {
+    for (const name of ["rotom", "rotom_wash", "rotom_heat"]) {
       const file = new URL(`../src/assets/rotom/cobblemon/${name}.geo.json`, import.meta.url);
       const geo = JSON.parse(readFileSync(file, "utf8"))["minecraft:geometry"][0];
       const model = buildGeo(geo, new MeshBasicMaterial());
@@ -1158,7 +1158,7 @@ try {
       assert.ok(Math.abs(body.min.x + body.max.x) < 0.05, `${name}'s body comes out lopsided`);
     }
 
-    console.log("ok — box UVs laid out like Blockbench, both Rotoms whole and upright");
+    console.log("ok — box UVs laid out like Blockbench, all three Rotoms whole and upright");
   } finally {
     await vite7.close();
   }

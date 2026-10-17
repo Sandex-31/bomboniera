@@ -22,6 +22,9 @@ import baseSkin from "../assets/rotom/cobblemon/rotom.png?url";
 import baseGlow from "../assets/rotom/cobblemon/rotom_emissive.png?url";
 import washSkin from "../assets/rotom/cobblemon/rotom_wash.png?url";
 import washGlow from "../assets/rotom/cobblemon/rotom_wash_emissive.png?url";
+import heatGeo from "../assets/rotom/cobblemon/rotom_heat.geo.json";
+import heatSkin from "../assets/rotom/cobblemon/rotom_heat.png?url";
+import heatGlow from "../assets/rotom/cobblemon/rotom_heat_emissive.png?url";
 
 /*
  * The models are Cobblemon's (gitlab.com/cable-mc/cobblemon), under the
@@ -31,11 +34,12 @@ import washGlow from "../assets/rotom/cobblemon/rotom_wash_emissive.png?url";
  */
 
 /** Which of its shapes it has taken. One per floor of the tower. */
-export type RotomForm = "base" | "wash";
+export type RotomForm = "base" | "wash" | "heat";
 
 const FORMS: Record<RotomForm, { geo: Geo; skin: string; glow: string; light: string }> = {
   base: { geo: baseGeo["minecraft:geometry"][0] as unknown as Geo, skin: baseSkin, glow: baseGlow, light: "#FFAE4A" },
   wash: { geo: washGeo["minecraft:geometry"][0] as unknown as Geo, skin: washSkin, glow: washGlow, light: "#8AD8FF" },
+  heat: { geo: heatGeo["minecraft:geometry"][0] as unknown as Geo, skin: heatSkin, glow: heatGlow, light: "#FF7A2A" },
 };
 
 /**
@@ -131,7 +135,7 @@ function buildForm(form: RotomForm, map: Texture, glowSheet: Texture) {
   };
 }
 
-const ORDER: RotomForm[] = ["base", "wash"];
+const ORDER: RotomForm[] = ["base", "wash", "heat"];
 
 export default function Rotom({
   reduced,
