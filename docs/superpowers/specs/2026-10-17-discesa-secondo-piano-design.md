@@ -120,8 +120,9 @@ della torre (`unlock`), continuano a chiudersi come adesso.
   visitatore è sceso. Va nella lista di `STAGES` in `src/lib/stages.ts`, come tappa **«secondo
   piano»** dopo «lucchetto». Il test di `scripts/check.mjs` controlla già che ogni chiave `*_KEY`
   ci sia.
-- Ricaricando dopo la discesa si riparte direttamente dal secondo piano, senza rivedere la
-  discesa.
+- Ricaricando si riparte dall'ultimo piano visitato, senza rivedere la discesa. Il piano in cui
+  si trova il visitatore va salvato a parte (non è un passo risolto, quindi non è una tappa di
+  `STAGES`, e «ricomincia il puzzle» lo deve azzerare comunque).
 
 ## Come si inserisce nel codice esistente
 
@@ -142,8 +143,14 @@ della torre (`unlock`), continuano a chiudersi come adesso.
   momento sulla torre e poi torna su Rotom.
 - Se il visitatore ricarica dopo la rivelazione ma prima della discesa, toccare il tombino aperto
   fa ripartire la battuta e poi la discesa. Il tocco non porta più alla vista della torre.
-- Dal secondo piano non si torna sull'isola, salvo con il menu di debug. «Torna nella stanza»
-  continua a funzionare.
+- **Navigazione libera tra i piani (deciso con Salvo: in futuro potrebbero esserci puzzle che
+  coinvolgono più piani).** *Come, scelta mia:* sull'isola, toccare il tombino aperto porta giù;
+  al secondo piano, toccare il buco nel soffitto riporta su. La discesa completa (battuta,
+  risucchio, lampo) si vede solo la prima volta; dopo, il passaggio è breve: la camera attraversa
+  il pozzo buio e Rotom cambia forma con un lampo veloce, in entrambe le direzioni. Le finestre
+  aperte di un piano restano a quel piano. Ricaricando si riparte dall'ultimo piano visitato.
+  Il modo di passare da un piano all'altro va pensato per piani a venire, non solo per due.
+  «Torna nella stanza» continua a funzionare.
 - La torre resta di otto gradoni: bastano per i piani che verranno.
 
 ## Obiettivi
