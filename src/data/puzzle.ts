@@ -101,6 +101,22 @@ export const TOMBINO_KEY = 'bomboniera.puzzle.tombino';
 export const LOCK_KEY = 'bomboniera.puzzle.lucchetto';
 
 /**
+ * Which floor of the tower the visitor is on: 0 the island, 1 the one below.
+ * Missing means they have never been down, which is what makes the first
+ * descent the long one.
+ */
+export const FLOOR_KEY = 'bomboniera.puzzle.piano';
+
+/** How many floors are built so far, the island included. */
+export const FLOORS = 2;
+
+/** The stored floor, read back: anything that is not a floor is the island. */
+export function floorFrom(stored: string | null): number {
+  const n = Number(stored);
+  return stored !== null && stored !== '' && Number.isInteger(n) && n >= 0 && n < FLOORS ? n : 0;
+}
+
+/**
  * The one thing the keeper says once the star has finished drawing itself.
  *
  * TODO: da scrivere — questa riga è segnaposto.
@@ -132,6 +148,9 @@ export const bravoLine = 'Rotom: Bravo! giusto ma non ti servirá a un bel nient
 
 /** And what it says when the word under the crying ghost is the right one. */
 export const tombinoLine = 'Rotom: Complimenti, hai trovato anche questo.';
+
+/** What it says once the tower has been seen, before it dives into the manhole. */
+export const systemLine = 'Rotom: Eccoci qua, adesso sai quanto é complicato entrare nel sistema';
 
 /**
  * What the keeper says once the rhythm is right, one line per tap forward.

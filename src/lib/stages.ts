@@ -10,6 +10,7 @@
  */
 import {
   BEAM_KEY,
+  FLOOR_KEY,
   HACK_KEY,
   LAMPS_KEY,
   LOCK_KEY,
@@ -74,6 +75,7 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "avvio", key: SAGOME_KEY, solved: () => "1" },
   { label: "tombino", key: TOMBINO_KEY, solved: () => "1" },
   { label: "lucchetto", key: LOCK_KEY, solved: () => [...LOCK_CODE] },
+  { label: "secondo piano", key: FLOOR_KEY, solved: () => "1" },
 ];
 
 /**

@@ -993,6 +993,15 @@ try {
     assert.ok(solvedTape(read(puzzle.MACHINE_KEY)), "the jump sets the levers wrong");
     const { unlocked } = await vite5.ssrLoadModule("/src/lib/sagome.ts");
     assert.ok(unlocked(read(puzzle.LOCK_KEY)), "the jump leaves the lock shut");
+    assert.equal(puzzle.floorFrom(store.get(puzzle.FLOOR_KEY)), 1, "the last stop leaves the visitor upstairs");
+
+    // the floor the visitor is on: whatever is stored, it lands on a real floor
+    assert.equal(puzzle.floorFrom(null), 0, "never been down is the island");
+    assert.equal(puzzle.floorFrom("1"), 1);
+    assert.equal(puzzle.floorFrom("0"), 0, "been down and back up is the island");
+    for (const bad of ["", "x", "-1", "1.5", String(puzzle.FLOORS), "99"]) {
+      assert.equal(puzzle.floorFrom(bad), 0, `"${bad}" must fall back to the island`);
+    }
 
     console.log(`ok — ${STAGES.length + 1} jump stops, each solving exactly the puzzles above it`);
   } finally {

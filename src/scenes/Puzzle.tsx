@@ -30,6 +30,7 @@ import Hotspot, { useTap } from "./Hotspot";
 import Portal from "./Portal";
 import { Manhole, Tower } from "./Tower";
 import Rotom from "./Rotom";
+import Babel from "./Babel";
 import Maze from "../components/Maze";
 import Mirrors from "../components/Mirrors";
 import Plan from "../components/Plan";
@@ -64,6 +65,8 @@ import {
   HACK_KEY,
   LOST_KEY,
   TOMBINO_KEY,
+  FLOOR_KEY,
+  floorFrom,
   PUZZLE_KEY,
   groupTaps,
   keeperLines,
@@ -1446,6 +1449,26 @@ function Desk({
   const endBravo = useCallback(() => setBravoAt(0), []);
   /** A scene is playing on the island: the desktop steps out of the way. */
   const [scene, setScene] = useState(false);
+  /** Which floor of the tower the visitor is on; read back from storage. */
+  const [floor, setFloor] = useState(() => {
+    try {
+      return floorFrom(localStorage.getItem(FLOOR_KEY));
+    } catch {
+      return 0;
+    }
+  });
+  /** Stands the visitor on another floor, and remembers it for next time. */
+  const goTo = useCallback((n: number) => {
+    try {
+      localStorage.setItem(FLOOR_KEY, String(n));
+    } catch {
+      /* storage unavailable — the floor still changes for this visit */
+    }
+    // whatever was playing upstairs stopped when its floor did
+    setScene(false);
+    setFloor(n);
+  }, []);
+  const toIsland = useCallback(() => goTo(0), [goTo]);
   /** Whether the lock is open, which is what the tower hangs on. */
   const [opened, setOpened] = useState(() => unlocked(loadLock()));
   /** When it opened in this visit; -Infinity is before it, or long since. */
@@ -1556,24 +1579,36 @@ function Desk({
   );
 
   return (
-    <div className={scene ? "stage is-scene" : "stage"}>
-      <Island
-        reduced={reduced}
-        onExit={onExit}
-        onOpen={show}
-        starred={starred}
-        calling={calling}
-        taped={taped}
-        hacked={laying}
-        linked={linked}
-        tombino={tombino}
-        onUnlock={unlock}
-        opened={opened}
-        openAt={openAt}
-        bravoAt={bravoAt}
-        onBravoDone={endBravo}
-        onScene={setScene}
-      />
+    /* below the island its windows stay open but out of sight, so going back
+       up finds them where they were */
+    <div className={["stage", scene && "is-scene", floor > 0 && "is-below"].filter(Boolean).join(" ")}>
+      {floor === 0 ? (
+        <Island
+          reduced={reduced}
+          onExit={onExit}
+          onOpen={show}
+          starred={starred}
+          calling={calling}
+          taped={taped}
+          hacked={laying}
+          linked={linked}
+          tombino={tombino}
+          onUnlock={unlock}
+          opened={opened}
+          openAt={openAt}
+          bravoAt={bravoAt}
+          onBravoDone={endBravo}
+          onScene={setScene}
+        />
+      ) : (
+        <Babel
+          reduced={reduced}
+          onScene={setScene}
+          onUp={toIsland}
+          arrivedAt={-Infinity}
+          first={false}
+        />
+      )}
 
       {/* the desktop: each screen its own window, stacked in the order they
           were last touched, and none of them nailed down */}

@@ -833,6 +833,7 @@ button { font: inherit; color: inherit; }
   transition: opacity 260ms ease, visibility 0s 260ms;
 }
 /* important: React Three Fiber writes pointer-events: auto inline on it */
+.stage.is-below .win { visibility: hidden; pointer-events: none; }
 .stage.is-scene div:has(> div > canvas) { pointer-events: none !important; }
 .stage.is-scene .keeper { pointer-events: auto; }
 
