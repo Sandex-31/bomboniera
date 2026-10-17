@@ -1390,3 +1390,23 @@ try {
   for (const w of wins) assert.match(w, /className="win--floor"/, "a window of the floor is hidden downstairs");
   console.log(`ok — the floor's ${wins.length} windows show downstairs`);
 }
+
+/* ---------------------------------------------------------- the sarcophagus
+ * A slot lights when it names one of the six works, unless an earlier slot
+ * already named that same work: the same title twice lights once.
+ */
+{
+  const vite12 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const { rightSlots } = await vite12.ssrLoadModule("/src/data/babel.ts");
+    const { sarcLine } = await vite12.ssrLoadModule("/src/data/puzzle.ts");
+    assert.deepEqual(
+      rightSlots(["Zelda", "halo", "ocarina of time", "", "Interstellar", "dark souls"]),
+      [true, false, false, false, true, true],
+    );
+    assert.ok(sarcLine.startsWith("Rotom:"));
+    console.log("ok — the sarcophagus lights each work once");
+  } finally {
+    await vite12.close();
+  }
+}

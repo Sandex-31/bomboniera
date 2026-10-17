@@ -408,6 +408,16 @@ export function titleOf(typed: string): number | null {
   return want && i >= 0 ? i : null;
 }
 
+/** Which slots name a work that no slot before them has named already. */
+export function rightSlots(slots: string[]): boolean[] {
+  const named = new Set<number>();
+  return slots.map((s) => {
+    const i = titleOf(s);
+    if (i === null || named.has(i)) return false;
+    named.add(i);
+    return true;
+  });
+}
+
 /** All six works named, each once, in whatever order. */
-export const titlesDone = (slots: string[]) =>
-  new Set(slots.map(titleOf).filter((i) => i !== null)).size === PHRASES.length;
+export const titlesDone = (slots: string[]) => rightSlots(slots).filter(Boolean).length === PHRASES.length;

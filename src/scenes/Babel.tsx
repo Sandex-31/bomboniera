@@ -1,19 +1,21 @@
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Html, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { BackSide, CanvasTexture, RepeatWrapping, SRGBColorSpace, type PointLight } from "three";
+import { BackSide, CanvasTexture, RepeatWrapping, SRGBColorSpace, type Group, type PointLight } from "three";
 import CameraRig from "./CameraRig";
 import { useTap } from "./Hotspot";
 import Rotom from "./Rotom";
+import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
-import { PHRASES } from "../data/babel";
-import { LANG_KEY, langFrom } from "../data/puzzle";
+import { PHRASES, titlesDone } from "../data/babel";
+import { LANG_KEY, langFrom, sarcLine } from "../data/puzzle";
 import { drawGlyphs, glyphLines } from "../components/Glyphs";
 import Window from "../components/Window";
 import Chats from "../components/Chats";
 import Plaque from "../components/Plaque";
+import Sarcophagus, { loadSlots } from "../components/Sarcophagus";
 
 /*
  * The second floor: a round hall inside the first terrace of the upside-down
@@ -222,8 +224,102 @@ const CEILING_VIEW: View = {
   spread: { azimuth: 0.1, polar: 0.05 },
 };
 
-/** The windows this floor opens: the terminal, and a slab up close. */
-type Pane = "chats" | `slab-${number}`;
+/** Standing back to take in the middle of the hall: the sarcophagus, and Rotom beside it. */
+const SARC_VIEW: View = {
+  target: [0.35, 0.75, -0.35],
+  azimuth: Math.PI / 4,
+  polar: 0.95,
+  zoom: 1.8,
+  spread: { azimuth: 0.1, polar: 0.05 },
+};
+
+/** How long the sarcophagus takes to come up out of the floor, and its lid to slide off. */
+const RISE_MS = 2400;
+const LID_MS = 1600;
+/**
+ * How far Rotom moves to make room for it: across the camera's first view,
+ * along x and back along z at once, so it ends up beside the sarcophagus
+ * on screen and not floating over it.
+ */
+const ASIDE = 0.75;
+
+const ease = (p: number) => 1 - (1 - Math.min(1, Math.max(0, p))) ** 3;
+
+/**
+ * The sarcophagus in the middle of the hall: out of sight under the floor
+ * until `risenAt`, then up; its lid in place until `openedAt`, then slid
+ * off to show the dark inside. -Infinity for either is "long since".
+ */
+function Coffin({
+  risenAt,
+  openedAt,
+  reduced,
+  onTap,
+}: {
+  risenAt: number;
+  openedAt: number | null;
+  reduced: boolean;
+  onTap: () => void;
+}) {
+  const body = useRef<Group>(null);
+  const lid = useRef<Group>(null);
+  const tap = useTap(onTap);
+  useFrame(() => {
+    const now = performance.now();
+    const up = reduced ? 1 : ease((now - risenAt) / RISE_MS);
+    const off = openedAt === null ? 0 : reduced ? 1 : ease((now - openedAt) / LID_MS);
+    if (body.current) body.current.position.y = -0.6 * (1 - up);
+    if (lid.current) {
+      lid.current.position.x = -0.62 * off;
+      lid.current.position.y = 0.46 - 0.22 * off;
+      lid.current.rotation.z = 0.35 * off;
+    }
+  });
+  return (
+    <group ref={body} position={[0, -0.6, 0]} {...tap}>
+      <mesh position={[0, 0.21, 0]}>
+        <boxGeometry args={[0.5, 0.42, 1.0]} />
+        <meshStandardMaterial color="#8C6A3E" roughness={0.6} metalness={0.2} />
+      </mesh>
+      {[0.08, 0.34].map((y) => (
+        <mesh key={y} position={[0, y, 0]}>
+          <boxGeometry args={[0.52, 0.035, 1.02]} />
+          <meshStandardMaterial color="#D9B25A" metalness={0.7} roughness={0.35} />
+        </mesh>
+      ))}
+      {/* the dark inside, there to be found once the lid is off */}
+      <mesh position={[0, 0.422, 0]} rotation-x={-Math.PI / 2}>
+        <planeGeometry args={[0.4, 0.9]} />
+        <meshBasicMaterial color="#000000" />
+      </mesh>
+      <group ref={lid} position={[0, 0.46, 0]}>
+        <mesh>
+          <boxGeometry args={[0.56, 0.08, 1.06]} />
+          <meshStandardMaterial color="#B08A4E" roughness={0.55} metalness={0.25} />
+        </mesh>
+        <mesh position={[0, 0.045, 0]}>
+          <boxGeometry args={[0.3, 0.012, 0.7]} />
+          <meshStandardMaterial color="#D9B25A" metalness={0.7} roughness={0.35} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/** Rotom and what it says, eased aside once the sarcophagus needs the middle. */
+function Aside({ x, children }: { x: number; children: ReactNode }) {
+  const group = useRef<Group>(null);
+  useFrame((_, dt) => {
+    const g = group.current;
+    if (!g) return;
+    g.position.x += (x - g.position.x) * Math.min(1, dt * 2.5);
+    g.position.z = -g.position.x;
+  });
+  return <group ref={group}>{children}</group>;
+}
+
+/** The windows this floor opens: the terminal, a slab up close, the sarcophagus. */
+type Pane = "chats" | "sarc" | `slab-${number}`;
 
 function loadSolved() {
   try {
@@ -318,6 +414,54 @@ export default function Babel({
     setView(slabView(SLABS[i]));
   };
   const screen = useTap(() => raise("chats"));
+
+  /** Timers of the scenes below, cleared if the floor goes before they are done. */
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+
+  /*
+   * The sixth slab read: the sarcophagus comes up out of the floor. Up
+   * already, and long since, on a visit that finds all six read.
+   */
+  const [risenAt, setRisenAt] = useState<number | null>(() =>
+    solved.length === PHRASES.length ? -Infinity : null,
+  );
+  useEffect(() => {
+    if (solved.length < PHRASES.length || risenAt !== null) return;
+    setStack([]);
+    setScene(true);
+    setView(SARC_VIEW);
+    setRisenAt(performance.now());
+    timers.current.push(
+      setTimeout(
+        () => {
+          setScene(false);
+          setView(HALL_VIEW);
+        },
+        reduced ? 0 : RISE_MS + 700,
+      ),
+    );
+  }, [solved, risenAt, reduced]);
+
+  /** The six titles in: the lid slides off and Rotom has something to say. */
+  const [openedAt, setOpenedAt] = useState<number | null>(() => (titlesDone(loadSlots()) ? -Infinity : null));
+  const [saying, setSaying] = useState(false);
+  const open = useCallback(() => {
+    setStack([]);
+    setScene(true);
+    setView(SARC_VIEW);
+    setOpenedAt(performance.now());
+    timers.current.push(setTimeout(() => setSaying(true), reduced ? 0 : LID_MS));
+  }, [reduced]);
+  const said = () => {
+    setSaying(false);
+    setScene(false);
+    setView(HALL_VIEW);
+  };
+  // open, it is only a dark way down to a floor that is not built yet
+  const tapCoffin = () => {
+    if (openedAt === null) raise("sarc");
+  };
 
   /** Niches round the foot of the wall, as the tower has arches round its terraces. */
   const niches = useMemo(() => {
@@ -423,11 +567,22 @@ export default function Babel({
           <meshBasicMaterial color="#8AD8FF" transparent opacity={0.08} depthWrite={false} />
         </mesh>
 
-        <group {...zap}>
-          <Suspense fallback={null}>
-            <Rotom form="wash" from="base" move={move} reduced={reduced} zapAt={zapAt} awake />
-          </Suspense>
-        </group>
+        {risenAt !== null && (
+          <Coffin risenAt={risenAt} openedAt={openedAt} reduced={reduced} onTap={tapCoffin} />
+        )}
+
+        <Aside x={risenAt === null ? 0 : ASIDE}>
+          <group {...zap}>
+            <Suspense fallback={null}>
+              <Rotom form="wash" from="base" move={move} reduced={reduced} zapAt={zapAt} awake />
+            </Suspense>
+          </group>
+          {saying && (
+            <Html position={[0, 2.1, 0]} center zIndexRange={[6, 0]}>
+              <Keeper line={sarcLine} last reduced={reduced} onNext={said} />
+            </Html>
+          )}
+        </Aside>
 
         <CameraRig
           view={view}
@@ -456,17 +611,19 @@ export default function Babel({
           <Window
             key={pane}
             className="win--floor"
-            title={slab === null ? "terminale" : `lastra ${slab + 1}`}
+            title={pane === "chats" ? "terminale" : pane === "sarc" ? "sarcofago" : `lastra ${slab! + 1}`}
             start={{ x: 16 + depth * 24, y: 74 + depth * 24 }}
-            width={slab === null ? 400 : 380}
+            width={pane === "chats" ? 400 : 360}
             z={depth}
             onFocus={() => raise(pane)}
             onClose={() => shut(pane)}
           >
-            {slab === null ? (
+            {pane === "chats" ? (
               <Chats solved={solved} reduced={reduced} />
+            ) : pane === "sarc" ? (
+              <Sarcophagus onDone={open} />
             ) : (
-              <Plaque index={slab} solved={solved.includes(slab)} onSolved={() => read(slab)} />
+              <Plaque index={slab!} solved={solved.includes(slab!)} onSolved={() => read(slab!)} />
             )}
           </Window>
         );
