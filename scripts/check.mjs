@@ -1100,3 +1100,50 @@ try {
     await vite6.close();
   }
 }
+
+/* ------------------------------------------------------- the Bedrock reader
+ * Rotom comes as Cobblemon's Bedrock models: boxes, box UVs, bones with
+ * pivots. A reader that gets one convention wrong hands back a Rotom in
+ * pieces, so the layout of a box UV is pinned, and a whole model has to come
+ * out symmetric, standing on the floor, one mesh per cube.
+ */
+{
+  const vite7 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const { boxUV, buildGeo } = await vite7.ssrLoadModule("/src/lib/bedrock.ts");
+    const { Box3, MeshBasicMaterial } = await import("three");
+    const { readFileSync } = await import("node:fs");
+
+    assert.deepEqual(boxUV([0, 0], [2, 3, 4], false), {
+      east: [0, 4, 4, 3],
+      north: [4, 4, 2, 3],
+      west: [6, 4, 4, 3],
+      south: [10, 4, 2, 3],
+      up: [4, 0, 2, 4],
+      down: [6, 4, 2, -4],
+    });
+
+    for (const name of ["rotom", "rotom_wash"]) {
+      const file = new URL(`../src/assets/rotom/cobblemon/${name}.geo.json`, import.meta.url);
+      const geo = JSON.parse(readFileSync(file, "utf8"))["minecraft:geometry"][0];
+      const model = buildGeo(geo, new MeshBasicMaterial());
+      let cubes = 0;
+      model.traverse((o) => {
+        if (o.isMesh) cubes++;
+      });
+      assert.equal(cubes, geo.bones.reduce((n, b) => n + (b.cubes?.length ?? 0), 0), `${name} lost cubes`);
+      const box = new Box3().setFromObject(model);
+      assert.ok(box.min.y > -0.1 && box.max.y > 0.5, `${name} is not standing on the floor`);
+      // the body is symmetric even where the whole is not: the washing
+      // machine trails its power cord off to one side
+      const body = new Box3();
+      model.updateMatrixWorld(true);
+      model.getObjectByName("body").children.forEach((o) => o.isMesh && body.expandByObject(o));
+      assert.ok(Math.abs(body.min.x + body.max.x) < 0.05, `${name}'s body comes out lopsided`);
+    }
+
+    console.log("ok — box UVs laid out like Blockbench, both Rotoms whole and upright");
+  } finally {
+    await vite7.close();
+  }
+}
