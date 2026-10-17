@@ -838,11 +838,11 @@ try {
       "the puzzle room spells out its storage key instead of reading PUZZLE_KEY",
     );
 
-    // the borrowed model is CC-BY: the credit is the licence, not a courtesy
-    if (existsSync("src/assets/rotom/rotom-body.stl")) {
+    // the borrowed model is Cobblemon's, under the MPL: say whose and under what
+    if (existsSync("src/assets/rotom/cobblemon")) {
       const readme = await read("README.md");
       assert.ok(
-        readme.includes("IdjeA") && /Creative Commons/i.test(readme),
+        readme.includes("Cobblemon") && /MPL-2\.0/.test(readme),
         "the Rotom model is in the project but its attribution is not in the README",
       );
     }

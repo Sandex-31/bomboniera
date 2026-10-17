@@ -1157,7 +1157,7 @@ const Island = memo(function Island({
           </mesh>
         )}
         <Suspense fallback={null}>
-          <Rotom reduced={reduced} zapAt={zapAt} awake={!open && saying === null} />
+          <Rotom form="base" reduced={reduced} zapAt={zapAt} awake={!open && saying === null} />
         </Suspense>
       </group>
 

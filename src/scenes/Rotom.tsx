@@ -1,180 +1,159 @@
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import {
   Box3,
-  BufferGeometry,
-  Float32BufferAttribute,
-  Matrix4,
-  Quaternion,
+  CanvasTexture,
+  MeshStandardMaterial,
+  NearestFilter,
+  SRGBColorSpace,
+  TextureLoader,
   Vector3,
   type Group,
   type Mesh,
-  type MeshStandardMaterial,
+  type Texture,
 } from "three";
-import { STLLoader } from "three-stdlib";
-import bodyUrl from "../assets/rotom/rotom-body.stl?url";
-import electricUrl from "../assets/rotom/rotom-electric.stl?url";
-import haloUrl from "../assets/rotom/rotom-halo.stl?url";
+import { buildGeo, type Geo } from "../lib/bedrock";
+import baseGeo from "../assets/rotom/cobblemon/rotom.geo.json";
+import washGeo from "../assets/rotom/cobblemon/rotom_wash.geo.json";
+import baseSkin from "../assets/rotom/cobblemon/rotom.png?url";
+import baseGlow from "../assets/rotom/cobblemon/rotom_emissive.png?url";
+import washSkin from "../assets/rotom/cobblemon/rotom_wash.png?url";
+import washGlow from "../assets/rotom/cobblemon/rotom_wash_emissive.png?url";
 
 /*
- * The model is "Rotom" by IdjeA (Thingiverse thing:4729117), used under
- * Creative Commons — Attribution. The credit is in README.md and `npm test`
- * fails if it goes missing. The three files are the print's three parts, all
- * in one coordinate frame: the body, the electric frame around it, and the
- * flat plate that backs the halo.
+ * The models are Cobblemon's (gitlab.com/cable-mc/cobblemon), under the
+ * MPL-2.0. The credit is in README.md and `npm test` fails if it goes
+ * missing. Each form is its own Bedrock model with its own pixel-art sheet
+ * and a second sheet of the parts that glow.
  */
 
-const BODY = "#F4761C";
-const BODY_HOT = "#FFAE4A";
-const ELECTRIC = "#FFC65A";
-const HALO = "#8AD8FF";
+/** Which of its shapes it has taken. One per floor of the tower. */
+export type RotomForm = "base" | "wash";
 
-/** How wide the keeper stands, in world units. The print is in millimetres. */
-const TARGET_W = 1.45;
+const FORMS: Record<RotomForm, { geo: Geo; skin: string; glow: string; light: string }> = {
+  base: { geo: baseGeo["minecraft:geometry"][0] as unknown as Geo, skin: baseSkin, glow: baseGlow, light: "#FFAE4A" },
+  wash: { geo: washGeo["minecraft:geometry"][0] as unknown as Geo, skin: washSkin, glow: washGlow, light: "#8AD8FF" },
+};
 
 /**
- * Which way the print faces once it is stood upright. The model was drawn for
- * a printer, not for a camera, so this is the one number to flip if it ever
- * turns its back on the visitor.
+ * The bones Cobblemon switches on and off as it animates: a closed and an
+ * open mouth under the grin, and lids over the eyes. Left showing, they sit
+ * on top of each other and the face is a mess.
  */
-const FACING = 0.25;
-
-/*
- * The face is engraved into the body, not modelled: grooves a millimetre deep
- * and nothing to colour. These numbers were measured off the mesh rather than
- * guessed — the body is a sphere of radius 25 mm centred at z = -0.5, the
- * grooves sit on the side facing 110° round from +x, the eyes are two ovals of
- * about 11 x 15 mm at 13.3 mm either side of the middle and level with the
- * equator, and the grin runs from its corners at v = -8 down to v = -16.5.
- * Re-measure with the same method if the model is ever swapped.
- */
-const SPHERE_R = 25;
-const SPHERE_CZ = -0.5;
-const FACE_ANGLE = (-110 * Math.PI) / 180;
-const EYE_U = 13.3;
-const EYE_W = 10.4;
-const EYE_H = 14;
-const MOUTH_HALF = 9.5;
-const MOUTH_TOP = -8.2;
-/** How deep the grin dips in the middle, and how far its floor drops. */
-const MOUTH_LIP = 2.3;
-const MOUTH_DROP = 8.3;
-/** How far a fill floats over the surface, so the groove still rims it. */
-const LIFT = 1.15;
-
-const EYE = "#43B7DC";
-const EYE_DEEP = "#12506B";
-const GRIN = "#F4EFE6";
-
-const FACE_DIR = new Vector3(Math.cos(FACE_ANGLE), Math.sin(FACE_ANGLE), 0);
-const FACE_RIGHT = new Vector3(-Math.sin(FACE_ANGLE), Math.cos(FACE_ANGLE), 0);
-const FACE_UP = new Vector3(0, 0, 1);
+const HIDDEN = ["mouth_closed", "mouth_open", "eyelid_left", "eyelid_right"];
 
 /**
- * A point on the face, given in the flat millimetres the measurements are in:
- * `u` across, `v` up, `lift` off the surface. Everything drawn on the head
- * goes through here, so nothing has to guess at the curve of the sphere.
+ * How wide the keeper's body stands, in world units, whatever it is wearing.
+ * The body only: the arms of plasma reach out four times as far again.
  */
-function onFace(u: number, v: number, lift: number) {
-  const depth = Math.sqrt(Math.max(1, SPHERE_R * SPHERE_R - u * u - v * v));
-  const dir = FACE_RIGHT.clone()
-    .multiplyScalar(u)
-    .addScaledVector(FACE_UP, v)
-    .addScaledVector(FACE_DIR, depth)
-    .normalize();
-  return dir.multiplyScalar(SPHERE_R + lift).add(new Vector3(0, 0, SPHERE_CZ));
+const TARGET_W = 0.8;
+
+/**
+ * Which way the model faces once built. Cobblemon draws its Pokémon looking
+ * down -z, and the turn below points +z at the camera, hence half a turn.
+ * The one number to change if it ever turns its back on the visitor.
+ */
+const FACING = Math.PI;
+
+/** Pixel art, so no smoothing: a blurred sheet turns the face to mush. */
+function crisp(t: Texture) {
+  t.magFilter = NearestFilter;
+  t.minFilter = NearestFilter;
+  t.generateMipmaps = false;
+  t.flipY = false;
+  t.colorSpace = SRGBColorSpace;
+  t.needsUpdate = true;
 }
 
 /**
- * Where a flat piece sits on the face and which way it looks. The frame is
- * built explicitly, with the model's own up as up: letting three.js pick a
- * rotation onto the normal would leave an arbitrary twist and the ovals would
- * sit crooked.
+ * The glow sheet as Cobblemon means it: an overlay drawn only where it is
+ * opaque. Its see-through pixels still carry colour, and an emissive map
+ * reads colour and ignores alpha, so left alone they lit the whole body pale
+ * blue. Weighting every pixel by its alpha blacks them out.
  */
-function placeOnFace(u: number, v: number, lift: number) {
-  const p = onFace(u, v, lift);
-  const dir = p.clone().sub(new Vector3(0, 0, SPHERE_CZ)).normalize();
-  const x = new Vector3().crossVectors(FACE_UP, dir).normalize();
-  const y = new Vector3().crossVectors(dir, x);
-  const q = new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(x, y, dir));
-  return {
-    position: [p.x, p.y, p.z] as [number, number, number],
-    quaternion: [q.x, q.y, q.z, q.w] as [number, number, number, number],
-  };
-}
-
-/**
- * The grin, as a strip of quads laid along the sphere rather than a flat shape
- * floating over it: nineteen millimetres of flat fill would sink its corners
- * into a head this round, and the body would show through the middle.
- */
-function grinGeometry() {
-  const steps = 28;
-  const verts: number[] = [];
-  const top = (u: number) => MOUTH_TOP - MOUTH_LIP * (1 - (u / MOUTH_HALF) ** 2);
-  const bottom = (u: number) => MOUTH_TOP - MOUTH_DROP * (1 - (u / MOUTH_HALF) ** 2);
-
-  for (let i = 0; i < steps; i++) {
-    const u0 = -MOUTH_HALF + (2 * MOUTH_HALF * i) / steps;
-    const u1 = -MOUTH_HALF + (2 * MOUTH_HALF * (i + 1)) / steps;
-    const a = onFace(u0, top(u0), LIFT);
-    const b = onFace(u1, top(u1), LIFT);
-    const c = onFace(u1, bottom(u1), LIFT);
-    const d = onFace(u0, bottom(u0), LIFT);
-    verts.push(...a.toArray(), ...b.toArray(), ...c.toArray());
-    verts.push(...a.toArray(), ...c.toArray(), ...d.toArray());
+function glowOnly(t: Texture) {
+  const img = t.image as HTMLImageElement;
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(img, 0, 0);
+  const px = ctx.getImageData(0, 0, img.width, img.height);
+  for (let i = 0; i < px.data.length; i += 4) {
+    const a = px.data[i + 3] / 255;
+    px.data[i] *= a;
+    px.data[i + 1] *= a;
+    px.data[i + 2] *= a;
+    px.data[i + 3] = 255;
   }
-
-  const geo = new BufferGeometry();
-  geo.setAttribute("position", new Float32BufferAttribute(verts, 3));
-  geo.computeVertexNormals();
-  return geo;
+  ctx.putImageData(px, 0, 0);
+  const out = new CanvasTexture(canvas);
+  crisp(out);
+  return out;
 }
 
 export default function Rotom({
   reduced,
   zapAt,
   awake,
+  form,
 }: {
   reduced: boolean;
   /** Time of the last tap, in `performance.now()` ms. Drives the flinch. */
   zapAt: number;
   /** Calm once the way is open: it stops buzzing and just floats. */
   awake: boolean;
+  form: RotomForm;
 }) {
   const group = useRef<Group>(null);
-  const body = useRef<Mesh>(null);
-  const electric = useRef<Mesh>(null);
   const camera = useThree((s) => s.camera);
+  const { geo, skin, glow, light } = FORMS[form];
+  const [map, glowSheet] = useLoader(TextureLoader, [skin, glow]);
 
-  const parts = useLoader(STLLoader, [bodyUrl, electricUrl, haloUrl]) as BufferGeometry[];
+  const material = useMemo(() => {
+    crisp(map);
+    return new MeshStandardMaterial({
+      map,
+      emissiveMap: glowOnly(glowSheet),
+      emissive: "#ffffff",
+      emissiveIntensity: 0.6,
+      alphaTest: 0.5,
+      roughness: 0.7,
+    });
+  }, [map, glowSheet]);
 
   /**
-   * The three parts are placed relative to each other, not to the origin, and
-   * they are printer-sized. Measuring them together keeps the assembly intact:
-   * one offset and one scale for all three, derived rather than guessed.
+   * Built once per form, then measured by its body alone: the washing machine
+   * trails a cord, and measuring that too would shrink it and push it off
+   * centre. Every form ends up the same size, in the same place.
    */
-  const { scale, offset } = useMemo(() => {
-    const box = new Box3();
-    for (const geo of parts) {
-      geo.computeBoundingBox();
-      if (geo.boundingBox) box.union(geo.boundingBox);
+  const { model, scale, offset } = useMemo(() => {
+    const model = buildGeo(geo, material);
+    for (const name of HIDDEN) {
+      const bone = model.getObjectByName(name);
+      if (bone) bone.visible = false;
     }
-    const size = box.getSize(new Vector3());
-    const mid = box.getCenter(new Vector3());
+    model.updateMatrixWorld(true);
+    const body = new Box3();
+    model.getObjectByName("body")?.children.forEach((o) => {
+      if ((o as Mesh).isMesh) body.expandByObject(o);
+    });
+    const size = body.getSize(new Vector3());
+    const mid = body.getCenter(new Vector3());
     return {
-      scale: TARGET_W / Math.max(size.x, 1),
-      // z is up in a print file, so the model's z becomes the scene's y
+      model,
+      scale: TARGET_W / Math.max(size.x, 0.01),
       offset: [-mid.x, -mid.y, -mid.z] as [number, number, number],
     };
-  }, [parts]);
+  }, [geo, material]);
 
-  const face = useMemo(
-    () => ({
-      eyes: [-1, 1].map((side) => ({ side, ...placeOnFace(side * EYE_U, 0, LIFT) })),
-      grin: grinGeometry(),
-    }),
-    [],
+  useEffect(
+    () => () => {
+      model.traverse((o) => (o as Mesh).geometry?.dispose());
+      material.emissiveMap?.dispose();
+      material.dispose();
+    },
+    [model, material],
   );
 
   useFrame((state) => {
@@ -193,80 +172,19 @@ export default function Rotom({
     g.rotation.z = reduced ? 0 : Math.sin(t * 0.9) * 0.04 - jolt * 0.1;
     g.scale.set(1 + jolt * 0.16, 1 - jolt * 0.08, 1 + jolt * 0.16);
 
-    const buzz = reduced || !awake ? 0 : (Math.sin(t * 17) + 1) * 0.08;
-    if (body.current) {
-      (body.current.material as MeshStandardMaterial).emissiveIntensity = 0.35 + buzz + jolt * 1.6;
-    }
-    if (electric.current) {
-      (electric.current.material as MeshStandardMaterial).emissiveIntensity =
-        0.7 + buzz * 2 + jolt * 2.4;
-    }
+    const buzz = reduced || !awake ? 0 : (Math.sin(t * 17) + 1) * 0.15;
+    material.emissiveIntensity = 0.6 + buzz + jolt * 1.4;
   });
 
   return (
     <group ref={group} position={[0, 1.12, 0]}>
-      {/* stood upright and centred on what was measured above */}
-      <group rotation-x={-Math.PI / 2} scale={scale}>
-        <group position={offset}>
-          <mesh ref={body} geometry={parts[0]}>
-            <meshStandardMaterial
-              color={BODY}
-              emissive={BODY_HOT}
-              emissiveIntensity={0.35}
-              roughness={0.4}
-              metalness={0.05}
-            />
-          </mesh>
-          <mesh ref={electric} geometry={parts[1]}>
-            <meshStandardMaterial
-              color={ELECTRIC}
-              emissive={ELECTRIC}
-              emissiveIntensity={0.7}
-              roughness={0.3}
-              metalness={0.1}
-            />
-          </mesh>
-          <mesh geometry={parts[2]}>
-            <meshStandardMaterial
-              color={HALO}
-              emissive={HALO}
-              emissiveIntensity={0.9}
-              roughness={0.25}
-            />
-          </mesh>
-
-          {/* the grin, filled along the curve of the head */}
-          <mesh geometry={face.grin}>
-            <meshStandardMaterial color={GRIN} roughness={0.45} />
-          </mesh>
-
-          {/* the eyes the print only outlines */}
-          {face.eyes.map(({ side, position, quaternion }) => (
-            <group key={side} position={position} quaternion={quaternion}>
-              <mesh scale={[EYE_W / 2, EYE_H / 2, 1]}>
-                <circleGeometry args={[1, 32]} />
-                <meshStandardMaterial
-                  color={EYE}
-                  emissive={EYE}
-                  emissiveIntensity={0.45}
-                  roughness={0.2}
-                />
-              </mesh>
-              {/* pupil and glint, the way the artwork has them */}
-              <mesh position={[side * -0.8, -1.2, 0.25]} scale={[2.1, 3.4, 1]}>
-                <circleGeometry args={[1, 24]} />
-                <meshStandardMaterial color={EYE_DEEP} roughness={0.35} />
-              </mesh>
-              <mesh position={[side * 1.7, 3.6, 0.4]} scale={[1.5, 2, 1]}>
-                <circleGeometry args={[1, 20]} />
-                <meshBasicMaterial color="#FFFFFF" />
-              </mesh>
-            </group>
-          ))}
-        </group>
+      <group scale={scale}>
+        <primitive object={model} position={offset} />
       </group>
-
-      <pointLight color={BODY_HOT} intensity={6} distance={5} />
+      {/* its own glow, out in front where it lights the face: from inside a
+          body made of boxes it would only light the backs of their faces */}
+      <pointLight color={light} intensity={6} distance={5} />
+      <pointLight position={[0, 0.4, -1.4]} color="#FFF1DC" intensity={5} distance={4} />
     </group>
   );
 }

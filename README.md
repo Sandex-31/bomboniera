@@ -291,13 +291,13 @@ in alto fluttua l'etichetta, `ring` = il cerchio dorato a terra).
 
 ## Crediti dei modelli
 
-Il guardiano della stanza nascosta è **"Rotom" di IdjeA** (Thingiverse,
-`thing:4729117`), usato sotto licenza **Creative Commons — Attribution**.
-La licenza chiede una sola cosa: citare l'autore. I file originali, il loro
-`LICENSE.txt` e il `SOURCE.txt` con il link stanno in `src/assets/rotom/`,
-accanto ai tre pezzi rinominati (`rotom-body`, `rotom-electric`, `rotom-halo`:
-corpo, struttura elettrica, piastra dell'alone). `npm test` fallisce se questa
-citazione sparisce dal README mentre i file sono ancora nel progetto.
+Il guardiano della stanza nascosta, Rotom, e le sue forme (per ora Rotom
+Lavaggio) sono i modelli e le texture del mod **Cobblemon**
+(<https://gitlab.com/cable-mc/cobblemon>), usati sotto licenza **MPL-2.0**.
+I file, non modificati, stanno in `src/assets/rotom/cobblemon/` con un
+`SOURCE.txt` che dice da quale commit vengono; `src/lib/bedrock.ts` li legge
+nel loro formato (Minecraft Bedrock). `npm test` fallisce se questa citazione
+sparisce dal README mentre i file sono ancora nel progetto.
 
 Tutto il resto della stanza è geometria scritta a mano: nessun altro asset di
 terze parti, nessun download a runtime.
