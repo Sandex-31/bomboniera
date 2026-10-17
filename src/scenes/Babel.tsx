@@ -333,6 +333,9 @@ export default function Babel({
   reduced,
   onScene,
   onUp,
+  onDown,
+  deep,
+  fromBelow,
   arrivedAt,
   first,
 }: {
@@ -361,13 +364,15 @@ export default function Babel({
   /*
    * Coming in: the camera waits under the shaft, Rotom drops out of it in
    * the form it had upstairs and flashes into this floor's, then the camera
-   * stands back to take in the hall. A reload just finds it all there.
+   * stands back to take in the hall. Coming up from the machine room it
+   * rises out of the sarcophagus instead, an oven until the flash. A reload
+   * just finds it all there.
    */
   const arriving = Number.isFinite(arrivedAt) && !reduced;
   const [move, setMove] = useState<Move | undefined>(() =>
-    arriving ? { at: arrivedAt, kind: "in", dir: "down", fast: !first } : undefined,
+    arriving ? { at: arrivedAt, kind: "in", dir: fromBelow ? "up" : "down", fast: !first } : undefined,
   );
-  const [view, setView] = useState(arriving ? CEILING_VIEW : HALL_VIEW);
+  const [view, setView] = useState(arriving ? (fromBelow ? SARC_VIEW : CEILING_VIEW) : HALL_VIEW);
   const [scene, setScene] = useState(arriving);
   useEffect(() => {
     if (!arriving) return;
@@ -385,11 +390,15 @@ export default function Babel({
   const leaving = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(leaving.current), []);
   const up = useTap(() => {
+    // already on the way somewhere: one trip at a time
+    if (scene) return;
     setScene(true);
     setMove({ at: performance.now(), kind: "out", dir: "up", fast: true });
     leaving.current = setTimeout(onUp, reduced ? 0 : moveMs(true) * 0.8);
   });
-  const zap = useTap(() => setZapAt(performance.now()));
+  const zap = useTap(() => {
+    if (!scene) setZapAt(performance.now());
+  });
 
   /** Which phrases have been read. Kept as they are read, nothing else to it. */
   const [solved, setSolved] = useState(loadSolved);
@@ -459,14 +468,36 @@ export default function Babel({
     setOpenedAt(performance.now());
     timers.current.push(setTimeout(() => setSaying(true), reduced ? 0 : LID_MS));
   }, [reduced]);
+  /*
+   * Down into the open sarcophagus: Rotom comes back over it from where it
+   * stood aside, hangs there a moment, then spirals in, and the machine room
+   * takes over. The long way the first time, the short way after.
+   */
+  const [diving, setDiving] = useState(false);
+  const dive = (long: boolean) => {
+    setStack([]);
+    setScene(true);
+    setView(SARC_VIEW);
+    setDiving(true);
+    timers.current.push(
+      setTimeout(
+        () => {
+          setMove({ at: performance.now(), kind: "out", dir: "down", fast: !long });
+          timers.current.push(setTimeout(() => onDown(long), reduced ? 0 : moveMs(!long) * 0.8));
+        },
+        reduced ? 0 : 900,
+      ),
+    );
+  };
+  // «mi ritrasformooooo!!!» — and it goes straight in to do it
   const said = () => {
     setSaying(false);
-    setScene(false);
-    setView(HALL_VIEW);
+    dive(!deep);
   };
-  // open, it is only a dark way down to a floor that is not built yet
+  // closed, it wants the titles; open, it is the way down
   const tapCoffin = () => {
     if (openedAt === null) raise("sarc");
+    else if (!scene) dive(!deep);
   };
 
   /** Niches round the foot of the wall, as the tower has arches round its terraces. */
@@ -584,10 +615,10 @@ export default function Babel({
           <Coffin risenAt={risenAt} openedAt={openedAt} reduced={reduced} onTap={tapCoffin} />
         )}
 
-        <Aside x={risenAt === null ? 0 : ASIDE}>
+        <Aside x={risenAt === null || diving ? 0 : ASIDE}>
           <group {...zap}>
             <Suspense fallback={null}>
-              <Rotom form="wash" from="base" move={move} reduced={reduced} zapAt={zapAt} awake />
+              <Rotom form="wash" from={fromBelow ? "heat" : "base"} move={move} reduced={reduced} zapAt={zapAt} awake />
             </Suspense>
           </group>
           {saying && (

@@ -428,7 +428,8 @@ export default function Engine({
       <group position={[0, HOLE_Y, 0]} {...up}>
         <mesh rotation-x={-Math.PI / 2}>
           <ringGeometry args={[HOLE_R, HOLE_R + 0.06, 40]} />
-          <meshStandardMaterial color="#8C6A3E" metalness={0.5} roughness={0.5} />
+          {/* lit by the fire below, or it is lost against the dark */}
+          <meshStandardMaterial color="#8C6A3E" emissive="#FF9A4A" emissiveIntensity={0.6} metalness={0.5} roughness={0.5} />
         </mesh>
         <mesh rotation-x={-Math.PI / 2}>
           <circleGeometry args={[HOLE_R + 0.15, 24]} />
@@ -437,7 +438,7 @@ export default function Engine({
       </group>
       <mesh position={[0, HOLE_Y - 0.5, 0]}>
         <cylinderGeometry args={[HOLE_R, HOLE_R * 1.6, 1, 24, 1, true]} />
-        <meshBasicMaterial color="#FFB070" transparent opacity={0.06} depthWrite={false} />
+        <meshBasicMaterial color="#FFB070" transparent opacity={0.1} depthWrite={false} />
       </mesh>
 
       <group {...zap}>
