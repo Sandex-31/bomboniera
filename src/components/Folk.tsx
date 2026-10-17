@@ -192,6 +192,15 @@ function Props({ scene }: { scene: SceneKind }) {
   }
 }
 
+/** Just the head, for the list of chats: who is talking, at a glance. */
+export function FolkHead({ script }: { script: Script }) {
+  return (
+    <svg className="folk-head" viewBox="-12 -54 24 24" width={24} height={24} aria-hidden="true">
+      <Head script={script} />
+    </svg>
+  );
+}
+
 export default function Folk({ who, scene, reduced }: { who: [Script, Script]; scene: SceneKind; reduced: boolean }) {
   return (
     <svg
