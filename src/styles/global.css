@@ -834,6 +834,14 @@ button { font: inherit; color: inherit; }
 }
 /* important: React Three Fiber writes pointer-events: auto inline on it */
 .stage.is-below .win { visibility: hidden; pointer-events: none; }
+
+/* the dark of the shaft between two floors of the tower: it closes over the
+   one being left, the next one is swapped in under it, and it lifts */
+.shaft {
+  position: fixed; inset: 0; z-index: 50; background: #000;
+  opacity: 0; pointer-events: none; transition: opacity 300ms ease;
+}
+.shaft[data-on="true"] { opacity: 1; pointer-events: auto; }
 .stage.is-scene div:has(> div > canvas) { pointer-events: none !important; }
 .stage.is-scene .keeper { pointer-events: auto; }
 

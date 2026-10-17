@@ -6,7 +6,8 @@ import { BackSide, CanvasTexture, RepeatWrapping, SRGBColorSpace, type PointLigh
 import CameraRig from "./CameraRig";
 import { useTap } from "./Hotspot";
 import Rotom from "./Rotom";
-import type { View } from "./focus";
+import { FLIGHT, type View } from "./focus";
+import { moveMs, type Move } from "../lib/descent";
 
 /*
  * The second floor: a round hall inside the first terrace of the upside-down
@@ -127,9 +128,21 @@ function Brazier({ angle, reduced }: { angle: number; reduced: boolean }) {
   );
 }
 
+/** Up under the shaft, looking at where Rotom is about to come through. */
+const CEILING_VIEW: View = {
+  target: [0, 1.9, 0],
+  azimuth: Math.PI / 4,
+  polar: 0.7,
+  zoom: 2.2,
+  spread: { azimuth: 0.1, polar: 0.05 },
+};
+
 export default function Babel({
   reduced,
+  onScene,
   onUp,
+  arrivedAt,
+  first,
 }: {
   reduced: boolean;
   /** Whether a scene is playing, for the desktop to clear itself. */
@@ -147,7 +160,37 @@ export default function Babel({
   const writing = useMemo(inscriptions, []);
   useEffect(() => () => writing.dispose(), [writing]);
 
-  const up = useTap(onUp);
+  /*
+   * Coming in: the camera waits under the shaft, Rotom drops out of it in
+   * the form it had upstairs and flashes into this floor's, then the camera
+   * stands back to take in the hall. A reload just finds it all there.
+   */
+  const arriving = Number.isFinite(arrivedAt) && !reduced;
+  const [move, setMove] = useState<Move | undefined>(() =>
+    arriving ? { at: arrivedAt, kind: "in", dir: "down", fast: !first } : undefined,
+  );
+  const [view, setView] = useState(arriving ? CEILING_VIEW : HALL_VIEW);
+  const [scene, setScene] = useState(arriving);
+  useEffect(() => {
+    if (!arriving) return;
+    const ms = moveMs(!first);
+    const steps = [
+      setTimeout(() => setView(HALL_VIEW), ms * 0.6),
+      setTimeout(() => setScene(false), ms * 0.6 + FLIGHT * 1000),
+    ];
+    return () => steps.forEach(clearTimeout);
+    // once, for the arrival this floor was mounted with
+  }, []);
+  useEffect(() => onScene(scene), [scene, onScene]);
+
+  /** Back up the shaft: Rotom rises into it, and the island takes over. */
+  const leaving = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(leaving.current), []);
+  const up = useTap(() => {
+    setScene(true);
+    setMove({ at: performance.now(), kind: "out", dir: "up", fast: true });
+    leaving.current = setTimeout(onUp, reduced ? 0 : moveMs(true) * 0.8);
+  });
   const zap = useTap(() => setZapAt(performance.now()));
 
   /** Niches round the foot of the wall, as the tower has arches round its terraces. */
@@ -188,7 +231,7 @@ export default function Babel({
       </mesh>
       <mesh position={[0, WALL_H, 0]} rotation-x={-Math.PI / 2}>
         <ringGeometry args={[HALL_R, HALL_R + 0.12, 64]} />
-        <meshStandardMaterial color={STONE_LIGHT} roughness={0.85} side={BackSide} />
+        <meshStandardMaterial color={STONE_LIGHT} roughness={0.85} />
       </mesh>
 
       {niches.map((a) =>
@@ -247,12 +290,12 @@ export default function Babel({
 
       <group {...zap}>
         <Suspense fallback={null}>
-          <Rotom form="wash" reduced={reduced} zapAt={zapAt} awake />
+          <Rotom form="wash" from="base" move={move} reduced={reduced} zapAt={zapAt} awake />
         </Suspense>
       </group>
 
       <CameraRig
-        view={HALL_VIEW}
+        view={view}
         controls={controls}
         reduced={reduced}
         onFlight={setFlying}
@@ -265,10 +308,10 @@ export default function Babel({
         enableZoom={false}
         enableDamping
         dampingFactor={0.08}
-        minPolarAngle={HALL_VIEW.polar - HALL_VIEW.spread.polar}
-        maxPolarAngle={HALL_VIEW.polar + HALL_VIEW.spread.polar}
-        minAzimuthAngle={-Infinity}
-        maxAzimuthAngle={Infinity}
+        minPolarAngle={view.polar - view.spread.polar}
+        maxPolarAngle={view.polar + view.spread.polar}
+        minAzimuthAngle={view.spread.azimuth >= Math.PI ? -Infinity : view.azimuth - view.spread.azimuth}
+        maxAzimuthAngle={view.spread.azimuth >= Math.PI ? Infinity : view.azimuth + view.spread.azimuth}
       />
     </Canvas>
   );

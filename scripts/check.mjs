@@ -1156,3 +1156,34 @@ try {
     await vite7.close();
   }
 }
+
+/* ---------------------------------------------------------------- the dive
+ * Rotom into the manhole and out of the ceiling below, and back up. The
+ * motion starts where it floats, ends out of sight, arrives where it floats,
+ * and only an arrival flashes — that flash is when the form changes.
+ */
+{
+  const vite8 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const { travel, moveMs } = await vite8.ssrLoadModule("/src/lib/descent.ts");
+
+    const rest = travel(0, "out", "down");
+    assert.deepEqual([rest.dy, rest.scale, rest.flash], [0, 1, 0], "the dive does not start where Rotom floats");
+    const gone = travel(1, "out", "down");
+    assert.ok(gone.dy <= -1.12 && gone.scale < 0.1, "Rotom has not gone into the shaft");
+    assert.ok(travel(1, "out", "up").dy > 0, "going up leaves upwards");
+    const landed = travel(1, "in", "down");
+    assert.deepEqual([landed.dy, landed.scale], [0, 1], "an arrival does not end where Rotom floats");
+    assert.ok(travel(0, "in", "down").dy > 0, "arriving from above starts above");
+    assert.ok(travel(0, "in", "up").dy < 0, "arriving from below starts below");
+    assert.ok(travel(0.5, "in", "down").flash > 0, "an arrival flashes");
+    assert.equal(travel(0.5, "out", "down").flash, 0, "a departure flashes");
+    assert.deepEqual(travel(2, "out", "down"), travel(1, "out", "down"), "p is not clamped");
+    assert.deepEqual(travel(-1, "in", "up"), travel(0, "in", "up"), "p is not clamped");
+    assert.ok(moveMs(true) < moveMs(false), "the short way is not shorter");
+
+    console.log("ok — the dive leaves from the float, ends out of sight, and arrivals flash");
+  } finally {
+    await vite8.close();
+  }
+}

@@ -77,8 +77,10 @@ import {
   wiredLine,
   bravoLine,
   tombinoLine,
+  systemLine,
 } from "../data/puzzle";
 import { FLIGHT, type View } from "./focus";
+import { moveMs, type Move } from "../lib/descent";
 
 /** Projected width of the island, the way ROOM_W frames the room. */
 const VOID_W = 7;
@@ -449,6 +451,21 @@ const TOWER_VIEW: View = {
   polar: 1.22,
   zoom: 0.55,
   spread: { azimuth: Math.PI, polar: 0.3 },
+};
+
+/** How long the camera stays out on the tower before it comes back to the keeper. */
+const TOWER_LOOK = 2500;
+
+/** How long the dark of the shaft takes to close over a floor, and to lift. */
+const VEIL_MS = 300;
+
+/** Looking down into the shaft after Rotom, as it goes. */
+const DIVE_VIEW: View = {
+  target: [0, 0.2, 0],
+  azimuth: Math.PI / 4,
+  polar: 0.35,
+  zoom: 2.4,
+  spread: { azimuth: 0.1, polar: 0.05 },
 };
 
 const ISLAND_VIEW: View = {
@@ -886,6 +903,9 @@ const Island = memo(function Island({
   bravoAt,
   onBravoDone,
   onScene,
+  descended,
+  onDescend,
+  arrivedAt,
 }: {
   reduced: boolean;
   onExit: () => void;
@@ -915,6 +935,12 @@ const Island = memo(function Island({
   onBravoDone: () => void;
   /** Whether a scene is playing: the desktop gets out of its way. */
   onScene: (on: boolean) => void;
+  /** Whether the visitor has been down the shaft before. */
+  descended: boolean;
+  /** Rotom is nearly down the shaft: hand over to the floor below. */
+  onDescend: (first: boolean) => void;
+  /** When the visitor came back up the shaft, or -Infinity if they did not. */
+  arrivedAt: number;
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const [flying, setFlying] = useState(false);
@@ -960,16 +986,23 @@ const Island = memo(function Island({
    */
   /** Standing back far enough to see the tower, once it has been revealed. */
   const [atTower, setAtTower] = useState(false);
+  /** Rotom on its way down the shaft, or up out of it. */
+  const [move, setMove] = useState<Move | undefined>(() =>
+    Number.isFinite(arrivedAt) ? { at: arrivedAt, kind: "in", dir: "up", fast: true } : undefined,
+  );
+  const diving = move?.kind === "out";
   const view = useMemo(
     () =>
-      picked === null
-        ? atTower
-          ? TOWER_VIEW
-          : ISLAND_VIEW
-        : picked === LOCK
-          ? lockView
-          : panelView(picked),
-    [picked, atTower],
+      diving
+        ? DIVE_VIEW
+        : picked === null
+          ? atTower
+            ? TOWER_VIEW
+            : ISLAND_VIEW
+          : picked === LOCK
+            ? lockView
+            : panelView(picked),
+    [picked, atTower, diving],
   );
 
   /*
@@ -978,19 +1011,67 @@ const Island = memo(function Island({
    * of a tower. A lock that was open already reveals nothing — the tower is
    * simply there, and so is the open shaft.
    */
-  /** The reveal is in the air, from the lock opening to the tower shot landing. */
+  /**
+   * The reveal is playing: from the lock opening, out to the tower, a long
+   * look at it, and back to the keeper, which then has its word about it.
+   */
   const [revealing, setRevealing] = useState(false);
+  /** Its word about the tower, said before it dives. */
+  const [aboutSystem, setAboutSystem] = useState(false);
   useEffect(() => {
     if (!Number.isFinite(openAt)) return;
     setPicked(null);
     setRevealing(true);
-    const t = setTimeout(() => setAtTower(true), reduced ? 0 : 1400);
-    const done = setTimeout(() => setRevealing(false), reduced ? 0 : 1400 + FLIGHT * 1000);
-    return () => {
-      clearTimeout(t);
-      clearTimeout(done);
-    };
+    const out = 1400;
+    const back = out + FLIGHT * 1000 + TOWER_LOOK;
+    const steps = [
+      setTimeout(() => setAtTower(true), reduced ? 0 : out),
+      setTimeout(() => setAtTower(false), reduced ? 0 : back),
+      setTimeout(
+        () => {
+          setRevealing(false);
+          setAboutSystem(true);
+        },
+        reduced ? 0 : back + FLIGHT * 1000,
+      ),
+    ];
+    return () => steps.forEach(clearTimeout);
   }, [openAt, reduced]);
+
+  /**
+   * Into the manhole. The first time is the long way, after the keeper's
+   * word; every time after it is a quick drop. Rotom shrinks into the shaft
+   * with the camera looking down after it, and the floor below is handed
+   * over before it is quite gone, while the dark of the shaft covers the cut.
+   */
+  const dive = useCallback(
+    (fast: boolean) => {
+      setPicked(null);
+      setAtTower(false);
+      setMove({ at: performance.now(), kind: "out", dir: "down", fast });
+      const t = setTimeout(() => onDescend(!fast), reduced ? 0 : moveMs(fast) * 0.8);
+      return () => clearTimeout(t);
+    },
+    [onDescend, reduced],
+  );
+  const leave = useRef<() => void>(undefined);
+  useEffect(() => () => leave.current?.(), []);
+  /** The open shaft: the way down, with the keeper's word if it is the first time. */
+  const toShaft = useTap(() => {
+    if (descended) leave.current = dive(true);
+    else {
+      setPicked(null);
+      setAboutSystem(true);
+    }
+  });
+
+  // coming back up is a scene of its own, as long as the climb lasts
+  const [climbing, setClimbing] = useState(move?.kind === "in");
+  useEffect(() => {
+    if (!climbing) return;
+    const t = setTimeout(() => setClimbing(false), reduced ? 0 : moveMs(true));
+    return () => clearTimeout(t);
+  }, [climbing, reduced]);
 
   /*
    * A silhouette named right is laughed at by the keeper, so the camera goes
@@ -1022,18 +1103,11 @@ const Island = memo(function Island({
     aboutTape ||
     aboutWires ||
     aboutTombino ||
-    aboutBravo;
+    aboutBravo ||
+    aboutSystem ||
+    diving ||
+    climbing;
   useEffect(() => onScene(scene), [scene, onScene]);
-
-  /*
-   * The open shaft is the way back to the tower shot. From the island the
-   * tower is out of sight underneath, so without this one tap in the void —
-   * or a reload — would lose it for good.
-   */
-  const toTower = useTap(() => {
-    setPicked(null);
-    setAtTower(true);
-  });
 
   // going to a screen is leaving the tower shot
   useEffect(() => {
@@ -1210,7 +1284,14 @@ const Island = memo(function Island({
           </mesh>
         )}
         <Suspense fallback={null}>
-          <Rotom form="base" reduced={reduced} zapAt={zapAt} awake={!open && saying === null} />
+          <Rotom
+            form="base"
+            from="wash"
+            move={move}
+            reduced={reduced}
+            zapAt={zapAt}
+            awake={!open && saying === null}
+          />
         </Suspense>
       </group>
 
@@ -1255,7 +1336,7 @@ const Island = memo(function Island({
       {opened && (
         <>
           <group
-            {...toTower}
+            {...toShaft}
             onPointerOver={(e) => {
               e.stopPropagation();
               document.body.style.cursor = "pointer";
@@ -1309,6 +1390,21 @@ const Island = memo(function Island({
             onNext={() => {
               setAboutTombino(false);
               setLockShown(true);
+            }}
+          />
+        </Html>
+      )}
+
+      {aboutSystem && (
+        <Html position={[0, 2.1, 0]} center zIndexRange={[80, 60]}>
+          <Keeper
+            key="system"
+            line={systemLine}
+            last
+            reduced={reduced}
+            onNext={() => {
+              setAboutSystem(false);
+              leave.current = dive(false);
             }}
           />
         </Html>
@@ -1457,18 +1553,47 @@ function Desk({
       return 0;
     }
   });
-  /** Stands the visitor on another floor, and remembers it for next time. */
-  const goTo = useCallback((n: number) => {
+  /** Whether the visitor has ever been down the shaft: then it is the short way. */
+  const [descended, setDescended] = useState(() => {
     try {
-      localStorage.setItem(FLOOR_KEY, String(n));
+      return localStorage.getItem(FLOOR_KEY) !== null;
     } catch {
-      /* storage unavailable — the floor still changes for this visit */
+      return false;
     }
-    // whatever was playing upstairs stopped when its floor did
-    setScene(false);
-    setFloor(n);
-  }, []);
-  const toIsland = useCallback(() => goTo(0), [goTo]);
+  });
+  /** When the visitor last came through the shaft, and whether it was the first time. */
+  const [arrival, setArrival] = useState({ at: -Infinity, first: false });
+  /** The dark of the shaft, drawn over the cut from one floor to the next. */
+  const [veil, setVeil] = useState(false);
+  /**
+   * Through the shaft to another floor: dark, swap, light. The floor is saved
+   * only here, on arrival — leave halfway and the visitor is still upstairs.
+   */
+  const goTo = useCallback(
+    (n: number, first: boolean) => {
+      const land = () => {
+        try {
+          localStorage.setItem(FLOOR_KEY, String(n));
+        } catch {
+          /* storage unavailable — the floor still changes for this visit */
+        }
+        // whatever was playing upstairs stopped when its floor did, and a
+        // reveal from earlier in the visit must not replay on the way back
+        setScene(false);
+        setOpenAt(-Infinity);
+        setDescended(true);
+        setArrival({ at: performance.now(), first });
+        setFloor(n);
+        setVeil(false);
+      };
+      if (reduced) return land();
+      setVeil(true);
+      setTimeout(land, VEIL_MS);
+    },
+    [reduced],
+  );
+  const toIsland = useCallback(() => goTo(0, false), [goTo]);
+  const toBabel = useCallback((first: boolean) => goTo(1, first), [goTo]);
   /** Whether the lock is open, which is what the tower hangs on. */
   const [opened, setOpened] = useState(() => unlocked(loadLock()));
   /** When it opened in this visit; -Infinity is before it, or long since. */
@@ -1599,16 +1724,20 @@ function Desk({
           bravoAt={bravoAt}
           onBravoDone={endBravo}
           onScene={setScene}
+          descended={descended}
+          onDescend={toBabel}
+          arrivedAt={arrival.at}
         />
       ) : (
         <Babel
           reduced={reduced}
           onScene={setScene}
           onUp={toIsland}
-          arrivedAt={-Infinity}
-          first={false}
+          arrivedAt={arrival.at}
+          first={arrival.first}
         />
       )}
+      <div className="shaft" data-on={veil} aria-hidden="true" />
 
       {/* the desktop: each screen its own window, stacked in the order they
           were last touched, and none of them nailed down */}
