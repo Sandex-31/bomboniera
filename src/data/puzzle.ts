@@ -116,6 +116,36 @@ export function floorFrom(stored: string | null): number {
   return stored !== null && stored !== '' && Number.isInteger(n) && n >= 0 && n < FLOORS ? n : 0;
 }
 
+/** Which of the six wall phrases of Babel have been read, by index. */
+export const LANG_KEY = 'bomboniera.puzzle.lingue';
+
+/** What has been written into the six slots of the sarcophagus. */
+export const TITLES_KEY = 'bomboniera.puzzle.sarcofago';
+
+/** Which chats of the terminal have been opened, so the rest still say «nuova». */
+export const CHAT_KEY = 'bomboniera.puzzle.chat';
+
+/** The read phrases, read back: anything that is not a list of distinct phrases is none. */
+export function langFrom(stored: string | null): number[] {
+  try {
+    const list: unknown = JSON.parse(stored ?? '[]');
+    const ok =
+      Array.isArray(list) &&
+      list.every((n) => Number.isInteger(n) && n >= 0 && n < 6) &&
+      new Set(list).size === list.length;
+    return ok ? (list as number[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * What it says once the sarcophagus has its six titles and opens.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const sarcLine = 'Rotom: TODO — la battuta del sarcofago.';
+
 /**
  * The one thing the keeper says once the star has finished drawing itself.
  *

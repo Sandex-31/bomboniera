@@ -11,7 +11,9 @@
 import {
   BEAM_KEY,
   FLOOR_KEY,
+  CHAT_KEY,
   HACK_KEY,
+  LANG_KEY,
   LAMPS_KEY,
   LOCK_KEY,
   LOST_KEY,
@@ -21,6 +23,7 @@ import {
   PUZZLE_KEY,
   SAGOME_KEY,
   SKI_KEY,
+  TITLES_KEY,
   TOMBINO_KEY,
 } from "../data/puzzle";
 import { buildMaze, solve } from "./maze";
@@ -76,7 +79,15 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "tombino", key: TOMBINO_KEY, solved: () => "1" },
   { label: "lucchetto", key: LOCK_KEY, solved: () => [...LOCK_CODE] },
   { label: "secondo piano", key: FLOOR_KEY, solved: () => "1" },
+  { label: "lingue: 3 frasi", key: LANG_KEY, solved: () => [0, 1, 2] },
+  { label: "sarcofago", key: LANG_KEY, solved: () => [0, 1, 2, 3, 4, 5] },
 ];
+
+/**
+ * What the puzzle keeps that is not a stop of its own: the titles half typed
+ * into the sarcophagus, and which chats have been opened. Wiped with the rest.
+ */
+export const WIPED = [TITLES_KEY, CHAT_KEY];
 
 /**
  * Wipes the whole chain, then solves the first `upTo` stops of it.
@@ -84,7 +95,7 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
  */
 export function jumpTo(upTo: number) {
   try {
-    STAGES.forEach(({ key }) => localStorage.removeItem(key));
+    [...STAGES.map((st) => st.key), ...WIPED].forEach((key) => localStorage.removeItem(key));
     STAGES.slice(0, upTo).forEach(({ key, solved }) => {
       const value = solved();
       localStorage.setItem(key, typeof value === "string" ? value : JSON.stringify(value));

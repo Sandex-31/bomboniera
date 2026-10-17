@@ -949,7 +949,7 @@ try {
   };
   const vite5 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
   try {
-    const { STAGES, jumpTo } = await vite5.ssrLoadModule("/src/lib/stages.ts");
+    const { STAGES, WIPED, jumpTo } = await vite5.ssrLoadModule("/src/lib/stages.ts");
     const puzzle = await vite5.ssrLoadModule("/src/data/puzzle.ts");
     const { buildMaze, validTrail } = await vite5.ssrLoadModule("/src/lib/maze.ts");
     const { FLOORS, complete } = await vite5.ssrLoadModule("/src/lib/beam.ts");
@@ -960,15 +960,22 @@ try {
 
     // the reset is stop 0, so every key the puzzle keeps has to be on the list
     const keys = Object.entries(puzzle).filter(([n]) => n.endsWith("_KEY")).map(([, v]) => v);
-    assert.deepEqual(new Set(STAGES.map((st) => st.key)), new Set(keys), "a puzzle key is missing from the stops");
+    assert.deepEqual(
+      new Set([...STAGES.map((st) => st.key), ...WIPED]),
+      new Set(keys),
+      "a puzzle key is missing from the stops",
+    );
 
     for (let n = 0; n <= STAGES.length; n++) {
       store.set("leftover", "x");
-      STAGES.forEach(({ key }) => store.set(key, "stale"));
+      [...STAGES.map((st) => st.key), ...WIPED].forEach((key) => store.set(key, "stale"));
       jumpTo(n);
-      STAGES.forEach(({ key }, i) =>
-        assert.equal(store.has(key), i < n, `stop ${n} gets ${key} wrong`),
+      // a key can carry more than one stop (the phrases of Babel do): it is
+      // there if any stop up to here writes it
+      STAGES.forEach(({ key }) =>
+        assert.equal(store.has(key), STAGES.slice(0, n).some((st) => st.key === key), `stop ${n} gets ${key} wrong`),
       );
+      WIPED.forEach((key) => assert.ok(!store.has(key), `stop ${n} leaves ${key} behind`));
     }
 
     // and what the last stop writes is what each screen accepts as solved
@@ -1231,5 +1238,108 @@ try {
     console.log("ok — the alphabets");
   } finally {
     await vite9.close();
+  }
+}
+
+/* ---------------------------------------------------------- the languages
+ * The six wall phrases and the chats that teach their scripts. The promise
+ * the floor makes: no letter of a phrase is ever a blind guess. Each one has
+ * turned up, in that phrase's script, in at least two different words of the
+ * chats the visitor can read by then — and every chat between two peoples
+ * has a word both of them say, which is what confirms a guess.
+ */
+{
+  const vite10 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const { tokens, bare, fold, LETTERS } = await vite10.ssrLoadModule("/src/lib/scripts.ts");
+    const { PHRASES, CHATS, unlockedChats, acceptsPhrase, titleOf, titlesDone } =
+      await vite10.ssrLoadModule("/src/data/babel.ts");
+    const { langFrom } = await vite10.ssrLoadModule("/src/data/puzzle.ts");
+
+    assert.deepEqual(
+      PHRASES.map((p) => p.script),
+      ["egizi", "stelle", "blocchi", "tubi", "onde", "esagrammi"],
+    );
+    assert.deepEqual(
+      PHRASES.map((p) => p.text),
+      [
+        "Perché sente sempre la musica?",
+        "il furtivo Pigmeo, così facilmente dimenticato",
+        "Se vinci, vivrai. Se perdi, morirai. Se non combatti, non puoi vincere.",
+        "Preferisco essere una scimmia senza cervello che un mostro senza cuore.",
+        "L'umanità è nata sulla Terra. Non è mai stato destinato a morire qui",
+        "Il tempo passa, le persone si muovono... Come il corso di un fiume, non finisce mai.",
+      ],
+    );
+    PHRASES.forEach((p) => tokens(p.text));
+
+    assert.ok(acceptsPhrase(0, "perche sente sempre la MUSICA"));
+    assert.ok(acceptsPhrase(4, "l umanita e nata sulla terra non e mai stato destinato a morire qui"));
+    assert.ok(!acceptsPhrase(0, "perche sente"));
+
+    assert.equal(titleOf("L'attacco dei giganti"), 2);
+    assert.equal(titleOf("ocarina of time"), 5);
+    assert.equal(titleOf("baby driver"), 0);
+    assert.equal(titleOf("halo"), null);
+    const six = ["Interstellar", "dark souls", "Dragon Ball Z", "Zelda", "Attack on Titans", "Baby Driver"];
+    assert.ok(titlesDone(six));
+    assert.ok(!titlesDone([...six.slice(0, 5), "dark souls 1"]), "a title typed twice counted twice");
+
+    const phases = (solved) => [...new Set(unlockedChats(solved).map((c) => c.phase))].sort();
+    assert.deepEqual(phases([]), [0]);
+    assert.deepEqual(phases([2]), [0, 3]);
+
+    assert.deepEqual(langFrom(null), []);
+    assert.deepEqual(langFrom("x"), []);
+    assert.deepEqual(langFrom("[7]"), []);
+    assert.deepEqual(langFrom("[1,1]"), []);
+    assert.deepEqual(langFrom("[0,2]"), [0, 2]);
+
+    assert.equal(new Set(CHATS.map((c) => c.id)).size, CHATS.length, "two chats share an id");
+    const words = (text) => fold(text).split(/[^a-z]+/).filter(Boolean);
+
+    for (const c of CHATS) {
+      c.lines.forEach((l) => tokens(l.text));
+      const all = bare(c.lines.map((l) => l.text).join(" "));
+      PHRASES.forEach((p, i) =>
+        assert.ok(!all.includes(bare(p.text)), `chat ${c.id} gives away phrase ${i + 1} whole`),
+      );
+      if (c.who[0] !== c.who[1]) {
+        const said = (by) => new Set(c.lines.filter((l) => l.by === by).flatMap((l) => words(l.text)));
+        const a = said(0);
+        assert.ok([...said(1)].some((w) => a.has(w)), `mixed chat ${c.id} has no word both say`);
+      }
+    }
+
+    // the chats of each phase, as the spec lays them out
+    const at = (k) => CHATS.filter((c) => c.phase === k);
+    assert.equal(at(0).length, 3);
+    assert.ok(at(0).every((c) => c.who[0] === "egizi" && c.who[1] === "egizi"));
+    for (let k = 1; k < 6; k++) {
+      const s = PHRASES[k].script;
+      const earlier = PHRASES.slice(0, k).map((p) => p.script);
+      assert.ok(at(k).filter((c) => c.who[0] === s && c.who[1] === s).length >= 2, `phase ${k}: too few ${s} chats`);
+      const mixed = at(k).filter((c) => c.who[0] !== c.who[1]);
+      assert.ok(mixed.length >= 1, `phase ${k}: no mixed chat`);
+      assert.ok(
+        mixed.every((c) => c.who.includes(s) && c.who.some((w) => earlier.includes(w))),
+        `phase ${k}: a mixed chat is not ${s} with an earlier people`,
+      );
+    }
+
+    // coverage: every letter of a phrase, twice over, in its script, before it is due
+    PHRASES.forEach((p, i) => {
+      const heard = CHATS.filter((c) => c.phase <= i).flatMap((c) =>
+        c.lines.filter((l) => c.who[l.by] === p.script).flatMap((l) => words(l.text)),
+      );
+      for (const ch of new Set(bare(p.text))) {
+        const n = new Set(heard.filter((w) => w.includes(ch))).size;
+        assert.ok(n >= 2, `phrase ${i + 1} (${p.script}): «${ch}» is in ${n} word(s) of the chats before it`);
+      }
+    });
+    assert.ok(LETTERS.length === 21);
+    console.log(`ok — the languages: ${CHATS.length} chats, every letter learnable before it is needed`);
+  } finally {
+    await vite10.close();
   }
 }
