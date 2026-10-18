@@ -1007,6 +1007,9 @@ try {
     // and the machines of the third floor are as their stops left them
     const { boilersFrom, solvedBoilers } = await vite5.ssrLoadModule("/src/lib/boilers.ts");
     assert.deepEqual(boilersFrom(store.get(puzzle.BOILERS_KEY)), solvedBoilers(), "the jump leaves a boiler cold");
+    const pipes = await vite5.ssrLoadModule("/src/lib/pipes.ts");
+    const lit = { tondo: true, triangolo: true, quadrato: true };
+    assert.ok(pipes.solved(pipes.flow(pipes.pipesFrom(store.get(puzzle.PIPES_KEY)), lit)), "the jump leaves the pipes wrong");
 
     // the floor the visitor is on: whatever is stored, it lands on a real floor
     assert.equal(puzzle.floorFrom(null), 0, "never been down is the island");
@@ -1499,6 +1502,125 @@ try {
     assert.deepEqual(b.steamOf(lit), { tondo: true, triangolo: true, quadrato: true });
     assert.deepEqual(b.steamOf(b.COLD), { tondo: false, triangolo: false, quadrato: false });
     console.log("ok — the boilers: one damper each, told by the smoke, a green a thumb can catch");
+
+    /* the pipes: one way through and no other. The search grows the three
+       lines out from their inlets, deciding each piece only when steam gets
+       to it, so pieces off the way are never counted twice. */
+    const p = await vite13.ssrLoadModule("/src/lib/pipes.ts");
+    const all = { tondo: true, triangolo: true, quadrato: true };
+    const ways = (() => {
+      const st = { turns: [...p.START.turns], switches: [...p.START.switches], valves: [...p.START.valves] };
+      const outletAt = new Map(Object.entries(p.OUTLETS).map(([o, r]) => [r, o]));
+      const inletAt = new Map(Object.entries(p.INLETS).map(([l, r]) => [r, l]));
+      const step = { [p.N]: [0, -1], [p.E]: [1, 0], [p.S]: [0, 1], [p.WEST]: [-1, 0] };
+      const found = [];
+      const options = (x, y) => {
+        const piece = p.GRID[y][x];
+        const i = y * p.W + x;
+        if (piece.kind === "rot") {
+          const seen = new Set();
+          return [0, 1, 2, 3].filter((k) => {
+            const m = p.turn(p.BASE[piece.shape], k);
+            return !seen.has(m) && seen.add(m);
+          }).map((k) => () => (st.turns[i] = k));
+        }
+        if (piece.kind === "switch") {
+          const s = p.SWITCHES.indexOf(i);
+          return [true, false].map((v) => () => (st.switches[s] = v));
+        }
+        if (piece.kind === "valve") {
+          const v = p.VALVES.indexOf(i);
+          return [true, false].map((o) => () => (st.valves[v] = o));
+        }
+        return [() => {}];
+      };
+      const key = (x, y, entry) =>
+        p.GRID[y][x].kind === "bridge" ? `${x},${y},${entry === p.N || entry === p.S ? "|" : "-"}` : `${x},${y}`;
+      const run = (queue, decided, owner, reached) => {
+        while (queue.length) {
+          const [x, y, entry, line] = queue.pop();
+          if (x < 0) {
+            if (inletAt.get(y) !== line) return;
+            continue;
+          }
+          if (x >= p.W) {
+            const out = outletAt.get(y);
+            if (!out) return;
+            reached[line].add(out);
+            continue;
+          }
+          if (y < 0 || y >= p.H || !p.GRID[y][x]) return;
+          const cell = `${x},${y}`;
+          if (!decided.has(cell)) {
+            for (const choose of options(x, y)) {
+              choose();
+              run(
+                [...queue, [x, y, entry, line]],
+                new Set([...decided, cell]),
+                new Map(owner),
+                Object.fromEntries(Object.entries(reached).map(([l, r]) => [l, new Set(r)])),
+              );
+            }
+            return;
+          }
+          const next = p.through(st, x, y, entry);
+          if (next === "leak") return;
+          const k = key(x, y, entry);
+          if (owner.has(k)) {
+            if (owner.get(k) !== line) return;
+            continue;
+          }
+          owner.set(k, line);
+          if (next === "sealed") continue;
+          for (const d of next) queue.push([x + step[d][0], y + step[d][1], p.opposite(d), line]);
+        }
+        if (Object.entries(reached).every(([l, r]) => r.size === 1 && r.has(l))) {
+          found.push(
+            [...decided].sort().map((c) => {
+              const [x, y] = c.split(",").map(Number);
+              const i = y * p.W + x;
+              return `${c}:${p.sidesOf(st, x, y)}:${st.switches[p.SWITCHES.indexOf(i)] ?? ""}:${st.valves[p.VALVES.indexOf(i)] ?? ""}`;
+            }).join(" "),
+          );
+        }
+      };
+      run(
+        Object.entries(p.INLETS).map(([l, r]) => [0, r, p.WEST, l]),
+        new Set(),
+        new Map(),
+        { tondo: new Set(), triangolo: new Set(), quadrato: new Set() },
+      );
+      return new Set(found);
+    })();
+    assert.equal(ways.size, 1, `the pipes have ${ways.size} ways through, not one`);
+    const right = p.solvedPipes();
+    assert.ok(p.solved(p.flow(right, all)), "the stored way through is not one");
+    assert.deepEqual(p.flow(right, all).leaks, [], "the way through leaks");
+    assert.ok(!p.solved(p.flow(p.START, all)), "the panel comes solved");
+    right.switches.forEach((_, k) => {
+      const wrong = { ...right, switches: right.switches.map((v, j) => (j === k ? !v : v)) };
+      assert.ok(!p.solved(p.flow(wrong, all)), `switch ${k} does not matter`);
+    });
+    right.valves.forEach((_, k) => {
+      const wrong = { ...right, valves: right.valves.map((v, j) => (j === k ? !v : v)) };
+      assert.ok(!p.solved(p.flow(wrong, all)), `valve ${k} does not matter`);
+    });
+    assert.ok(right.valves.includes(true) && right.valves.includes(false), "every valve is shut, or every one open");
+    // a valve opened onto a dead end leaks; two lines run together mix
+    const open = { ...right, valves: right.valves.map(() => true) };
+    assert.ok(p.flow(open, all).leaks.length > 0, "an open dead end does not leak");
+    const crossed = { ...right, switches: right.switches.map((v, j) => (j === 0 ? !v : v)) };
+    assert.ok(Object.values(p.flow(crossed, all).outlets).some((o) => o !== "ok"), "a wrong lever goes unnoticed");
+    // a cold boiler sends nothing, and its outlet is dead even with the way right
+    assert.equal(p.flow(right, { ...all, tondo: false }).outlets.tondo, "none");
+    assert.equal(p.flow(right, { ...all, tondo: false }).outlets.triangolo, "ok");
+    assert.deepEqual(p.pipesFrom(null), p.START);
+    for (const bad of ["x", "{}", JSON.stringify({ ...right, turns: [9] })]) assert.deepEqual(p.pipesFrom(bad), p.START);
+    assert.deepEqual(p.pipesFrom(JSON.stringify(right)), right);
+    const turnable = p.GRID.flat().filter((q) => q?.kind === "rot").length;
+    console.log(
+      `ok — the pipes: ${turnable} pieces to turn, ${p.SWITCHES.length} switches, ${p.VALVES.length} valves, one way through`,
+    );
   } finally {
     await vite13.close();
   }

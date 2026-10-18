@@ -19,8 +19,10 @@ import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import CardPieces, { type PieceId } from "../components/CardPieces";
 import Boilers, { BOILER_ANGLES, doorAt } from "./machines/Boilers";
-import { BOILERS_KEY, boilerLine } from "../data/puzzle";
-import { loadBoilers, type BoilerState } from "../lib/boilers";
+import Pipes from "./machines/Pipes";
+import { BOILERS_KEY, PIPES_KEY, boilerLine } from "../data/puzzle";
+import { loadBoilers, steamOf, type BoilerState } from "../lib/boilers";
+import { flow as steamFlow, loadPipes, type PipesState } from "../lib/pipes";
 import { FLIGHT, type View } from "./focus";
 import { BURN_MS, moveMs, type Move } from "../lib/descent";
 import {
@@ -96,6 +98,15 @@ function waitBy(i: number): [number, number, number] {
   const out = [-Math.cos(a), -Math.sin(a)];
   const side = [-Math.sin(a), Math.cos(a)];
   return [x + out[0] * 0.35 + side[0] * 0.62, -0.24, z + out[1] * 0.35 + side[1] * 0.62];
+}
+
+/**
+ * Where Rotom keeps while a machine on the wall at angle `a` is worked: off
+ * to one side along the wall, out of the shot, so it never floats between
+ * the camera and the machine.
+ */
+function outOfTheWay(a: number): [number, number, number] {
+  return [-Math.sin(a) * 2.25, -0.2, Math.cos(a) * 2.25];
 }
 
 /** How much light the hall has with no boiler lit, and what each lit one adds. */
@@ -327,6 +338,16 @@ export default function Engine({
     }
   }, [boilers]);
   const burning = boilers.lit.filter(Boolean).length;
+  /** The pipes, and where the steam of the lit boilers goes through them. */
+  const [pipes, setPipes] = useState<PipesState>(loadPipes);
+  useEffect(() => {
+    try {
+      localStorage.setItem(PIPES_KEY, JSON.stringify(pipes));
+    } catch {
+      /* storage unavailable — the panel still works for this visit */
+    }
+  }, [pipes]);
+  const steam = useMemo(() => steamFlow(pipes, steamOf(boilers)), [pipes, boilers]);
   /** Which boiler Rotom has been put in, if any. Not kept: a reload finds it in the middle. */
   const [inside, setInside] = useState<number | null>(null);
   /** When Rotom was last blown out of a boiler, black with soot. */
@@ -436,7 +457,9 @@ export default function Engine({
       ? [doorAt(inside)[0], doorAt(inside)[1] - 1.12 * 0.35, doorAt(inside)[2]]
       : focus === "boilers"
         ? waitBy(which)
-        : [0, 0, 0];
+        : focus && focus !== "press"
+          ? outOfTheWay(SPOTS[focus].a)
+          : [0, 0, 0];
 
   /** What came of the bellows. */
   const outcome = (i: number, what: "out" | "lit" | "spat") => {
@@ -515,7 +538,12 @@ export default function Engine({
         ))}
         {/* and risers between them, every so often */}
         {Array.from({ length: 10 }, (_, k) => FAR + 0.42 + (k * Math.PI * 2) / 10)
-          .filter((a) => !BOILER_ANGLES.some((b) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) < 0.3))
+          .filter(
+            (a) =>
+              ![...BOILER_ANGLES, SPOTS.pipes.a, SPOTS.gears.a, SPOTS.hoist.a, SPOTS.organ.a].some(
+                (b) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) < 0.35,
+              ),
+          )
           .map((a) => (
             <FarSide key={a} a={a}>
               <mesh position={[Math.cos(a) * (HALL_R - 0.12), 0.98, Math.sin(a) * (HALL_R - 0.12)]}>
@@ -561,7 +589,15 @@ export default function Engine({
         )}
 
         {/* the machines still to be built, each walked up to with a tap */}
-        {(["pipes", "gears", "hoist", "organ"] as const).map((id) => (
+        <Pipes
+          state={pipes}
+          flow={steam}
+          active={focus === "pipes" && !scene}
+          reduced={reduced}
+          onPick={() => pick("pipes")}
+          onChange={setPipes}
+        />
+        {(["gears", "hoist", "organ"] as const).map((id) => (
           <Spot key={id} id={id} onPick={pick} />
         ))}
 
