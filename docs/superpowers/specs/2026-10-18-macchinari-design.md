@@ -3,7 +3,7 @@
 Data: 2026-10-18. Riguarda la sala macchine (`src/scenes/Engine.tsx`) e segue il capitolo
 «discesa alla sala macchine» (`2026-10-18-sala-macchine-design.md`).
 
-**Stato: approvato da Salvo. Melodia scelta, trascrizione ancora da fare.**
+**Stato: approvato da Salvo, melodia compresa.**
 
 ## Perché
 
@@ -194,12 +194,28 @@ Tirando una catena il fischio suona finché la si tiene: tocco breve, nota breve
   riga, nell'ordine delle colonne.
 - **Suonare.** Si tirano le catene seguendo la scheda. Il ritmo esatto non conta, contano l'ordine
   e la differenza tra breve e lunga. Un errore fa uscire uno sbuffo stonato e si ricomincia da capo.
-  La melodia è lunga circa 14–16 note.
+  La melodia è lunga 12 note (sotto).
 
 **La melodia (scelta da Salvo)** è **«Genesis Retake Light»** di Ridiculon, dalla colonna sonora
-di The Binding of Isaac: Repentance (la musica della schermata del titolo). Va ridotta a una frase
-riconoscibile di circa 14–16 note, con al massimo sei note diverse, una per fischio. Riconoscerla
-non serve per risolvere, è il premio, e richiama The Lost dell'isola.
+di The Binding of Isaac: Repentance (la musica della schermata del titolo). Riconoscerla non serve
+per risolvere, è il premio, e richiama The Lost dell'isola.
+
+È la frase da 0:39 a 1:00 del brano, ricavata dall'audio e approvata a orecchio da Salvo: tre
+discese uguali, la terza che sale invece di fermarsi. **12 note, sei note diverse**, una per
+fischio. «Lunga» vuol dire fessura sulla scheda e catena tenuta.
+
+| # | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| nota | La♭5 | Fa5 | Do5 | La♭5 | Fa5 | Do5 | La♭5 | Fa5 | Do5 | Re5 | Mi♭5 | Sol5 |
+| durata | breve | breve | **lunga** | breve | breve | **lunga** | breve | breve | breve | breve | breve | **lunga** |
+
+I sei fischi, dal più alto e grave al più basso e acuto: Do5, Re5, Mi♭5, Fa5, Sol5, La♭5.
+
+**Il suono.** È un organo a canne, non un flauto (Salvo l'ha chiesto dopo la prima prova): ogni
+nota suona su più registri insieme (l'ottava sotto, la fondamentale e tre registri acuti), con due
+file di canne appena scordate tra loro, il soffio d'aria all'attacco, un tremolo leggero e il
+riverbero di una sala grande. Si genera con Web Audio, senza file audio: nel sito non entra niente
+del brano originale.
 
 Suonata giusta, l'organo ripete la melodia da solo, intera, e sotto la tastiera si sgancia un
 fermo.
@@ -313,12 +329,9 @@ Volare davanti a una macchina non è una scena: si può tornare indietro quando 
   ritmo dell'isola).
 - Durate e curve delle animazioni.
 
-## Domande aperte per Salvo
+## Decisioni di Salvo
 
-1. La trascrizione della melodia (vedi sotto). Non c'è uno spartito online: va ricavata
-   dall'audio e Salvo la conferma a orecchio.
-
-Approvati da Salvo: la sala spenta all'arrivo che si accende risolvendo, la pressa che sfonda il
+Nessuna. Approvati da Salvo: la sala spenta all'arrivo che si accende risolvendo, la pressa che sfonda il
 pavimento, i cinque macchinari così come sono.
 
 ## Rischi
