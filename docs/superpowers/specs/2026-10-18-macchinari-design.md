@@ -3,7 +3,7 @@
 Data: 2026-10-18. Riguarda la sala macchine (`src/scenes/Engine.tsx`) e segue il capitolo
 «discesa alla sala macchine» (`2026-10-18-sala-macchine-design.md`).
 
-**Stato: approvato da Salvo, tranne la melodia dell'organo che è ancora da scegliere.**
+**Stato: approvato da Salvo. Melodia scelta, trascrizione ancora da fare.**
 
 ## Perché
 
@@ -196,8 +196,10 @@ Tirando una catena il fischio suona finché la si tiene: tocco breve, nota breve
   e la differenza tra breve e lunga. Un errore fa uscire uno sbuffo stonato e si ricomincia da capo.
   La melodia è lunga circa 14–16 note.
 
-**La melodia la sceglie Salvo**, da un gioco di nicchia che gli piace (vedi le domande aperte).
-Riconoscerla non serve per risolvere, è il premio.
+**La melodia (scelta da Salvo)** è **«Genesis Retake Light»** di Ridiculon, dalla colonna sonora
+di The Binding of Isaac: Repentance (la musica della schermata del titolo). Va ridotta a una frase
+riconoscibile di circa 14–16 note, con al massimo sei note diverse, una per fischio. Riconoscerla
+non serve per risolvere, è il premio, e richiama The Lost dell'isola.
 
 Suonata giusta, l'organo ripete la melodia da solo, intera, e sotto la tastiera si sgancia un
 fermo.
@@ -313,10 +315,8 @@ Volare davanti a una macchina non è una scena: si può tornare indietro quando 
 
 ## Domande aperte per Salvo
 
-1. La melodia dell'organo. Salvo non vuole il Centro Pokémon ma qualcosa di un gioco più di
-   nicchia che gli piace. Da scegliere tra i giochi già nel puzzle (The Binding of Isaac, Hollow
-   Knight, Animal Well, Death's Door, Blasphemous...). Vincolo: al massimo sei note diverse, una per
-   fischio, in circa 14–16 note.
+1. La trascrizione della melodia (vedi sotto). Non c'è uno spartito online: va ricavata
+   dall'audio e Salvo la conferma a orecchio.
 
 Approvati da Salvo: la sala spenta all'arrivo che si accende risolvendo, la pressa che sfonda il
 pavimento, i cinque macchinari così come sono.
