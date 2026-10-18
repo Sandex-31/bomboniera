@@ -3,7 +3,7 @@
 Data: 2026-10-18. Riguarda la sala macchine (`src/scenes/Engine.tsx`) e segue il capitolo
 «discesa alla sala macchine» (`2026-10-18-sala-macchine-design.md`).
 
-**Stato: proposta, da approvare con Salvo prima del piano di lavoro.**
+**Stato: approvato da Salvo, tranne la melodia dell'organo che è ancora da scegliere.**
 
 ## Perché
 
@@ -196,9 +196,8 @@ Tirando una catena il fischio suona finché la si tiene: tocco breve, nota breve
   e la differenza tra breve e lunga. Un errore fa uscire uno sbuffo stonato e si ricomincia da capo.
   La melodia è lunga circa 14–16 note.
 
-**La melodia la sceglie Salvo.** *Proposta mia:* una melodia di un videogioco che si riconosce
-appena suonata, nello spirito delle frasi di Babele: per esempio il jingle del Centro Pokémon,
-visto che il piano è di Rotom. Riconoscerla non serve per risolvere, è il premio.
+**La melodia la sceglie Salvo**, da un gioco di nicchia che gli piace (vedi le domande aperte).
+Riconoscerla non serve per risolvere, è il premio.
 
 Suonata giusta, l'organo ripete la melodia da solo, intera, e sotto la tastiera si sgancia un
 fermo.
@@ -314,10 +313,13 @@ Volare davanti a una macchina non è una scena: si può tornare indietro quando 
 
 ## Domande aperte per Salvo
 
-1. La melodia dell'organo (proposta: il jingle del Centro Pokémon).
-2. Va bene che la sala all'arrivo sia **spenta** e si accenda risolvendo?
-3. Va bene che il quarto piano (l'università) si apra con una **pressa che sfonda il pavimento**?
-4. C'è un macchinario che vuoi in più o in meno rispetto ai cinque proposti?
+1. La melodia dell'organo. Salvo non vuole il Centro Pokémon ma qualcosa di un gioco più di
+   nicchia che gli piace. Da scegliere tra i giochi già nel puzzle (The Binding of Isaac, Hollow
+   Knight, Animal Well, Death's Door, Blasphemous...). Vincolo: al massimo sei note diverse, una per
+   fischio, in circa 14–16 note.
+
+Approvati da Salvo: la sala spenta all'arrivo che si accende risolvendo, la pressa che sfonda il
+pavimento, i cinque macchinari così come sono.
 
 ## Rischi
 
