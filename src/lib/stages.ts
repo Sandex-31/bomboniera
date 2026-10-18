@@ -10,8 +10,14 @@
  */
 import {
   BEAM_KEY,
+  BOILERS_KEY,
   FLOOR_KEY,
   CHAT_KEY,
+  GEARS_KEY,
+  HOIST_KEY,
+  ORGAN_KEY,
+  PIPES_KEY,
+  PRESS_KEY,
   DEPTH_KEY,
   HACK_KEY,
   LANG_KEY,
@@ -35,6 +41,12 @@ import { STATIONS } from "./ski";
 import { SLOTS, solvedTape } from "./tape";
 import { LOCK_CODE } from "./sagome";
 import { PHRASES } from "../data/babel";
+import { solvedBoilers } from "./boilers";
+import { solvedPipes } from "./pipes";
+import { solvedGears } from "./gears";
+import { solvedHoist } from "./hoist";
+import { solvedOrgan } from "./card";
+import { solvedPress } from "./press";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
 function levers(): boolean[] {
@@ -85,6 +97,12 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "sarcofago", key: LANG_KEY, solved: () => [0, 1, 2, 3, 4, 5] },
   { label: "titoli", key: TITLES_KEY, solved: () => PHRASES.map((p) => p.titles[0]) },
   { label: "terzo piano", key: FLOOR_KEY, solved: () => "2" },
+  { label: "caldaie", key: BOILERS_KEY, solved: solvedBoilers },
+  { label: "tubi", key: PIPES_KEY, solved: solvedPipes },
+  { label: "ingranaggi", key: GEARS_KEY, solved: solvedGears },
+  { label: "montacarichi", key: HOIST_KEY, solved: solvedHoist },
+  { label: "organo", key: ORGAN_KEY, solved: solvedOrgan },
+  { label: "pressa", key: PRESS_KEY, solved: solvedPress },
 ];
 
 /**

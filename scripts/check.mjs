@@ -1004,6 +1004,23 @@ try {
     // and the way back down from Babel is open, not a sarcophagus still to fill
     const { titlesDone } = await vite5.ssrLoadModule("/src/data/babel.ts");
     assert.ok(titlesDone(read(puzzle.TITLES_KEY)), "the jump leaves the sarcophagus shut");
+    // and the machines of the third floor are as their stops left them
+    const { boilersFrom, solvedBoilers } = await vite5.ssrLoadModule("/src/lib/boilers.ts");
+    assert.deepEqual(boilersFrom(store.get(puzzle.BOILERS_KEY)), solvedBoilers(), "the jump leaves a boiler cold");
+    const pipes = await vite5.ssrLoadModule("/src/lib/pipes.ts");
+    const lit = { tondo: true, triangolo: true, quadrato: true };
+    assert.ok(pipes.solved(pipes.flow(pipes.pipesFrom(store.get(puzzle.PIPES_KEY)), lit)), "the jump leaves the pipes wrong");
+    const gears = await vite5.ssrLoadModule("/src/lib/gears.ts");
+    const board = gears.spin(gears.gearsFrom(store.get(puzzle.GEARS_KEY)), true);
+    assert.ok(Object.values(board.shafts).every((v) => v === "ok"), "the jump leaves the gears wrong");
+    const hoist = await vite5.ssrLoadModule("/src/lib/hoist.ts");
+    const hung = hoist.hoistFrom(store.get(puzzle.HOIST_KEY));
+    assert.ok(hoist.tilt(hung) === 0 && hung.piece, "the jump leaves the hoist down");
+    const card = await vite5.ssrLoadModule("/src/lib/card.ts");
+    const organ = card.organFrom(store.get(puzzle.ORGAN_KEY));
+    assert.ok(card.assembled(organ.lectern) && organ.played, "the jump leaves the organ unplayed");
+    const thePress = await vite5.ssrLoadModule("/src/lib/press.ts");
+    assert.ok(thePress.pressFrom(store.get(puzzle.PRESS_KEY)).pulled, "the jump leaves the press up");
 
     // the floor the visitor is on: whatever is stored, it lands on a real floor
     assert.equal(puzzle.floorFrom(null), 0, "never been down is the island");
@@ -1231,10 +1248,10 @@ try {
  */
 {
   const { readFileSync } = await import("node:fs");
-  for (const file of ["src/scenes/Puzzle.tsx", "src/scenes/Babel.tsx"]) {
+  for (const file of ["src/scenes/Puzzle.tsx", "src/scenes/Babel.tsx", "src/scenes/Engine.tsx"]) {
     const src = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
     const controls = src.match(/<OrbitControls\s[\s\S]*?\/>/)?.[0] ?? "";
-    assert.match(controls, /enabled=\{!flying && !scene\}/, `${file}: the camera can be turned during a scene`);
+    assert.match(controls, /enabled=\{!flying && !scene( && [^}]+)?\}/, `${file}: the camera can be turned during a scene`);
   }
   console.log("ok — no floor lets the camera turn during a scene");
 }
@@ -1449,4 +1466,351 @@ try {
   } finally {
     await vite12.close();
   }
+}
+
+/* ---------------------------------------------------------- the machine room
+ * The third floor: five machines worked by hand, each with its rules in a
+ * module of its own. What makes each one hard is checked here, not trusted.
+ */
+{
+  const vite13 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    /* the boilers: one damper position per boiler lets the needle be caught
+       in the green, and the smoke is what tells the three positions apart */
+    const b = await vite13.ssrLoadModule("/src/lib/boilers.ts");
+    assert.equal(new Set(b.RIGHT_DAMPERS).size, 3, "two boilers want the same damper");
+    const catchable = (d, right) =>
+      Array.from({ length: 8000 }, (_, ms) => b.rise(d, right, ms)).some((n) => b.release(n) === "lit");
+    for (const right of b.RIGHT_DAMPERS) {
+      for (const d of [0, 1, 2]) {
+        assert.equal(catchable(d, right), d === right, `damper ${d} on a boiler wanting ${right}`);
+      }
+      assert.deepEqual(
+        new Set([0, 1, 2].filter((d) => d !== right).map((d) => b.smoke(d, right))).has("grigio"),
+        false,
+        "a wrong damper smokes like the right one",
+      );
+      assert.equal(b.smoke(right, right), "grigio");
+      // the green lasts long enough for a thumb, with the right damper
+      const inGreen = Array.from({ length: 8000 }, (_, ms) => b.rise(right, right, ms)).filter(
+        (n) => b.release(n) === "lit",
+      ).length;
+      assert.ok(inGreen >= 600, `the green lasts only ${inGreen} ms`);
+      // and held on, it ends in the red
+      assert.equal(b.release(b.rise(right, right, 8000)), "spat", "pumping on never blows");
+    }
+    assert.notEqual(b.smoke(2, 0), b.smoke(0, 2), "too little and too much air smoke the same");
+    assert.equal(b.release(0), "out");
+    assert.deepEqual(b.boilersFrom(null), b.COLD);
+    for (const bad of ["x", "{}", '{"lit":[true],"dampers":[0,0,0],"doors":[1,0,0],"drawer":false,"piece":false}'])
+      assert.deepEqual(b.boilersFrom(bad), b.COLD, `${bad} is not a boiler room`);
+    assert.equal(
+      b.boilersFrom(JSON.stringify({ ...b.COLD, piece: true })).piece,
+      false,
+      "a piece out of a drawer never opened",
+    );
+    const lit = b.boilersFrom(JSON.stringify(b.solvedBoilers()));
+    assert.deepEqual(b.steamOf(lit), { tondo: true, triangolo: true, quadrato: true });
+    assert.deepEqual(b.steamOf(b.COLD), { tondo: false, triangolo: false, quadrato: false });
+    console.log("ok — the boilers: one damper each, told by the smoke, a green a thumb can catch");
+
+    /* the pipes: one way through and no other. The search grows the three
+       lines out from their inlets, deciding each piece only when steam gets
+       to it, so pieces off the way are never counted twice. */
+    const p = await vite13.ssrLoadModule("/src/lib/pipes.ts");
+    const all = { tondo: true, triangolo: true, quadrato: true };
+    const ways = (() => {
+      const st = { turns: [...p.START.turns], switches: [...p.START.switches], valves: [...p.START.valves] };
+      const outletAt = new Map(Object.entries(p.OUTLETS).map(([o, r]) => [r, o]));
+      const inletAt = new Map(Object.entries(p.INLETS).map(([l, r]) => [r, l]));
+      const step = { [p.N]: [0, -1], [p.E]: [1, 0], [p.S]: [0, 1], [p.WEST]: [-1, 0] };
+      const found = [];
+      const options = (x, y) => {
+        const piece = p.GRID[y][x];
+        const i = y * p.W + x;
+        if (piece.kind === "rot") {
+          const seen = new Set();
+          return [0, 1, 2, 3].filter((k) => {
+            const m = p.turn(p.BASE[piece.shape], k);
+            return !seen.has(m) && seen.add(m);
+          }).map((k) => () => (st.turns[i] = k));
+        }
+        if (piece.kind === "switch") {
+          const s = p.SWITCHES.indexOf(i);
+          return [true, false].map((v) => () => (st.switches[s] = v));
+        }
+        if (piece.kind === "valve") {
+          const v = p.VALVES.indexOf(i);
+          return [true, false].map((o) => () => (st.valves[v] = o));
+        }
+        return [() => {}];
+      };
+      const key = (x, y, entry) =>
+        p.GRID[y][x].kind === "bridge" ? `${x},${y},${entry === p.N || entry === p.S ? "|" : "-"}` : `${x},${y}`;
+      const run = (queue, decided, owner, reached) => {
+        while (queue.length) {
+          const [x, y, entry, line] = queue.pop();
+          if (x < 0) {
+            if (inletAt.get(y) !== line) return;
+            continue;
+          }
+          if (x >= p.W) {
+            const out = outletAt.get(y);
+            if (!out) return;
+            reached[line].add(out);
+            continue;
+          }
+          if (y < 0 || y >= p.H || !p.GRID[y][x]) return;
+          const cell = `${x},${y}`;
+          if (!decided.has(cell)) {
+            for (const choose of options(x, y)) {
+              choose();
+              run(
+                [...queue, [x, y, entry, line]],
+                new Set([...decided, cell]),
+                new Map(owner),
+                Object.fromEntries(Object.entries(reached).map(([l, r]) => [l, new Set(r)])),
+              );
+            }
+            return;
+          }
+          const next = p.through(st, x, y, entry);
+          if (next === "leak") return;
+          const k = key(x, y, entry);
+          if (owner.has(k)) {
+            if (owner.get(k) !== line) return;
+            continue;
+          }
+          owner.set(k, line);
+          if (next === "sealed") continue;
+          for (const d of next) queue.push([x + step[d][0], y + step[d][1], p.opposite(d), line]);
+        }
+        if (Object.entries(reached).every(([l, r]) => r.size === 1 && r.has(l))) {
+          found.push(
+            [...decided].sort().map((c) => {
+              const [x, y] = c.split(",").map(Number);
+              const i = y * p.W + x;
+              return `${c}:${p.sidesOf(st, x, y)}:${st.switches[p.SWITCHES.indexOf(i)] ?? ""}:${st.valves[p.VALVES.indexOf(i)] ?? ""}`;
+            }).join(" "),
+          );
+        }
+      };
+      run(
+        Object.entries(p.INLETS).map(([l, r]) => [0, r, p.WEST, l]),
+        new Set(),
+        new Map(),
+        { tondo: new Set(), triangolo: new Set(), quadrato: new Set() },
+      );
+      return new Set(found);
+    })();
+    assert.equal(ways.size, 1, `the pipes have ${ways.size} ways through, not one`);
+    const right = p.solvedPipes();
+    assert.ok(p.solved(p.flow(right, all)), "the stored way through is not one");
+    assert.deepEqual(p.flow(right, all).leaks, [], "the way through leaks");
+    assert.ok(!p.solved(p.flow(p.START, all)), "the panel comes solved");
+    right.switches.forEach((_, k) => {
+      const wrong = { ...right, switches: right.switches.map((v, j) => (j === k ? !v : v)) };
+      assert.ok(!p.solved(p.flow(wrong, all)), `switch ${k} does not matter`);
+    });
+    right.valves.forEach((_, k) => {
+      const wrong = { ...right, valves: right.valves.map((v, j) => (j === k ? !v : v)) };
+      assert.ok(!p.solved(p.flow(wrong, all)), `valve ${k} does not matter`);
+    });
+    assert.ok(right.valves.includes(true) && right.valves.includes(false), "every valve is shut, or every one open");
+    // a valve opened onto a dead end leaks; two lines run together mix
+    const open = { ...right, valves: right.valves.map(() => true) };
+    assert.ok(p.flow(open, all).leaks.length > 0, "an open dead end does not leak");
+    const crossed = { ...right, switches: right.switches.map((v, j) => (j === 0 ? !v : v)) };
+    assert.ok(Object.values(p.flow(crossed, all).outlets).some((o) => o !== "ok"), "a wrong lever goes unnoticed");
+    // a cold boiler sends nothing, and its outlet is dead even with the way right
+    assert.equal(p.flow(right, { ...all, tondo: false }).outlets.tondo, "none");
+    assert.equal(p.flow(right, { ...all, tondo: false }).outlets.triangolo, "ok");
+    assert.deepEqual(p.pipesFrom(null), p.START);
+    for (const bad of ["x", "{}", JSON.stringify({ ...right, turns: [9] })]) assert.deepEqual(p.pipesFrom(bad), p.START);
+    assert.deepEqual(p.pipesFrom(JSON.stringify(right)), right);
+    const turnable = p.GRID.flat().filter((q) => q?.kind === "rot").length;
+    console.log(
+      `ok — the pipes: ${turnable} pieces to turn, ${p.SWITCHES.length} switches, ${p.VALVES.length} valves, one way through`,
+    );
+
+    /* the gears: every way the rack can be put on the pegs, and only one
+       that turns all three shafts as their plates ask */
+    const g = await vite13.ssrLoadModule("/src/lib/gears.ts");
+    const boards = [];
+    const counts = { 1: 0, 2: 0, 3: 0 };
+    const stock = { 1: 0, 2: 0, 3: 0 };
+    g.RACK.forEach((r) => stock[r]++);
+    const pegs = g.PEGS.map((_, i) => i).filter((i) => i !== g.MOTOR.peg);
+    const place = (i, state) => {
+      if (i === pegs.length) {
+        const sp = g.spin(state, true);
+        if (Object.values(sp.shafts).every((v) => v === "ok")) boards.push(state);
+        return;
+      }
+      place(i + 1, state);
+      for (const size of [1, 2, 3]) {
+        if (counts[size] >= stock[size] || !g.fits(state, pegs[i], size)) continue;
+        // which rack gear of that size goes there does not matter
+        const gear = g.RACK.findIndex((r, k) => r === size && !Object.values(state.placed).includes(k));
+        counts[size]++;
+        place(i + 1, { ...state, placed: { ...state.placed, [pegs[i]]: gear } });
+        counts[size]--;
+      }
+    };
+    place(0, g.EMPTY);
+    assert.equal(boards.length, 1, `the gears turn right ${boards.length} ways, not one`);
+    const geared = g.solvedGears();
+    assert.ok(Object.values(g.spin(geared, true).shafts).every((v) => v === "ok"), "the stored board does not turn right");
+    const used = Object.keys(geared.placed).length;
+    assert.ok(used >= 6, `only ${used} gears to place`);
+    assert.ok(used < g.RACK.length, "no spare gear to mislead");
+    assert.ok(Object.values(geared.placed).includes(g.PIECE_BEHIND), "the piece behind the rack is never uncovered");
+    assert.deepEqual(new Set(g.SHAFTS.map((s) => s.pace)).size, 2, "every plate asks the same pace");
+    assert.deepEqual(new Set(g.SHAFTS.map((s) => s.dir)).size, 2, "every plate turns the same way");
+    // with no steam nothing turns; take one gear out and its shaft stops
+    assert.ok(Object.values(g.spin(geared, false).shafts).every((v) => v === "still"));
+    const [firstPeg] = Object.keys(geared.placed);
+    const fewer = { ...geared, placed: Object.fromEntries(Object.entries(geared.placed).filter(([k]) => k !== firstPeg)) };
+    assert.ok(Object.values(g.spin(fewer, true).shafts).some((v) => v !== "ok"), "a gear more or less changes nothing");
+    assert.deepEqual(g.gearsFrom(JSON.stringify(geared)), geared);
+    assert.deepEqual(g.gearsFrom(null), g.EMPTY);
+    for (const bad of ["x", "{}", '{"placed":{"0":0,"2":0},"piece":false}', '{"placed":{"0":0,"2":6},"piece":false}'])
+      assert.deepEqual(g.gearsFrom(bad), g.EMPTY, `${bad} is not a board that can be built`);
+    console.log(`ok — the gears: ${g.PEGS.length} pegs, ${g.RACK.length} in the rack, ${used} to place, one way to turn all three`);
+
+    /* the hoist: one way to level the beam, and the scale enough to find it */
+    const h = await vite13.ssrLoadModule("/src/lib/hoist.ts");
+    const w = h.weightsForTest();
+    const things = [...h.OBJECTS];
+    const levels = [];
+    let settings = 0;
+    const hang = (i, used, where) => {
+      if (i === things.length) {
+        settings++;
+        if (h.tilt({ ...h.START, where }) === 0) levels.push({ ...where });
+        return;
+      }
+      hang(i + 1, used, { ...where, [things[i]]: "posto" });
+      for (let k = 1; k <= h.NOTCHES; k++) {
+        if (!used.has(k)) hang(i + 1, new Set([...used, k]), { ...where, [things[i]]: k });
+      }
+    };
+    hang(0, new Set(), {});
+    assert.equal(levels.length, 1, `the beam levels ${levels.length} ways`);
+    assert.deepEqual(levels[0], h.solvedHoist().where, "the stored way does not level the beam");
+    const hung = things.filter((t) => typeof levels[0][t] === "number");
+    assert.ok(hung.length >= 3, "the beam levels with fewer than three things");
+    const heaviestOut = [...hung].sort((a, b) => w[b] - w[a]);
+    assert.ok(
+      !heaviestOut.every((t, k) => k === 0 || levels[0][t] < levels[0][heaviestOut[k - 1]]),
+      "the answer is just the heaviest the furthest out",
+    );
+    // what the scale can show: one or two things a pan, which side goes down
+    const singles = things.map((_, i) => [i]);
+    const pairs = things.flatMap((_, i) => things.map((_, j) => (i < j ? [i, j] : null)).filter(Boolean));
+    const loads = [...singles, ...pairs];
+    const shown = (ws) =>
+      loads.flatMap((a) =>
+        loads
+          .filter((b) => !b.some((x) => a.includes(x)))
+          .map((b) => Math.sign(b.reduce((s, x) => s + ws[x], 0) - a.reduce((s, x) => s + ws[x], 0))),
+      );
+    const truth = shown(things.map((t) => w[t]));
+    const alike = [];
+    const pick = (ws) => {
+      if (ws.length === things.length) {
+        if (shown(ws).every((v, k) => v === truth[k])) alike.push(ws);
+        return;
+      }
+      for (let v = 1; v <= 12; v++) if (!ws.includes(v)) pick([...ws, v]);
+    };
+    pick([]);
+    assert.equal(alike.length, 1, `${alike.length} sets of weights look the same on the scale`);
+    // the scale and the beam read the same weights
+    const scale = { ...h.START, where: { ...h.START.where, palla: "sinistra", ruota: "destra", secchio: "destra" } };
+    assert.equal(h.weigh(scale), 0, "six is not two and four on the scale");
+    assert.equal(h.canPut({ ...h.START, where: { ...h.START.where, palla: 2 } }, "ruota", 2), false, "two things on one notch");
+    assert.deepEqual(h.hoistFrom(JSON.stringify(h.solvedHoist())), h.solvedHoist());
+    assert.deepEqual(h.hoistFrom(null), h.START);
+    for (const bad of ["x", "{}", JSON.stringify({ ...h.START, where: { ...h.START.where, palla: 1, ruota: 1 } })])
+      assert.deepEqual(h.hoistFrom(bad), h.START, `${bad} is not a hoist`);
+    console.log(`ok — the hoist: ${settings} settings of the beam, one level, and the scale enough to find it`);
+
+    /* the punched card: it carries the tune, and goes back together one way */
+    const c = await vite13.ssrLoadModule("/src/lib/card.ts");
+    const read = Array.from({ length: c.COLS }, (_, col) => {
+      const row = c.CARD.findIndex((r) => r[col] !== null);
+      return { note: row, long: c.CARD[row][col] === "fessura" };
+    });
+    assert.deepEqual(read, c.MELODY, "the card does not carry the tune");
+    assert.equal(new Set(c.MELODY.map((m) => m.note)).size, c.ROWS, "a whistle is never played");
+    assert.ok(c.CARD.every((row) => row.length === c.COLS) && c.CARD.flat().filter(Boolean).length === c.COLS);
+    const layings = [];
+    const orders = [["A", "B", "C"], ["A", "C", "B"], ["B", "A", "C"], ["B", "C", "A"], ["C", "A", "B"], ["C", "B", "A"]];
+    for (const order of orders) {
+      for (let f = 0; f < 64; f++) {
+        const lectern = order.map((piece, s) => ({ piece, flipH: Boolean((f >> (2 * s)) & 1), flipV: Boolean((f >> (2 * s + 1)) & 1) }));
+        if (c.assembled(lectern)) layings.push(lectern);
+      }
+    }
+    assert.equal(layings.length, 1, `the card goes together ${layings.length} ways`);
+    assert.deepEqual(layings[0], c.solvedOrgan().lectern, "the card goes together some other way");
+    assert.ok(!c.assembled([null, null, null]) && !c.assembled(c.solvedOrgan().lectern.slice(0, 2).concat([null])));
+    // the edges alone do not decide it, nor the pins alone: both are needed
+    const flipAll = ["C", "B", "A"].map((piece) => ({ piece, flipH: true, flipV: false }));
+    assert.ok(!c.assembled(flipAll), "the card read back to front still goes together");
+    // the tune, pulled: short and long count, the rhythm between does not
+    const pull = (notes) => notes.reduce((done, { note, long }) => c.step(done, note, long ? 900 : 150), 0);
+    assert.equal(pull(c.MELODY), c.MELODY.length, "the tune itself is refused");
+    assert.notEqual(pull(c.MELODY.map((m, k) => (k === 2 ? { ...m, long: false } : m))), c.MELODY.length, "a short pull where a long one goes");
+    assert.equal(c.step(5, c.MELODY[0].note, 100), 1, "a wrong note that starts the tune afresh is not counted");
+    assert.equal(c.step(5, 2, 100), 0);
+    assert.deepEqual(c.organFrom(JSON.stringify(c.solvedOrgan())), c.solvedOrgan());
+    assert.deepEqual(c.organFrom(null), c.EMPTY);
+    for (const bad of ["x", "{}", JSON.stringify({ lectern: [{ piece: "A", flipH: false, flipV: false }, { piece: "A", flipH: false, flipV: false }, null], played: false })])
+      assert.deepEqual(c.organFrom(bad), c.EMPTY, `${bad} is not an organ`);
+    console.log(`ok — the card: ${c.MELODY.length} notes on ${c.ROWS} whistles, ${orders.length * 64} ways to lay it, one right`);
+
+    /* the press: three latches, all needed; a finale that ends in the hole */
+    const pr = await vite13.ssrLoadModule("/src/lib/press.ts");
+    assert.ok(pr.free({ quadrato: true, volano: true, organo: true }));
+    for (const k of ["quadrato", "volano", "organo"])
+      assert.ok(!pr.free({ quadrato: true, volano: true, organo: true, [k]: false }), `the lever comes down without ${k}`);
+    assert.ok(pr.BLOWS.length === 3 && pr.BLOWS.every((b) => b < pr.BREAK_MS) && pr.BREAK_MS < pr.LINE_MS);
+    assert.deepEqual(pr.pressFrom(null), pr.STILL);
+    assert.deepEqual(pr.pressFrom("x"), pr.STILL);
+    assert.deepEqual(pr.pressFrom(JSON.stringify(pr.solvedPress())), pr.solvedPress());
+    const { pressLine, boilerLine, cardLine } = await vite13.ssrLoadModule("/src/data/puzzle.ts");
+    for (const l of [pressLine, boilerLine, cardLine]) assert.ok(l.startsWith("Rotom:"));
+    console.log("ok — the press: three latches, three blows, and the floor gives way");
+  } finally {
+    await vite13.close();
+  }
+}
+
+/* ---------------------------------------------------------- no words, no numbers
+ * The machines of the third floor say nothing in writing: shapes, colours,
+ * movement and sound only. No text between their tags, no text element, no
+ * HTML overlay that could carry some; and an aria-label may name the object,
+ * never what it means.
+ */
+{
+  const { readFileSync, readdirSync } = await import("node:fs");
+  const dir = new URL("../src/scenes/machines/", import.meta.url);
+  const files = readdirSync(dir).filter((f) => f.endsWith(".tsx"));
+  assert.ok(files.length >= 6, "the machines are not where they should be");
+  for (const f of files) {
+    const src = readFileSync(new URL(f, dir), "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/\/\/.*$/gm, "");
+    // text sitting between a tag's end and the next tag
+    const text = [...src.matchAll(/>\s*([^<>{}\n]*[A-Za-zÀ-ÿ0-9][^<>{}\n]*?)\s*<\/?[A-Za-z]/g)]
+      .map((m) => m[1].trim())
+      // a comparison or an arrow in plain code is not a text node
+      .filter((t) => !/^[\s\w.()[\]!?:&|=+\-*/%,'"`]*(=>|&&|\|\||\?|:)/.test(t) && !/^(null|true|false)\)/.test(t));
+    assert.deepEqual(text, [], `${f} writes something: ${text.join(" | ")}`);
+    assert.ok(!/<Text\b|<Text3D\b|<Html\b/.test(src), `${f} has a text element or an HTML overlay`);
+    assert.ok(!/aria-label/.test(src), `${f} labels something in words`);
+  }
+  console.log(`ok — the ${files.length} machine files write nothing`);
 }
