@@ -1010,6 +1010,9 @@ try {
     const pipes = await vite5.ssrLoadModule("/src/lib/pipes.ts");
     const lit = { tondo: true, triangolo: true, quadrato: true };
     assert.ok(pipes.solved(pipes.flow(pipes.pipesFrom(store.get(puzzle.PIPES_KEY)), lit)), "the jump leaves the pipes wrong");
+    const gears = await vite5.ssrLoadModule("/src/lib/gears.ts");
+    const board = gears.spin(gears.gearsFrom(store.get(puzzle.GEARS_KEY)), true);
+    assert.ok(Object.values(board.shafts).every((v) => v === "ok"), "the jump leaves the gears wrong");
 
     // the floor the visitor is on: whatever is stored, it lands on a real floor
     assert.equal(puzzle.floorFrom(null), 0, "never been down is the island");
@@ -1621,6 +1624,51 @@ try {
     console.log(
       `ok — the pipes: ${turnable} pieces to turn, ${p.SWITCHES.length} switches, ${p.VALVES.length} valves, one way through`,
     );
+
+    /* the gears: every way the rack can be put on the pegs, and only one
+       that turns all three shafts as their plates ask */
+    const g = await vite13.ssrLoadModule("/src/lib/gears.ts");
+    const boards = [];
+    const counts = { 1: 0, 2: 0, 3: 0 };
+    const stock = { 1: 0, 2: 0, 3: 0 };
+    g.RACK.forEach((r) => stock[r]++);
+    const pegs = g.PEGS.map((_, i) => i).filter((i) => i !== g.MOTOR.peg);
+    const place = (i, state) => {
+      if (i === pegs.length) {
+        const sp = g.spin(state, true);
+        if (Object.values(sp.shafts).every((v) => v === "ok")) boards.push(state);
+        return;
+      }
+      place(i + 1, state);
+      for (const size of [1, 2, 3]) {
+        if (counts[size] >= stock[size] || !g.fits(state, pegs[i], size)) continue;
+        // which rack gear of that size goes there does not matter
+        const gear = g.RACK.findIndex((r, k) => r === size && !Object.values(state.placed).includes(k));
+        counts[size]++;
+        place(i + 1, { ...state, placed: { ...state.placed, [pegs[i]]: gear } });
+        counts[size]--;
+      }
+    };
+    place(0, g.EMPTY);
+    assert.equal(boards.length, 1, `the gears turn right ${boards.length} ways, not one`);
+    const geared = g.solvedGears();
+    assert.ok(Object.values(g.spin(geared, true).shafts).every((v) => v === "ok"), "the stored board does not turn right");
+    const used = Object.keys(geared.placed).length;
+    assert.ok(used >= 6, `only ${used} gears to place`);
+    assert.ok(used < g.RACK.length, "no spare gear to mislead");
+    assert.ok(Object.values(geared.placed).includes(g.PIECE_BEHIND), "the piece behind the rack is never uncovered");
+    assert.deepEqual(new Set(g.SHAFTS.map((s) => s.pace)).size, 2, "every plate asks the same pace");
+    assert.deepEqual(new Set(g.SHAFTS.map((s) => s.dir)).size, 2, "every plate turns the same way");
+    // with no steam nothing turns; take one gear out and its shaft stops
+    assert.ok(Object.values(g.spin(geared, false).shafts).every((v) => v === "still"));
+    const [firstPeg] = Object.keys(geared.placed);
+    const fewer = { ...geared, placed: Object.fromEntries(Object.entries(geared.placed).filter(([k]) => k !== firstPeg)) };
+    assert.ok(Object.values(g.spin(fewer, true).shafts).some((v) => v !== "ok"), "a gear more or less changes nothing");
+    assert.deepEqual(g.gearsFrom(JSON.stringify(geared)), geared);
+    assert.deepEqual(g.gearsFrom(null), g.EMPTY);
+    for (const bad of ["x", "{}", '{"placed":{"0":0,"2":0},"piece":false}', '{"placed":{"0":0,"2":6},"piece":false}'])
+      assert.deepEqual(g.gearsFrom(bad), g.EMPTY, `${bad} is not a board that can be built`);
+    console.log(`ok — the gears: ${g.PEGS.length} pegs, ${g.RACK.length} in the rack, ${used} to place, one way to turn all three`);
   } finally {
     await vite13.close();
   }

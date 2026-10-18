@@ -85,7 +85,13 @@ function Stamp({ shape }: { shape: Shape }) {
   return (
     <mesh>
       <shapeGeometry args={[geometry]} />
-      <meshStandardMaterial color="#D9A66A" emissive="#D9A66A" emissiveIntensity={0.35} metalness={0.6} roughness={0.35} />
+      <meshStandardMaterial
+        color="#D9A66A"
+        emissive="#D9A66A"
+        emissiveIntensity={0.35}
+        metalness={0.6}
+        roughness={0.35}
+      />
     </mesh>
   );
 }

@@ -1,6 +1,7 @@
 import { useRef, type ReactNode } from "react";
+import { useTap } from "../Hotspot";
 import { useFrame } from "@react-three/fiber";
-import type { Group } from "three";
+import type { Group, Intersection, Object3D } from "three";
 import type { View } from "../focus";
 
 /*
@@ -35,7 +36,7 @@ export const SPOTS: Record<Exclude<MachineId, "press">, { a: number; y: number; 
   // boilers on the screen instead of in front of the middle one
   boilers: { a: FAR, y: 0.3, zoom: 1.45, polar: 0.85 },
   pipes: { a: FAR + 1.75, y: 1, zoom: 4.3, polar: 1.5 },
-  gears: { a: FAR - 1.75, y: 1, zoom: 2.6, polar: 1.1 },
+  gears: { a: FAR - 1.75, y: 0.95, zoom: 3.9, polar: 1.5 },
   hoist: { a: FAR + Math.PI - 0.6, y: 0.9, zoom: 2.3, polar: 1.1 },
   organ: { a: FAR + Math.PI + 0.6, y: 1, zoom: 2.3, polar: 1.1 },
 };
@@ -88,4 +89,32 @@ export function FarSide({ a, children }: { a: number; children: ReactNode }) {
     group.current.visible = Math.cos(a - towards) < 0.25;
   });
   return <group ref={group}>{children}</group>;
+}
+
+/**
+ * Only what can be seen takes a tap. Three's raycaster tests objects whether
+ * they are drawn or not, and `FarSide` hides things by not drawing them: left
+ * alone, a panel hidden behind the camera would catch every tap meant for the
+ * machine in front of it.
+ */
+export function onlySeen(hits: Intersection[]): Intersection[] {
+  const seen = (o: Object3D | null): boolean => !o || (o.visible && seen(o.parent));
+  return hits.filter((h) => seen(h.object));
+}
+
+/**
+ * Seen from across the hall, a machine on the side wall shows only its edge.
+ * This is a box out in front of it, as wide and high as the machine and
+ * reaching well into the hall, so a tap anywhere near it walks up to it. It
+ * is only there while the machine is not being worked, or it would swallow
+ * every tap meant for its pieces.
+ */
+export function Approach({ w, h, onPick }: { w: number; h: number; onPick: () => void }) {
+  const tap = useTap(onPick);
+  return (
+    <mesh position={[0, 0, 0.45]} {...tap}>
+      <boxGeometry args={[w, h, 0.9]} />
+      <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+    </mesh>
+  );
 }

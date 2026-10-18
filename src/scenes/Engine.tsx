@@ -1,5 +1,5 @@
 import { Suspense, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, events, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
@@ -20,9 +20,11 @@ import Keeper from "./Keeper";
 import CardPieces, { type PieceId } from "../components/CardPieces";
 import Boilers, { BOILER_ANGLES, doorAt } from "./machines/Boilers";
 import Pipes from "./machines/Pipes";
-import { BOILERS_KEY, PIPES_KEY, boilerLine } from "../data/puzzle";
+import Gears from "./machines/Gears";
+import { BOILERS_KEY, GEARS_KEY, PIPES_KEY, boilerLine } from "../data/puzzle";
 import { loadBoilers, steamOf, type BoilerState } from "../lib/boilers";
 import { flow as steamFlow, loadPipes, type PipesState } from "../lib/pipes";
+import { loadGears, spin as spinGears, type GearsState } from "../lib/gears";
 import { FLIGHT, type View } from "./focus";
 import { BURN_MS, moveMs, type Move } from "../lib/descent";
 import {
@@ -37,6 +39,7 @@ import {
   SPOTS,
   WALL_H,
   facing,
+  onlySeen,
   onWall,
   type MachineId,
 } from "./machines/hall";
@@ -106,7 +109,9 @@ function waitBy(i: number): [number, number, number] {
  * the camera and the machine.
  */
 function outOfTheWay(a: number): [number, number, number] {
-  return [-Math.sin(a) * 2.25, -0.2, Math.cos(a) * 2.25];
+  // the side away from the boilers, which crowd the shot from the other
+  const side = Math.sin(a - FAR) >= 0 ? 1 : -1;
+  return [-Math.sin(a) * 2.25 * side, -0.2, Math.cos(a) * 2.25 * side];
 }
 
 /** How much light the hall has with no boiler lit, and what each lit one adds. */
@@ -348,6 +353,17 @@ export default function Engine({
     }
   }, [pipes]);
   const steam = useMemo(() => steamFlow(pipes, steamOf(boilers)), [pipes, boilers]);
+  /** The gear board, and how it turns with the round line driving its motor or not. */
+  const [gears, setGears] = useState<GearsState>(loadGears);
+  useEffect(() => {
+    try {
+      localStorage.setItem(GEARS_KEY, JSON.stringify(gears));
+    } catch {
+      /* storage unavailable — the gears still turn for this visit */
+    }
+  }, [gears]);
+  const driven = steam.outlets.tondo === "ok";
+  const turning = useMemo(() => spinGears(gears, driven), [gears, driven]);
   /** Which boiler Rotom has been put in, if any. Not kept: a reload finds it in the middle. */
   const [inside, setInside] = useState<number | null>(null);
   /** When Rotom was last blown out of a boiler, black with soot. */
@@ -383,20 +399,29 @@ export default function Engine({
   useEffect(() => onScene(scene), [scene, onScene]);
 
   /** Walking up to a machine, and back to the whole hall. Not during a scene. */
+  /**
+   * When the camera last set off towards a machine. The tap that sent it
+   * there ends in a click, and by then what was tapped may be gone from under
+   * the finger (a machine's approach pad goes once it is being worked): that
+   * click must not count as a tap on nothing, which would send it back.
+   */
+  const pickedAt = useRef(-Infinity);
   const pick = (id: MachineId) => {
     if (scene) return;
+    pickedAt.current = performance.now();
     setFocus(id);
     setView(VIEWS[id]);
   };
   const pickBoiler = (i: number) => {
     if (scene) return;
+    pickedAt.current = performance.now();
     setFocus("boilers");
     setWhich(i);
     setInside(null);
     setView(BOILER_VIEWS[i]);
   };
   const back = () => {
-    if (scene || focus === null) return;
+    if (scene || focus === null || performance.now() - pickedAt.current < 400) return;
     setFocus(null);
     setView(HALL_VIEW);
   };
@@ -483,7 +508,7 @@ export default function Engine({
   };
 
   /** The pieces of the punched card in the visitor's pocket. */
-  const found: PieceId[] = boilers.piece ? ["A"] : [];
+  const found: PieceId[] = [...(boilers.piece ? (["A"] as const) : []), ...(gears.piece ? (["B"] as const) : [])];
 
   return (
     <>
@@ -491,6 +516,7 @@ export default function Engine({
         orthographic
         dpr={[1, 1.75]}
         camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
+        events={(store) => ({ ...events(store), filter: onlySeen })}
         onPointerMissed={back}
         onPointerUp={drop}
       >
@@ -565,7 +591,7 @@ export default function Engine({
         />
         {GEARS.map((g) => (
           <FarSide key={g.a} a={g.a}>
-            <Gear {...g} turning={false} reduced={reduced} />
+            <Gear {...g} turning={driven && !turning.jam} reduced={reduced} />
           </FarSide>
         ))}
         {LEVERS.map((a, k) => (
@@ -597,7 +623,15 @@ export default function Engine({
           onPick={() => pick("pipes")}
           onChange={setPipes}
         />
-        {(["gears", "hoist", "organ"] as const).map((id) => (
+        <Gears
+          state={gears}
+          spin={turning}
+          active={focus === "gears" && !scene}
+          reduced={reduced}
+          onPick={() => pick("gears")}
+          onChange={setGears}
+        />
+        {(["hoist", "organ"] as const).map((id) => (
           <Spot key={id} id={id} onPick={pick} />
         ))}
 
@@ -627,7 +661,7 @@ export default function Engine({
 
         <Carried
           at={at}
-          size={inside !== null && !held ? 0.35 : focus === "boilers" ? 0.5 : 1}
+          size={inside !== null && !held ? 0.35 : focus === "boilers" ? 0.5 : focus && focus !== "press" ? 0.6 : 1}
           instant={!!held || reduced}
         >
           <group {...zap} onPointerDown={(e) => (zap.onPointerDown(e), grab(e))} onPointerMove={drag}>
