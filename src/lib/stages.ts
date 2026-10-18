@@ -10,8 +10,14 @@
  */
 import {
   BEAM_KEY,
+  BOILERS_KEY,
   FLOOR_KEY,
   CHAT_KEY,
+  GEARS_KEY,
+  HOIST_KEY,
+  ORGAN_KEY,
+  PIPES_KEY,
+  PRESS_KEY,
   DEPTH_KEY,
   HACK_KEY,
   LANG_KEY,
@@ -89,9 +95,10 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
 
 /**
  * What the puzzle keeps that is not a stop of its own: which chats have been
- * opened, and how deep the visitor has been. Wiped with the rest.
+ * opened, and how deep the visitor has been. Wiped with the rest. The
+ * machines of the third floor wait here until each has a stop of its own.
  */
-export const WIPED = [CHAT_KEY, DEPTH_KEY];
+export const WIPED = [CHAT_KEY, DEPTH_KEY, BOILERS_KEY, PIPES_KEY, GEARS_KEY, HOIST_KEY, ORGAN_KEY, PRESS_KEY];
 
 /**
  * Wipes the whole chain, then solves the first `upTo` stops of it.

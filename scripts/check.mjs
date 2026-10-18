@@ -1231,7 +1231,7 @@ try {
  */
 {
   const { readFileSync } = await import("node:fs");
-  for (const file of ["src/scenes/Puzzle.tsx", "src/scenes/Babel.tsx"]) {
+  for (const file of ["src/scenes/Puzzle.tsx", "src/scenes/Babel.tsx", "src/scenes/Engine.tsx"]) {
     const src = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
     const controls = src.match(/<OrbitControls\s[\s\S]*?\/>/)?.[0] ?? "";
     assert.match(controls, /enabled=\{!flying && !scene\}/, `${file}: the camera can be turned during a scene`);

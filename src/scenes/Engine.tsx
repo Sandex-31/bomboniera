@@ -1,4 +1,4 @@
-import { Suspense, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -17,27 +17,34 @@ import { useTap } from "./Hotspot";
 import Rotom from "./Rotom";
 import { FLIGHT, type View } from "./focus";
 import { BURN_MS, moveMs, type Move } from "../lib/descent";
+import {
+  BRICK,
+  COPPER,
+  FAR,
+  FIRE,
+  FarSide,
+  HALL_R,
+  IRON,
+  MORTAR,
+  PRESS_VIEW,
+  SPOTS,
+  WALL_H,
+  facing,
+  onWall,
+  type MachineId,
+} from "./machines/hall";
 
 /*
  * The third floor: the machine room, in the terrace below Babel. Dark brick
- * and iron where Babel is warm stone; boilers with their fires lit, copper
- * pipes round the wall, great gears turning, levers and gauges, and steam
- * now and then. All of it scenery for now: the puzzle of this floor comes
- * later, and the middle of the floor is left clear for it.
+ * and iron where Babel is warm stone; boilers, copper pipes round the wall,
+ * great gears, levers and gauges. It is found cold and dark: Heat Rotom is
+ * the only fire left, and the room comes back to life one machine at a time
+ * as the visitor works them. Each machine is walked up to with a tap.
  */
 
-/** How wide the hall is, and how high its wall stands: Babel's, so the camera fits it the same. */
-const HALL_R = 2.4;
-const WALL_H = 1.9;
 /** Where the way down from the sarcophagus comes through the ceiling. */
 const HOLE_Y = 2.55;
 const HOLE_R = 0.3;
-
-const BRICK = "#4A2A22";
-const MORTAR = "#22140F";
-const IRON = "#2E2A28";
-const COPPER = "#B8733A";
-const FIRE = "#FF6A1A";
 
 /** Width the camera fits, as on the other floors, so phones see all of it. */
 const FIT_W = 7;
@@ -59,8 +66,20 @@ const CEILING_VIEW: View = {
   spread: { azimuth: 0.1, polar: 0.05 },
 };
 
-/** Straight across from where the camera first looks: the boilers stand there. */
-const FAR = (-3 * Math.PI) / 4;
+/** Standing in front of each machine. */
+const VIEWS: Record<MachineId, View> = {
+  boilers: facing(SPOTS.boilers.a, SPOTS.boilers.y, SPOTS.boilers.zoom),
+  pipes: facing(SPOTS.pipes.a, SPOTS.pipes.y, SPOTS.pipes.zoom),
+  gears: facing(SPOTS.gears.a, SPOTS.gears.y, SPOTS.gears.zoom),
+  hoist: facing(SPOTS.hoist.a, SPOTS.hoist.y, SPOTS.hoist.zoom),
+  organ: facing(SPOTS.organ.a, SPOTS.organ.y, SPOTS.organ.zoom),
+  press: PRESS_VIEW,
+};
+
+/** How much light the hall has with no boiler lit, and what each lit one adds. */
+const DARK = { ambient: 0.14, hemi: 0.12 };
+const PER_BOILER = { ambient: 0.12, hemi: 0.11 };
+
 const BOILERS = [FAR - 1.1, FAR, FAR + 1.1];
 const GEARS = [
   { a: FAR - 0.55, r: 0.36, y: 1.25, dir: 1 },
@@ -69,32 +88,6 @@ const GEARS = [
 const LEVERS = [FAR - 0.62, FAR - 0.48, FAR + 0.55];
 /** How many arcs the pipes round the hall are cut into, to come and go one at a time. */
 const PIPE_ARCS = 24;
-
-/** Placed against the wall at angle `a`, `inset` in from it, turned to face the middle. */
-function onWall(a: number, inset: number, y: number) {
-  const r = HALL_R - inset;
-  return {
-    position: [Math.cos(a) * r, y, Math.sin(a) * r] as [number, number, number],
-    "rotation-y": -a - Math.PI / 2,
-  };
-}
-
-/**
- * Shown only while it is on the far side of the hall from the camera. The
- * wall is drawn from the inside only, so its near half never stands in the
- * way; pipes and gears are solid all round, and on the near half they would
- * hang in front of everything. As the camera goes round, they come and go
- * with the wall behind them.
- */
-function FarSide({ a, children }: { a: number; children: ReactNode }) {
-  const group = useRef<Group>(null);
-  useFrame(({ camera }) => {
-    if (!group.current) return;
-    const towards = Math.atan2(camera.position.z, camera.position.x);
-    group.current.visible = Math.cos(a - towards) < 0.25;
-  });
-  return <group ref={group}>{children}</group>;
-}
 
 /** Dark bricks in staggered courses, with pale mortar so they read in the firelight. */
 function brickwork() {
@@ -125,16 +118,28 @@ function brickwork() {
   return t;
 }
 
-/** A boiler against the wall: its fire glowing through the door, a gauge over it. */
-function Boiler({ angle, reduced }: { angle: number; reduced: boolean }) {
+/** The gauge needle at rest, cold, and up in the working band. */
+const NEEDLE_REST = 1.1;
+const NEEDLE_UP = -0.4;
+
+/**
+ * A boiler against the wall, a gauge over its door. Cold, only a few embers
+ * show through the door and the needle lies at rest; lit, the fire glows,
+ * lights the hall round it and the needle trembles in the working band.
+ */
+function Boiler({ angle, lit, reduced }: { angle: number; lit: boolean; reduced: boolean }) {
   const light = useRef<PointLight>(null);
   const needle = useRef<Group>(null);
   useFrame((state) => {
-    if (reduced) return;
+    if (!needle.current) return;
+    if (!lit || reduced) {
+      needle.current.rotation.z = lit ? NEEDLE_UP : NEEDLE_REST;
+      return;
+    }
     const t = state.clock.elapsedTime * 8 + angle * 5;
     if (light.current) light.current.intensity = 3 + Math.sin(t) * 0.5 + Math.sin(t * 2.7) * 0.35;
     // the pressure never quite settles
-    if (needle.current) needle.current.rotation.z = -0.4 + Math.sin(t * 0.6) * 0.12 + Math.sin(t * 3.1) * 0.04;
+    needle.current.rotation.z = NEEDLE_UP + Math.sin(t * 0.6) * 0.12 + Math.sin(t * 3.1) * 0.04;
   });
   const { position, "rotation-y": turn } = onWall(angle, 0.42, 0);
   return (
@@ -161,13 +166,13 @@ function Boiler({ angle, reduced }: { angle: number; reduced: boolean }) {
       {/* the fire door, and the fire through it */}
       <mesh position={[0, 0.38, 0.305]}>
         <planeGeometry args={[0.26, 0.2]} />
-        <meshStandardMaterial color="#1A0A04" emissive={FIRE} emissiveIntensity={1.4} />
+        <meshStandardMaterial color="#1A0A04" emissive={FIRE} emissiveIntensity={lit ? 1.4 : 0.18} />
       </mesh>
       <mesh position={[0, 0.38, 0.3]}>
         <planeGeometry args={[0.32, 0.26]} />
         <meshStandardMaterial color="#15110F" metalness={0.5} roughness={0.6} />
       </mesh>
-      <pointLight ref={light} position={[0, 0.45, 0.7]} color="#FF8A3A" intensity={3} distance={3.4} />
+      {lit && <pointLight ref={light} position={[0, 0.45, 0.7]} color="#FF8A3A" intensity={3} distance={3.4} />}
       {/* the gauge */}
       <group position={[0, 0.78, 0.31]}>
         <mesh>
@@ -178,7 +183,7 @@ function Boiler({ angle, reduced }: { angle: number; reduced: boolean }) {
           <circleGeometry args={[0.105, 24]} />
           <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
         </mesh>
-        <group ref={needle} position={[0, 0, 0.004]} rotation-z={-0.4}>
+        <group ref={needle} position={[0, 0, 0.004]} rotation-z={NEEDLE_REST}>
           <mesh position={[0, 0.035, 0]}>
             <planeGeometry args={[0.012, 0.07]} />
             <meshBasicMaterial color="#B0201A" />
@@ -189,11 +194,26 @@ function Boiler({ angle, reduced }: { angle: number; reduced: boolean }) {
   );
 }
 
-/** A great gear on the wall, turning slowly; its neighbour turns the other way. */
-function Gear({ a, r, y, dir, reduced }: { a: number; r: number; y: number; dir: number; reduced: boolean }) {
+/** A great gear on the wall, turning slowly once driven; its neighbour turns the other way. */
+function Gear({
+  a,
+  r,
+  y,
+  dir,
+  turning,
+  reduced,
+}: {
+  a: number;
+  r: number;
+  y: number;
+  dir: number;
+  /** Whether anything drives it yet. */
+  turning: boolean;
+  reduced: boolean;
+}) {
   const wheel = useRef<Group>(null);
   useFrame((_, dt) => {
-    if (wheel.current && !reduced) wheel.current.rotation.z += dir * 0.3 * dt;
+    if (wheel.current && turning && !reduced) wheel.current.rotation.z += dir * 0.3 * dt;
   });
   const teeth = Math.round(r * 40);
   return (
@@ -277,6 +297,31 @@ function Steam({ position, every, reduced }: { position: [number, number, number
   );
 }
 
+/**
+ * Where a machine stands, until it is built: an iron plate on the wall with
+ * a copper rim, which a tap walks up to. The machines of the next chapters
+ * replace these one at a time.
+ */
+function Spot({ id, onPick }: { id: Exclude<MachineId, "press">; onPick: (id: MachineId) => void }) {
+  const { a, y } = SPOTS[id];
+  const tap = useTap(() => onPick(id));
+  return (
+    <FarSide a={a}>
+      <group {...onWall(a, 0.05, y)} {...tap}>
+        <mesh position={[0, 0, -0.01]}>
+          <planeGeometry args={[1.06, 0.86]} />
+          {/* faintly lit by the fire, or it is lost in the dark */}
+          <meshStandardMaterial color={COPPER} emissive="#FF8A3A" emissiveIntensity={0.18} metalness={0.7} roughness={0.4} />
+        </mesh>
+        <mesh>
+          <planeGeometry args={[1, 0.8]} />
+          <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.6} />
+        </mesh>
+      </group>
+    </FarSide>
+  );
+}
+
 export default function Engine({
   reduced,
   onScene,
@@ -296,6 +341,11 @@ export default function Engine({
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const [flying, setFlying] = useState(false);
+  /** Which boilers burn. Cold until the boilers are built to light them. */
+  const [lit] = useState([false, false, false]);
+  const burning = lit.filter(Boolean).length;
+  /** The machine the camera stands in front of, if any. */
+  const [focus, setFocus] = useState<MachineId | null>(null);
   const [zapAt, setZapAt] = useState(0);
   const walls = useMemo(brickwork, []);
   useEffect(() => () => walls.dispose(), [walls]);
@@ -323,6 +373,25 @@ export default function Engine({
   }, []);
   useEffect(() => onScene(scene), [scene, onScene]);
 
+  /** Walking up to a machine, and back to the whole hall. Not during a scene. */
+  const pick = (id: MachineId) => {
+    if (scene) return;
+    setFocus(id);
+    setView(VIEWS[id]);
+  };
+  const back = () => {
+    if (scene || focus === null) return;
+    setFocus(null);
+    setView(HALL_VIEW);
+  };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") back();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
   /** Back up through the hole: Rotom rises into it, and Babel takes over. */
   const leaving = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(leaving.current), []);
@@ -332,6 +401,7 @@ export default function Engine({
     setMove({ at: performance.now(), kind: "out", dir: "up", fast: true });
     leaving.current = setTimeout(onUp, reduced ? 0 : moveMs(true) * 0.8);
   });
+  const boilersTap = useTap(() => pick("boilers"));
   const zap = useTap(() => {
     if (!scene) setZapAt(performance.now());
   });
@@ -341,10 +411,13 @@ export default function Engine({
       orthographic
       dpr={[1, 1.75]}
       camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
+      onPointerMissed={back}
     >
       <color attach="background" args={["#0B0705"]} />
-      <ambientLight intensity={0.5} color="#FFC8A0" />
-      <hemisphereLight args={["#FFD0A0", "#1A0E08", 0.45]} />
+      <ambientLight intensity={DARK.ambient + PER_BOILER.ambient * burning} color="#FFC8A0" />
+      <hemisphereLight args={["#FFD0A0", "#1A0E08", DARK.hemi + PER_BOILER.hemi * burning]} />
+      {/* Heat Rotom is the one fire left: it lights the middle of the hall */}
+      <pointLight position={[0, 1.2, 0]} color="#FF8A3A" intensity={1.6} distance={3.2} />
 
       {/* the floor: iron plates, riveted in rings */}
       <mesh rotation-x={-Math.PI / 2}>
@@ -394,14 +467,17 @@ export default function Engine({
           </FarSide>
         ))}
 
-      {BOILERS.map((a) => (
+      {BOILERS.map((a, k) => (
         <FarSide key={a} a={a}>
-          <Boiler angle={a} reduced={reduced} />
+          {/* the boilers are already there: a tap on any of them walks up */}
+          <group {...boilersTap}>
+            <Boiler angle={a} lit={lit[k]} reduced={reduced} />
+          </group>
         </FarSide>
       ))}
       {GEARS.map((g) => (
         <FarSide key={g.a} a={g.a}>
-          <Gear {...g} reduced={reduced} />
+          <Gear {...g} turning={false} reduced={reduced} />
         </FarSide>
       ))}
       {LEVERS.map((a, k) => (
@@ -409,16 +485,26 @@ export default function Engine({
           <Lever a={a} up={k !== 1} />
         </FarSide>
       ))}
-      <Steam
-        position={[Math.cos(FAR - 1.75) * (HALL_R - 0.12), 1.86, Math.sin(FAR - 1.75) * (HALL_R - 0.12)]}
-        every={4.2}
-        reduced={reduced}
-      />
-      <Steam
-        position={[Math.cos(FAR + 1.75) * (HALL_R - 0.12), 1.86, Math.sin(FAR + 1.75) * (HALL_R - 0.12)]}
-        every={5.6}
-        reduced={reduced}
-      />
+      {burning > 0 && (
+        <>
+          <Steam
+            position={[Math.cos(FAR - 1.75) * (HALL_R - 0.12), 1.86, Math.sin(FAR - 1.75) * (HALL_R - 0.12)]}
+            every={4.2}
+            reduced={reduced}
+          />
+          <Steam
+            position={[Math.cos(FAR + 1.75) * (HALL_R - 0.12), 1.86, Math.sin(FAR + 1.75) * (HALL_R - 0.12)]}
+            every={5.6}
+            reduced={reduced}
+          />
+        </>
+      )}
+
+      {/* the machines still to be built, each walked up to with a tap */}
+      {(["pipes", "gears", "hoist", "organ"] as const).map((id) => (
+        <Spot key={id} id={id} onPick={pick} />
+      ))}
+
 
       {/* the way down from the sarcophagus, through where the ceiling would
           be: a rim and the dark above it. Tapping it goes back up. */}

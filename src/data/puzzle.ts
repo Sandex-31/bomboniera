@@ -133,6 +133,24 @@ export const TITLES_KEY = 'bomboniera.puzzle.sarcofago';
 /** Which chats of the terminal have been opened, so the rest still say «nuova». */
 export const CHAT_KEY = 'bomboniera.puzzle.chat';
 
+/** The machine room, one key per machine: the boilers, lit or not, and how they were left. */
+export const BOILERS_KEY = 'bomboniera.puzzle.caldaie';
+
+/** How each piece of the steam pipes was turned, and the switches and valves. */
+export const PIPES_KEY = 'bomboniera.puzzle.tubi';
+
+/** Which gear stands on which peg of the board. */
+export const GEARS_KEY = 'bomboniera.puzzle.ingranaggi';
+
+/** What hangs from the arm of the hoist, and whether the crate was opened. */
+export const HOIST_KEY = 'bomboniera.puzzle.montacarichi';
+
+/** The pieces of the punched card on the lectern, and whether the tune was played. */
+export const ORGAN_KEY = 'bomboniera.puzzle.organo';
+
+/** Whether the big lever was pulled and the press went through the floor. */
+export const PRESS_KEY = 'bomboniera.puzzle.pressa';
+
 /** The read phrases, read back: anything that is not a list of distinct phrases is none. */
 export function langFrom(stored: string | null): number[] {
   try {
@@ -178,6 +196,27 @@ export const tapeLine = 'Rotom: TODO — la battuta che nomina Animal Well.';
  */
 export const wiredLine =
   "Rotom: ...Va bene. Non me l'aspettavo. Hai letto il nastro, hai il nome giusto, sei dentro il DB. Ti stendo i cavi: da qui in poi le finestre passano da uno schermo all'altro. Non rompere niente. Pff.";
+
+/**
+ * What it says once the first boiler of the machine room is lit.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const boilerLine = 'Rotom: TODO — la battuta della prima caldaia.';
+
+/**
+ * And once the three pieces of the punched card are back together.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const cardLine = 'Rotom: TODO — la battuta della scheda ricomposta.';
+
+/**
+ * And once the press has broken through the floor.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const pressLine = 'Rotom: TODO — la battuta della pressa.';
 
 /** What it says to anyone who names a silhouette right: right, and useless. */
 export const bravoLine = 'Rotom: Bravo! giusto ma non ti servirá a un bel niente hahahahah';
