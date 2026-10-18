@@ -84,6 +84,7 @@ export default function Press({
   finaleAt,
   broken,
   active,
+  hidden,
   reduced,
   onPick,
   onPull,
@@ -98,6 +99,11 @@ export default function Press({
   /** The floor has given way. */
   broken: boolean;
   active: boolean;
+  /**
+   * Another machine is being worked. The camera looks at it across the
+   * middle of the hall, so the press would stand right in front of it.
+   */
+  hidden: boolean;
   reduced: boolean;
   onPick: () => void;
   onPull: () => void;
@@ -176,7 +182,7 @@ export default function Press({
   });
 
   return (
-    <group {...machine("press")}>
+    <group {...machine("press")} visible={!hidden}>
       {/* the hole through the floor, and the cold white light of the floor below */}
       {broken && (
         <group>

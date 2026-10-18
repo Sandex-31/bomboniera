@@ -1787,3 +1787,30 @@ try {
     await vite13.close();
   }
 }
+
+/* ---------------------------------------------------------- no words, no numbers
+ * The machines of the third floor say nothing in writing: shapes, colours,
+ * movement and sound only. No text between their tags, no text element, no
+ * HTML overlay that could carry some; and an aria-label may name the object,
+ * never what it means.
+ */
+{
+  const { readFileSync, readdirSync } = await import("node:fs");
+  const dir = new URL("../src/scenes/machines/", import.meta.url);
+  const files = readdirSync(dir).filter((f) => f.endsWith(".tsx"));
+  assert.ok(files.length >= 6, "the machines are not where they should be");
+  for (const f of files) {
+    const src = readFileSync(new URL(f, dir), "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/\/\/.*$/gm, "");
+    // text sitting between a tag's end and the next tag
+    const text = [...src.matchAll(/>\s*([^<>{}\n]*[A-Za-zÀ-ÿ0-9][^<>{}\n]*?)\s*<\/?[A-Za-z]/g)]
+      .map((m) => m[1].trim())
+      // a comparison or an arrow in plain code is not a text node
+      .filter((t) => !/^[\s\w.()[\]!?:&|=+\-*/%,'"`]*(=>|&&|\|\||\?|:)/.test(t) && !/^(null|true|false)\)/.test(t));
+    assert.deepEqual(text, [], `${f} writes something: ${text.join(" | ")}`);
+    assert.ok(!/<Text\b|<Text3D\b|<Html\b/.test(src), `${f} has a text element or an HTML overlay`);
+    assert.ok(!/aria-label/.test(src), `${f} labels something in words`);
+  }
+  console.log(`ok — the ${files.length} machine files write nothing`);
+}

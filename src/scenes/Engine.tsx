@@ -784,6 +784,7 @@ export default function Engine({
           finaleAt={finaleAt}
           broken={broken}
           active={focus === "press" && !scene}
+          hidden={focus !== null && focus !== "press"}
           reduced={reduced}
           onPick={() => pick("press")}
           onPull={pull}

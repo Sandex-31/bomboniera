@@ -341,3 +341,27 @@ pavimento, i cinque macchinari così come sono.
 - Il trascinamento in 3D (ingranaggi, pesi, pezzi di scheda) è più delicato di quello nelle
   finestre: va provato presto su un telefono vero.
 - L'audio dell'organo su iPhone parte solo dopo un tocco: il primo tiro di catena deve sbloccarlo.
+
+## Com'è stato costruito (differenze dalla proposta)
+
+Scelte prese costruendo, provate nel browser su desktop e a 390 px:
+
+- **Toccare invece di trascinare.** Ingranaggi, oggetti del montacarichi e pezzi di scheda si
+  prendono con un tocco e si posano con un altro, invece di trascinarli: sul telefono è molto più
+  affidabile. Si trascinano davvero solo Rotom (nello sportello della caldaia) e la leva grande.
+  Il chiavistello, la serranda, i deviatoi e i volantini scattano a ogni tocco.
+- **Una caldaia alla volta.** Toccando una caldaia la camera va davanti a quella sola: viste
+  tutte e tre insieme, i pezzi erano troppo piccoli per un dito.
+- **Rotom di lato.** Al centro c'è la pressa, quindi Rotom galleggia alla sua sinistra e anche il
+  buco nel soffitto, da cui arriva e riparte, sta sopra di lui. Davanti a una macchina sul muro
+  Rotom si sposta fuori dall'inquadratura, e le sue battute compaiono sopra la macchina.
+- **Davanti a una macchina si tocca solo quella.** Le altre macchine e la pressa non prendono
+  tocchi (la pressa sparisce, perché starebbe davanti); un tocco nel vuoto riporta alla sala.
+- **Leggio.** Un tocco su un pezzo posato lo gira nei quattro versi possibili; la levetta sotto
+  ogni posto lo rimette in tasca.
+- **La battuta di Rotom sul montacarichi** (Rotom che scappa se lo si appende) non c'è: Rotom non
+  si trascina fuori dalle caldaie.
+- **I numeri della difficoltà**, controllati da `npm test`: tubi con 32 pezzi da girare e una sola
+  strada; ingranaggi con 14 perni, 8 pezzi in rastrelliera e una sola disposizione giusta; braccio
+  del montacarichi con 1546 sistemazioni e una sola in equilibrio, e la bilancina che basta a
+  scoprire i pesi; scheda con 384 modi di posarla e uno giusto.
