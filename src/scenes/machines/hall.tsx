@@ -30,12 +30,14 @@ export type MachineId = "boilers" | "pipes" | "gears" | "hoist" | "organ" | "pre
  * organ share the side the camera starts on, so turning round finds them.
  * The press is not on the wall: it hangs over the middle.
  */
-export const SPOTS: Record<Exclude<MachineId, "press">, { a: number; y: number; zoom: number }> = {
-  boilers: { a: FAR, y: 0.7, zoom: 1.7 },
-  pipes: { a: FAR + 1.75, y: 1, zoom: 2.6 },
-  gears: { a: FAR - 1.75, y: 1, zoom: 2.6 },
-  hoist: { a: FAR + Math.PI - 0.6, y: 0.9, zoom: 2.3 },
-  organ: { a: FAR + Math.PI + 0.6, y: 1, zoom: 2.3 },
+export const SPOTS: Record<Exclude<MachineId, "press">, { a: number; y: number; zoom: number; polar: number }> = {
+  // from higher up than the rest, so Rotom in the middle hangs below the
+  // boilers on the screen instead of in front of the middle one
+  boilers: { a: FAR, y: 0.3, zoom: 1.45, polar: 0.85 },
+  pipes: { a: FAR + 1.75, y: 1, zoom: 2.6, polar: 1.1 },
+  gears: { a: FAR - 1.75, y: 1, zoom: 2.6, polar: 1.1 },
+  hoist: { a: FAR + Math.PI - 0.6, y: 0.9, zoom: 2.3, polar: 1.1 },
+  organ: { a: FAR + Math.PI + 0.6, y: 1, zoom: 2.3, polar: 1.1 },
 };
 
 /** Placed against the wall at angle `a`, `inset` in from it, turned to face the middle. */
@@ -49,14 +51,14 @@ export function onWall(a: number, inset: number, y: number) {
 
 /**
  * Standing in the middle of the hall, looking straight at the wall at angle
- * `a`. OrbitControls measure azimuth from +z towards +x, and the camera has
+ * `a`, from `polar` off the vertical. OrbitControls measure azimuth from +z towards +x, and the camera has
  * to be on the far side of the middle from the wall it looks at.
  */
-export function facing(a: number, y: number, zoom: number): View {
+export function facing({ a, y, zoom, polar }: { a: number; y: number; zoom: number; polar: number }): View {
   return {
     target: [Math.cos(a) * (HALL_R - 0.3), y, Math.sin(a) * (HALL_R - 0.3)],
     azimuth: Math.atan2(-Math.cos(a), -Math.sin(a)),
-    polar: 1.3,
+    polar,
     zoom,
     spread: { azimuth: 0.25, polar: 0.15 },
   };

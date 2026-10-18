@@ -41,6 +41,7 @@ import { STATIONS } from "./ski";
 import { SLOTS, solvedTape } from "./tape";
 import { LOCK_CODE } from "./sagome";
 import { PHRASES } from "../data/babel";
+import { solvedBoilers } from "./boilers";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
 function levers(): boolean[] {
@@ -91,6 +92,7 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "sarcofago", key: LANG_KEY, solved: () => [0, 1, 2, 3, 4, 5] },
   { label: "titoli", key: TITLES_KEY, solved: () => PHRASES.map((p) => p.titles[0]) },
   { label: "terzo piano", key: FLOOR_KEY, solved: () => "2" },
+  { label: "caldaie", key: BOILERS_KEY, solved: solvedBoilers },
 ];
 
 /**
@@ -98,7 +100,7 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
  * opened, and how deep the visitor has been. Wiped with the rest. The
  * machines of the third floor wait here until each has a stop of its own.
  */
-export const WIPED = [CHAT_KEY, DEPTH_KEY, BOILERS_KEY, PIPES_KEY, GEARS_KEY, HOIST_KEY, ORGAN_KEY, PRESS_KEY];
+export const WIPED = [CHAT_KEY, DEPTH_KEY, PIPES_KEY, GEARS_KEY, HOIST_KEY, ORGAN_KEY, PRESS_KEY];
 
 /**
  * Wipes the whole chain, then solves the first `upTo` stops of it.

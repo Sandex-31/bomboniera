@@ -1004,6 +1004,9 @@ try {
     // and the way back down from Babel is open, not a sarcophagus still to fill
     const { titlesDone } = await vite5.ssrLoadModule("/src/data/babel.ts");
     assert.ok(titlesDone(read(puzzle.TITLES_KEY)), "the jump leaves the sarcophagus shut");
+    // and the machines of the third floor are as their stops left them
+    const { boilersFrom, solvedBoilers } = await vite5.ssrLoadModule("/src/lib/boilers.ts");
+    assert.deepEqual(boilersFrom(store.get(puzzle.BOILERS_KEY)), solvedBoilers(), "the jump leaves a boiler cold");
 
     // the floor the visitor is on: whatever is stored, it lands on a real floor
     assert.equal(puzzle.floorFrom(null), 0, "never been down is the island");
@@ -1234,7 +1237,7 @@ try {
   for (const file of ["src/scenes/Puzzle.tsx", "src/scenes/Babel.tsx", "src/scenes/Engine.tsx"]) {
     const src = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
     const controls = src.match(/<OrbitControls\s[\s\S]*?\/>/)?.[0] ?? "";
-    assert.match(controls, /enabled=\{!flying && !scene\}/, `${file}: the camera can be turned during a scene`);
+    assert.match(controls, /enabled=\{!flying && !scene( && [^}]+)?\}/, `${file}: the camera can be turned during a scene`);
   }
   console.log("ok — no floor lets the camera turn during a scene");
 }
@@ -1448,5 +1451,55 @@ try {
     console.log("ok — the sarcophagus lights each work once");
   } finally {
     await vite12.close();
+  }
+}
+
+/* ---------------------------------------------------------- the machine room
+ * The third floor: five machines worked by hand, each with its rules in a
+ * module of its own. What makes each one hard is checked here, not trusted.
+ */
+{
+  const vite13 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    /* the boilers: one damper position per boiler lets the needle be caught
+       in the green, and the smoke is what tells the three positions apart */
+    const b = await vite13.ssrLoadModule("/src/lib/boilers.ts");
+    assert.equal(new Set(b.RIGHT_DAMPERS).size, 3, "two boilers want the same damper");
+    const catchable = (d, right) =>
+      Array.from({ length: 8000 }, (_, ms) => b.rise(d, right, ms)).some((n) => b.release(n) === "lit");
+    for (const right of b.RIGHT_DAMPERS) {
+      for (const d of [0, 1, 2]) {
+        assert.equal(catchable(d, right), d === right, `damper ${d} on a boiler wanting ${right}`);
+      }
+      assert.deepEqual(
+        new Set([0, 1, 2].filter((d) => d !== right).map((d) => b.smoke(d, right))).has("grigio"),
+        false,
+        "a wrong damper smokes like the right one",
+      );
+      assert.equal(b.smoke(right, right), "grigio");
+      // the green lasts long enough for a thumb, with the right damper
+      const inGreen = Array.from({ length: 8000 }, (_, ms) => b.rise(right, right, ms)).filter(
+        (n) => b.release(n) === "lit",
+      ).length;
+      assert.ok(inGreen >= 600, `the green lasts only ${inGreen} ms`);
+      // and held on, it ends in the red
+      assert.equal(b.release(b.rise(right, right, 8000)), "spat", "pumping on never blows");
+    }
+    assert.notEqual(b.smoke(2, 0), b.smoke(0, 2), "too little and too much air smoke the same");
+    assert.equal(b.release(0), "out");
+    assert.deepEqual(b.boilersFrom(null), b.COLD);
+    for (const bad of ["x", "{}", '{"lit":[true],"dampers":[0,0,0],"doors":[1,0,0],"drawer":false,"piece":false}'])
+      assert.deepEqual(b.boilersFrom(bad), b.COLD, `${bad} is not a boiler room`);
+    assert.equal(
+      b.boilersFrom(JSON.stringify({ ...b.COLD, piece: true })).piece,
+      false,
+      "a piece out of a drawer never opened",
+    );
+    const lit = b.boilersFrom(JSON.stringify(b.solvedBoilers()));
+    assert.deepEqual(b.steamOf(lit), { tondo: true, triangolo: true, quadrato: true });
+    assert.deepEqual(b.steamOf(b.COLD), { tondo: false, triangolo: false, quadrato: false });
+    console.log("ok — the boilers: one damper each, told by the smoke, a green a thumb can catch");
+  } finally {
+    await vite13.close();
   }
 }

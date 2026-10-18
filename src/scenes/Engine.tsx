@@ -1,27 +1,32 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Suspense, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Html, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
   BackSide,
   CanvasTexture,
+  Plane,
+  Vector3,
   RepeatWrapping,
   SRGBColorSpace,
   type Group,
   type Mesh,
   type MeshBasicMaterial,
-  type PointLight,
 } from "three";
 import CameraRig from "./CameraRig";
 import { useTap } from "./Hotspot";
 import Rotom from "./Rotom";
+import Keeper from "./Keeper";
+import CardPieces, { type PieceId } from "../components/CardPieces";
+import Boilers, { BOILER_ANGLES, doorAt } from "./machines/Boilers";
+import { BOILERS_KEY, boilerLine } from "../data/puzzle";
+import { loadBoilers, type BoilerState } from "../lib/boilers";
 import { FLIGHT, type View } from "./focus";
 import { BURN_MS, moveMs, type Move } from "../lib/descent";
 import {
   BRICK,
   COPPER,
   FAR,
-  FIRE,
   FarSide,
   HALL_R,
   IRON,
@@ -66,21 +71,37 @@ const CEILING_VIEW: View = {
   spread: { azimuth: 0.1, polar: 0.05 },
 };
 
+/** Standing in front of one boiler: they are worked one at a time, up close. */
+const BOILER_VIEWS = BOILER_ANGLES.map((a) => facing({ a, y: 0.62, zoom: 3.1, polar: 1.12 }));
+
 /** Standing in front of each machine. */
 const VIEWS: Record<MachineId, View> = {
-  boilers: facing(SPOTS.boilers.a, SPOTS.boilers.y, SPOTS.boilers.zoom),
-  pipes: facing(SPOTS.pipes.a, SPOTS.pipes.y, SPOTS.pipes.zoom),
-  gears: facing(SPOTS.gears.a, SPOTS.gears.y, SPOTS.gears.zoom),
-  hoist: facing(SPOTS.hoist.a, SPOTS.hoist.y, SPOTS.hoist.zoom),
-  organ: facing(SPOTS.organ.a, SPOTS.organ.y, SPOTS.organ.zoom),
+  boilers: BOILER_VIEWS[1],
+  pipes: facing(SPOTS.pipes),
+  gears: facing(SPOTS.gears),
+  hoist: facing(SPOTS.hoist),
+  organ: facing(SPOTS.organ),
   press: PRESS_VIEW,
 };
+
+/**
+ * Where Rotom waits by boiler `i`, to be picked up and put in: out in front
+ * of it and off to one side, low, where it hides neither the door nor the
+ * gauge.
+ */
+function waitBy(i: number): [number, number, number] {
+  const [x, , z] = doorAt(i);
+  const a = BOILER_ANGLES[i];
+  // towards the middle, and along the wall
+  const out = [-Math.cos(a), -Math.sin(a)];
+  const side = [-Math.sin(a), Math.cos(a)];
+  return [x + out[0] * 0.35 + side[0] * 0.62, -0.24, z + out[1] * 0.35 + side[1] * 0.62];
+}
 
 /** How much light the hall has with no boiler lit, and what each lit one adds. */
 const DARK = { ambient: 0.14, hemi: 0.12 };
 const PER_BOILER = { ambient: 0.12, hemi: 0.11 };
 
-const BOILERS = [FAR - 1.1, FAR, FAR + 1.1];
 const GEARS = [
   { a: FAR - 0.55, r: 0.36, y: 1.25, dir: 1 },
   { a: FAR + 0.55, r: 0.3, y: 1.3, dir: -1 },
@@ -116,82 +137,6 @@ function brickwork() {
   t.wrapS = RepeatWrapping;
   t.repeat.x = 2;
   return t;
-}
-
-/** The gauge needle at rest, cold, and up in the working band. */
-const NEEDLE_REST = 1.1;
-const NEEDLE_UP = -0.4;
-
-/**
- * A boiler against the wall, a gauge over its door. Cold, only a few embers
- * show through the door and the needle lies at rest; lit, the fire glows,
- * lights the hall round it and the needle trembles in the working band.
- */
-function Boiler({ angle, lit, reduced }: { angle: number; lit: boolean; reduced: boolean }) {
-  const light = useRef<PointLight>(null);
-  const needle = useRef<Group>(null);
-  useFrame((state) => {
-    if (!needle.current) return;
-    if (!lit || reduced) {
-      needle.current.rotation.z = lit ? NEEDLE_UP : NEEDLE_REST;
-      return;
-    }
-    const t = state.clock.elapsedTime * 8 + angle * 5;
-    if (light.current) light.current.intensity = 3 + Math.sin(t) * 0.5 + Math.sin(t * 2.7) * 0.35;
-    // the pressure never quite settles
-    needle.current.rotation.z = NEEDLE_UP + Math.sin(t * 0.6) * 0.12 + Math.sin(t * 3.1) * 0.04;
-  });
-  const { position, "rotation-y": turn } = onWall(angle, 0.42, 0);
-  return (
-    <group position={position} rotation-y={turn}>
-      <mesh position={[0, 0.55, 0]}>
-        <cylinderGeometry args={[0.3, 0.32, 1.1, 20]} />
-        <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.55} />
-      </mesh>
-      {[0.12, 0.98].map((y) => (
-        <mesh key={y} position={[0, y, 0]} rotation-x={Math.PI / 2}>
-          <torusGeometry args={[0.315, 0.025, 8, 24]} />
-          <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
-        </mesh>
-      ))}
-      <mesh position={[0, 1.1, 0]}>
-        <sphereGeometry args={[0.3, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.55} />
-      </mesh>
-      {/* the chimney, up into the pipe that rings the hall */}
-      <mesh position={[0, 1.55, -0.12]}>
-        <cylinderGeometry args={[0.06, 0.06, 0.5, 10]} />
-        <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
-      </mesh>
-      {/* the fire door, and the fire through it */}
-      <mesh position={[0, 0.38, 0.305]}>
-        <planeGeometry args={[0.26, 0.2]} />
-        <meshStandardMaterial color="#1A0A04" emissive={FIRE} emissiveIntensity={lit ? 1.4 : 0.18} />
-      </mesh>
-      <mesh position={[0, 0.38, 0.3]}>
-        <planeGeometry args={[0.32, 0.26]} />
-        <meshStandardMaterial color="#15110F" metalness={0.5} roughness={0.6} />
-      </mesh>
-      {lit && <pointLight ref={light} position={[0, 0.45, 0.7]} color="#FF8A3A" intensity={3} distance={3.4} />}
-      {/* the gauge */}
-      <group position={[0, 0.78, 0.31]}>
-        <mesh>
-          <circleGeometry args={[0.09, 24]} />
-          <meshStandardMaterial color="#EFE3C8" roughness={0.6} />
-        </mesh>
-        <mesh position={[0, 0, -0.005]}>
-          <circleGeometry args={[0.105, 24]} />
-          <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
-        </mesh>
-        <group ref={needle} position={[0, 0, 0.004]} rotation-z={NEEDLE_REST}>
-          <mesh position={[0, 0.035, 0]}>
-            <planeGeometry args={[0.012, 0.07]} />
-            <meshBasicMaterial color="#B0201A" />
-          </mesh>
-        </group>
-      </group>
-    </group>
-  );
 }
 
 /** A great gear on the wall, turning slowly once driven; its neighbour turns the other way. */
@@ -311,7 +256,13 @@ function Spot({ id, onPick }: { id: Exclude<MachineId, "press">; onPick: (id: Ma
         <mesh position={[0, 0, -0.01]}>
           <planeGeometry args={[1.06, 0.86]} />
           {/* faintly lit by the fire, or it is lost in the dark */}
-          <meshStandardMaterial color={COPPER} emissive="#FF8A3A" emissiveIntensity={0.18} metalness={0.7} roughness={0.4} />
+          <meshStandardMaterial
+            color={COPPER}
+            emissive="#FF8A3A"
+            emissiveIntensity={0.18}
+            metalness={0.7}
+            roughness={0.4}
+          />
         </mesh>
         <mesh>
           <planeGeometry args={[1, 0.8]} />
@@ -320,6 +271,31 @@ function Spot({ id, onPick }: { id: Exclude<MachineId, "press">; onPick: (id: Ma
       </group>
     </FarSide>
   );
+}
+
+/** Rotom, eased to where it is put and to the size it is wanted at. */
+function Carried({
+  at,
+  size,
+  instant,
+  children,
+}: {
+  at: [number, number, number];
+  size: number;
+  instant: boolean;
+  children: ReactNode;
+}) {
+  const group = useRef<Group>(null);
+  useFrame((_, dt) => {
+    const g = group.current;
+    if (!g) return;
+    const k = instant ? 1 : Math.min(1, dt * 4);
+    g.position.x += (at[0] - g.position.x) * k;
+    g.position.y += (at[1] - g.position.y) * k;
+    g.position.z += (at[2] - g.position.z) * k;
+    g.scale.setScalar(g.scale.x + (size - g.scale.x) * Math.min(1, dt * 5));
+  });
+  return <group ref={group}>{children}</group>;
 }
 
 export default function Engine({
@@ -341,11 +317,26 @@ export default function Engine({
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const [flying, setFlying] = useState(false);
-  /** Which boilers burn. Cold until the boilers are built to light them. */
-  const [lit] = useState([false, false, false]);
-  const burning = lit.filter(Boolean).length;
+  /** The boilers, as the visitor left them. Which of them burn lights the hall. */
+  const [boilers, setBoilers] = useState<BoilerState>(loadBoilers);
+  useEffect(() => {
+    try {
+      localStorage.setItem(BOILERS_KEY, JSON.stringify(boilers));
+    } catch {
+      /* storage unavailable — the boilers still burn for this visit */
+    }
+  }, [boilers]);
+  const burning = boilers.lit.filter(Boolean).length;
+  /** Which boiler Rotom has been put in, if any. Not kept: a reload finds it in the middle. */
+  const [inside, setInside] = useState<number | null>(null);
+  /** When Rotom was last blown out of a boiler, black with soot. */
+  const [sootAt, setSootAt] = useState(-Infinity);
+  /** Rotom says its line over the first boiler lit. */
+  const [saying, setSaying] = useState(false);
   /** The machine the camera stands in front of, if any. */
   const [focus, setFocus] = useState<MachineId | null>(null);
+  /** Which boiler, when it is the boilers. */
+  const [which, setWhich] = useState(1);
   const [zapAt, setZapAt] = useState(0);
   const walls = useMemo(brickwork, []);
   useEffect(() => () => walls.dispose(), [walls]);
@@ -364,10 +355,7 @@ export default function Engine({
   useEffect(() => {
     if (!arriving) return;
     const ms = moveMs(!first) * 0.6 + (first ? moveMs(false) * 0.4 + BURN_MS : 0);
-    const steps = [
-      setTimeout(() => setView(HALL_VIEW), ms),
-      setTimeout(() => setScene(false), ms + FLIGHT * 1000),
-    ];
+    const steps = [setTimeout(() => setView(HALL_VIEW), ms), setTimeout(() => setScene(false), ms + FLIGHT * 1000)];
     return () => steps.forEach(clearTimeout);
     // once, for the arrival this floor was mounted with
   }, []);
@@ -378,6 +366,13 @@ export default function Engine({
     if (scene) return;
     setFocus(id);
     setView(VIEWS[id]);
+  };
+  const pickBoiler = (i: number) => {
+    if (scene) return;
+    setFocus("boilers");
+    setWhich(i);
+    setInside(null);
+    setView(BOILER_VIEWS[i]);
   };
   const back = () => {
     if (scene || focus === null) return;
@@ -401,148 +396,240 @@ export default function Engine({
     setMove({ at: performance.now(), kind: "out", dir: "up", fast: true });
     leaving.current = setTimeout(onUp, reduced ? 0 : moveMs(true) * 0.8);
   });
-  const boilersTap = useTap(() => pick("boilers"));
   const zap = useTap(() => {
     if (!scene) setZapAt(performance.now());
   });
 
+  /*
+   * Carrying Rotom. In front of the boilers it can be picked up and dropped
+   * into an open door; it follows the finger across an upright plane through
+   * the doors, so where it is let go is where the door is on the screen.
+   */
+  const [held, setHeld] = useState<[number, number, number] | null>(null);
+  const plane = useMemo(() => {
+    const [x, , z] = doorAt(which);
+    const n = new Vector3(-x, 0, -z).normalize();
+    return new Plane(n, -n.dot(new Vector3(x, 0, z)));
+  }, [which]);
+  const hit = useMemo(() => new Vector3(), []);
+  const grab = (e: ThreeEvent<PointerEvent>) => {
+    if (focus !== "boilers" || scene) return;
+    e.stopPropagation();
+    (e.target as unknown as Element).setPointerCapture?.(e.pointerId);
+    setInside(null);
+    if (e.ray.intersectPlane(plane, hit)) setHeld([hit.x, hit.y, hit.z]);
+  };
+  const drag = (e: ThreeEvent<PointerEvent>) => {
+    if (held && e.ray.intersectPlane(plane, hit)) setHeld([hit.x, hit.y, hit.z]);
+  };
+  const drop = () => {
+    if (!held) return;
+    const [x, y, z] = doorAt(which);
+    setHeld(null);
+    const near = Math.hypot(held[0] - x, held[1] - y, held[2] - z) < 0.3;
+    if (near && boilers.doors[which] && !boilers.lit[which]) setInside(which);
+  };
+  /** Where Rotom floats: held, in a boiler's mouth, or in the middle. */
+  const at: [number, number, number] = held
+    ? [held[0], held[1] - 1.12 * 0.5, held[2]]
+    : inside !== null
+      ? [doorAt(inside)[0], doorAt(inside)[1] - 1.12 * 0.35, doorAt(inside)[2]]
+      : focus === "boilers"
+        ? waitBy(which)
+        : [0, 0, 0];
+
+  /** What came of the bellows. */
+  const outcome = (i: number, what: "out" | "lit" | "spat") => {
+    if (what === "lit") {
+      const firstFire = burning === 0;
+      setBoilers((b) => ({ ...b, lit: b.lit.map((l, k) => l || k === i) }));
+      setInside(null);
+      if (firstFire) {
+        setScene(true);
+        setSaying(true);
+      }
+    } else if (what === "spat") {
+      setInside(null);
+      setSootAt(performance.now());
+    }
+    // put out, it stays in the boiler for another go
+  };
+  const said = () => {
+    setSaying(false);
+    setScene(false);
+  };
+
+  /** The pieces of the punched card in the visitor's pocket. */
+  const found: PieceId[] = boilers.piece ? ["A"] : [];
+
   return (
-    <Canvas
-      orthographic
-      dpr={[1, 1.75]}
-      camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
-      onPointerMissed={back}
-    >
-      <color attach="background" args={["#0B0705"]} />
-      <ambientLight intensity={DARK.ambient + PER_BOILER.ambient * burning} color="#FFC8A0" />
-      <hemisphereLight args={["#FFD0A0", "#1A0E08", DARK.hemi + PER_BOILER.hemi * burning]} />
-      {/* Heat Rotom is the one fire left: it lights the middle of the hall */}
-      <pointLight position={[0, 1.2, 0]} color="#FF8A3A" intensity={1.6} distance={3.2} />
+    <>
+      <Canvas
+        orthographic
+        dpr={[1, 1.75]}
+        camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
+        onPointerMissed={back}
+        onPointerUp={drop}
+      >
+        <color attach="background" args={["#0B0705"]} />
+        <ambientLight intensity={DARK.ambient + PER_BOILER.ambient * burning} color="#FFC8A0" />
+        <hemisphereLight args={["#FFD0A0", "#1A0E08", DARK.hemi + PER_BOILER.hemi * burning]} />
+        {/* Heat Rotom is the one fire left: it lights the middle of the hall */}
+        <pointLight position={[0, 1.2, 0]} color="#FF8A3A" intensity={1.6} distance={3.2} />
 
-      {/* the floor: iron plates, riveted in rings */}
-      <mesh rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[HALL_R, 48]} />
-        <meshStandardMaterial color="#3A332E" metalness={0.5} roughness={0.75} />
-      </mesh>
-      {[0.8, 1.6].map((r) => (
-        <mesh key={r} rotation-x={-Math.PI / 2} position={[0, 0.003, 0]}>
-          <ringGeometry args={[r, r + 0.03, 48]} />
-          <meshBasicMaterial color="#14100D" transparent opacity={0.5} />
+        {/* the floor: iron plates, riveted in rings */}
+        <mesh rotation-x={-Math.PI / 2}>
+          <circleGeometry args={[HALL_R, 48]} />
+          <meshStandardMaterial color="#3A332E" metalness={0.5} roughness={0.75} />
         </mesh>
-      ))}
-
-      {/* the wall, from the inside only, like Babel's */}
-      <mesh position={[0, WALL_H / 2, 0]}>
-        <cylinderGeometry args={[HALL_R, HALL_R, WALL_H, 64, 1, true]} />
-        <meshStandardMaterial map={walls} side={BackSide} roughness={0.95} />
-      </mesh>
-      <mesh position={[0, WALL_H, 0]} rotation-x={-Math.PI / 2}>
-        <ringGeometry args={[HALL_R, HALL_R + 0.12, 64]} />
-        <meshStandardMaterial color={IRON} metalness={0.5} roughness={0.6} />
-      </mesh>
-
-      {/* copper pipes round the hall, high and low, in arcs that each come
-          and go with the wall behind them */}
-      {Array.from({ length: PIPE_ARCS }, (_, k) => (k * Math.PI * 2) / PIPE_ARCS).map((a) => (
-        <FarSide key={a} a={a + Math.PI / PIPE_ARCS}>
-          {[1.8, 0.16].map((y) => (
-            <group key={y} position={[0, y, 0]} rotation-y={-a}>
-              <mesh rotation-x={Math.PI / 2}>
-                <torusGeometry args={[HALL_R - 0.12, y > 1 ? 0.05 : 0.035, 8, 6, (Math.PI * 2) / PIPE_ARCS]} />
-                <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
-              </mesh>
-            </group>
-          ))}
-        </FarSide>
-      ))}
-      {/* and risers between them, every so often */}
-      {Array.from({ length: 10 }, (_, k) => FAR + 0.42 + (k * Math.PI * 2) / 10)
-        .filter((a) => !BOILERS.some((b) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) < 0.3))
-        .map((a) => (
-          <FarSide key={a} a={a}>
-            <mesh position={[Math.cos(a) * (HALL_R - 0.12), 0.98, Math.sin(a) * (HALL_R - 0.12)]}>
-              <cylinderGeometry args={[0.03, 0.03, 1.64, 8]} />
-              <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
-            </mesh>
-          </FarSide>
+        {[0.8, 1.6].map((r) => (
+          <mesh key={r} rotation-x={-Math.PI / 2} position={[0, 0.003, 0]}>
+            <ringGeometry args={[r, r + 0.03, 48]} />
+            <meshBasicMaterial color="#14100D" transparent opacity={0.5} />
+          </mesh>
         ))}
 
-      {BOILERS.map((a, k) => (
-        <FarSide key={a} a={a}>
-          {/* the boilers are already there: a tap on any of them walks up */}
-          <group {...boilersTap}>
-            <Boiler angle={a} lit={lit[k]} reduced={reduced} />
-          </group>
-        </FarSide>
-      ))}
-      {GEARS.map((g) => (
-        <FarSide key={g.a} a={g.a}>
-          <Gear {...g} turning={false} reduced={reduced} />
-        </FarSide>
-      ))}
-      {LEVERS.map((a, k) => (
-        <FarSide key={a} a={a}>
-          <Lever a={a} up={k !== 1} />
-        </FarSide>
-      ))}
-      {burning > 0 && (
-        <>
-          <Steam
-            position={[Math.cos(FAR - 1.75) * (HALL_R - 0.12), 1.86, Math.sin(FAR - 1.75) * (HALL_R - 0.12)]}
-            every={4.2}
-            reduced={reduced}
-          />
-          <Steam
-            position={[Math.cos(FAR + 1.75) * (HALL_R - 0.12), 1.86, Math.sin(FAR + 1.75) * (HALL_R - 0.12)]}
-            every={5.6}
-            reduced={reduced}
-          />
-        </>
-      )}
+        {/* the wall, from the inside only, like Babel's */}
+        <mesh position={[0, WALL_H / 2, 0]}>
+          <cylinderGeometry args={[HALL_R, HALL_R, WALL_H, 64, 1, true]} />
+          <meshStandardMaterial map={walls} side={BackSide} roughness={0.95} />
+        </mesh>
+        <mesh position={[0, WALL_H, 0]} rotation-x={-Math.PI / 2} visible={focus === null}>
+          <ringGeometry args={[HALL_R, HALL_R + 0.12, 64]} />
+          <meshStandardMaterial color={IRON} metalness={0.5} roughness={0.6} />
+        </mesh>
 
-      {/* the machines still to be built, each walked up to with a tap */}
-      {(["pipes", "gears", "hoist", "organ"] as const).map((id) => (
-        <Spot key={id} id={id} onPick={pick} />
-      ))}
+        {/* copper pipes round the hall, high and low, in arcs that each come
+          and go with the wall behind them */}
+        {Array.from({ length: PIPE_ARCS }, (_, k) => (k * Math.PI * 2) / PIPE_ARCS).map((a) => (
+          <FarSide key={a} a={a + Math.PI / PIPE_ARCS}>
+            {[1.8, 0.16].map((y) => (
+              <group key={y} position={[0, y, 0]} rotation-y={-a}>
+                <mesh rotation-x={Math.PI / 2}>
+                  <torusGeometry args={[HALL_R - 0.12, y > 1 ? 0.05 : 0.035, 8, 6, (Math.PI * 2) / PIPE_ARCS]} />
+                  <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
+                </mesh>
+              </group>
+            ))}
+          </FarSide>
+        ))}
+        {/* and risers between them, every so often */}
+        {Array.from({ length: 10 }, (_, k) => FAR + 0.42 + (k * Math.PI * 2) / 10)
+          .filter((a) => !BOILER_ANGLES.some((b) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) < 0.3))
+          .map((a) => (
+            <FarSide key={a} a={a}>
+              <mesh position={[Math.cos(a) * (HALL_R - 0.12), 0.98, Math.sin(a) * (HALL_R - 0.12)]}>
+                <cylinderGeometry args={[0.03, 0.03, 1.64, 8]} />
+                <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
+              </mesh>
+            </FarSide>
+          ))}
 
+        <Boilers
+          state={boilers}
+          active={focus === "boilers" && !scene}
+          which={which}
+          inside={inside}
+          reduced={reduced}
+          onPick={pickBoiler}
+          onChange={setBoilers}
+          onOutcome={outcome}
+        />
+        {GEARS.map((g) => (
+          <FarSide key={g.a} a={g.a}>
+            <Gear {...g} turning={false} reduced={reduced} />
+          </FarSide>
+        ))}
+        {LEVERS.map((a, k) => (
+          <FarSide key={a} a={a}>
+            <Lever a={a} up={k !== 1} />
+          </FarSide>
+        ))}
+        {burning > 0 && (
+          <>
+            <Steam
+              position={[Math.cos(FAR - 1.75) * (HALL_R - 0.12), 1.86, Math.sin(FAR - 1.75) * (HALL_R - 0.12)]}
+              every={4.2}
+              reduced={reduced}
+            />
+            <Steam
+              position={[Math.cos(FAR + 1.75) * (HALL_R - 0.12), 1.86, Math.sin(FAR + 1.75) * (HALL_R - 0.12)]}
+              every={5.6}
+              reduced={reduced}
+            />
+          </>
+        )}
 
-      {/* the way down from the sarcophagus, through where the ceiling would
+        {/* the machines still to be built, each walked up to with a tap */}
+        {(["pipes", "gears", "hoist", "organ"] as const).map((id) => (
+          <Spot key={id} id={id} onPick={pick} />
+        ))}
+
+        {/* the way down from the sarcophagus, through where the ceiling would
           be: a rim and the dark above it. Tapping it goes back up. */}
-      <group position={[0, HOLE_Y, 0]} {...up}>
-        <mesh rotation-x={-Math.PI / 2}>
-          <ringGeometry args={[HOLE_R, HOLE_R + 0.06, 40]} />
-          {/* lit by the fire below, or it is lost against the dark */}
-          <meshStandardMaterial color="#8C6A3E" emissive="#FF9A4A" emissiveIntensity={0.6} metalness={0.5} roughness={0.5} />
+        <group position={[0, HOLE_Y, 0]} visible={focus === null} {...up}>
+          <mesh rotation-x={-Math.PI / 2}>
+            <ringGeometry args={[HOLE_R, HOLE_R + 0.06, 40]} />
+            {/* lit by the fire below, or it is lost against the dark */}
+            <meshStandardMaterial
+              color="#8C6A3E"
+              emissive="#FF9A4A"
+              emissiveIntensity={0.6}
+              metalness={0.5}
+              roughness={0.5}
+            />
+          </mesh>
+          <mesh rotation-x={-Math.PI / 2}>
+            <circleGeometry args={[HOLE_R + 0.15, 24]} />
+            <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+          </mesh>
+        </group>
+        <mesh position={[0, HOLE_Y - 0.5, 0]} visible={focus === null}>
+          <cylinderGeometry args={[HOLE_R, HOLE_R * 1.6, 1, 24, 1, true]} />
+          <meshBasicMaterial color="#FFB070" transparent opacity={0.1} depthWrite={false} />
         </mesh>
-        <mesh rotation-x={-Math.PI / 2}>
-          <circleGeometry args={[HOLE_R + 0.15, 24]} />
-          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-        </mesh>
-      </group>
-      <mesh position={[0, HOLE_Y - 0.5, 0]}>
-        <cylinderGeometry args={[HOLE_R, HOLE_R * 1.6, 1, 24, 1, true]} />
-        <meshBasicMaterial color="#FFB070" transparent opacity={0.1} depthWrite={false} />
-      </mesh>
 
-      <group {...zap}>
-        <Suspense fallback={null}>
-          <Rotom form="heat" from="wash" fire={first} move={move} reduced={reduced} zapAt={zapAt} awake />
-        </Suspense>
-      </group>
+        <Carried
+          at={at}
+          size={inside !== null && !held ? 0.35 : focus === "boilers" ? 0.5 : 1}
+          instant={!!held || reduced}
+        >
+          <group {...zap} onPointerDown={(e) => (zap.onPointerDown(e), grab(e))} onPointerMove={drag}>
+            <Suspense fallback={null}>
+              <Rotom
+                form="heat"
+                from="wash"
+                fire={first}
+                move={move}
+                reduced={reduced}
+                zapAt={zapAt}
+                sootAt={sootAt}
+                awake
+              />
+            </Suspense>
+          </group>
+          {saying && (
+            <Html position={[0, 2.1, 0]} center zIndexRange={[6, 0]}>
+              <Keeper line={boilerLine} last reduced={reduced} onNext={said} />
+            </Html>
+          )}
+        </Carried>
 
-      <CameraRig view={view} controls={controls} reduced={reduced} onFlight={setFlying} fit={[FIT_W, FIT_W]} />
-      <OrbitControls
-        ref={controls}
-        enabled={!flying && !scene}
-        enablePan={false}
-        enableZoom={false}
-        enableDamping
-        dampingFactor={0.08}
-        minPolarAngle={view.polar - view.spread.polar}
-        maxPolarAngle={view.polar + view.spread.polar}
-        minAzimuthAngle={view.spread.azimuth >= Math.PI ? -Infinity : view.azimuth - view.spread.azimuth}
-        maxAzimuthAngle={view.spread.azimuth >= Math.PI ? Infinity : view.azimuth + view.spread.azimuth}
-      />
-    </Canvas>
+        <CameraRig view={view} controls={controls} reduced={reduced} onFlight={setFlying} fit={[FIT_W, FIT_W]} />
+        <OrbitControls
+          ref={controls}
+          enabled={!flying && !scene && focus === null}
+          enablePan={false}
+          enableZoom={false}
+          enableDamping
+          dampingFactor={0.08}
+          minPolarAngle={view.polar - view.spread.polar}
+          maxPolarAngle={view.polar + view.spread.polar}
+          minAzimuthAngle={view.spread.azimuth >= Math.PI ? -Infinity : view.azimuth - view.spread.azimuth}
+          maxAzimuthAngle={view.spread.azimuth >= Math.PI ? Infinity : view.azimuth + view.spread.azimuth}
+        />
+      </Canvas>
+      <CardPieces found={found} />
+    </>
   );
 }

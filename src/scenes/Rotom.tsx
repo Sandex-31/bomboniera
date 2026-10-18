@@ -138,6 +138,9 @@ function buildForm(form: RotomForm, map: Texture, glowSheet: Texture) {
 
 const ORDER: RotomForm[] = ["base", "wash", "heat"];
 
+/** How long the soot of a boiler stays on it. */
+const SOOT_MS = 3000;
+
 /** The flames round it when it catches fire: an outer ring and an inner one. */
 const TONGUES = [
   // the big outer flames, deep orange, all round it
@@ -154,6 +157,7 @@ export default function Rotom({
   move,
   from,
   fire,
+  sootAt = -Infinity,
 }: {
   reduced: boolean;
   /** Time of the last tap, in `performance.now()` ms. Drives the flinch. */
@@ -167,6 +171,8 @@ export default function Rotom({
   from?: RotomForm;
   /** Instead of the flash, it catches fire and changes behind the smoke. */
   fire?: boolean;
+  /** When it was last blown out of a boiler: black with soot for a moment. */
+  sootAt?: number;
 }) {
   const group = useRef<Group>(null);
   const flash = useRef<Mesh>(null);
@@ -238,7 +244,10 @@ export default function Rotom({
     const buzz = reduced || !awake ? 0 : (Math.sin(t * 17) + 1) * 0.15;
     const heat = blaze?.heat ?? 0;
     const { material } = forms[shown];
-    material.emissiveIntensity = 0.6 + buzz + jolt * 1.4 + trip.flash * 3 + heat * 1.6;
+    // blown out of a boiler, it comes out sooty and the soot falls off it
+    const soot = reduced ? 0 : Math.max(0, 1 - (now - sootAt) / SOOT_MS);
+    material.color.setScalar(1 - soot * 0.95);
+    material.emissiveIntensity = (0.6 + buzz + jolt * 1.4 + trip.flash * 3 + heat * 1.6) * (1 - soot * 0.95);
     // red-hot: the glow goes from white towards #FF3A10
     material.emissive.setRGB(1, 1 - heat * 0.77, 1 - heat * 0.94);
     g.position.x = blaze ? Math.sin(t * 70) * blaze.shake * 0.03 : 0;

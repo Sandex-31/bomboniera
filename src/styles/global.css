@@ -1681,3 +1681,17 @@ button { font: inherit; color: inherit; }
 .sarc__slot:focus { border-color: rgba(242, 227, 204, 0.7); }
 .sarc__slot.is-right { color: #FFFFFF; border-color: #FFFFFF; box-shadow: 0 0 12px rgba(255, 255, 255, 0.35); }
 .chats__list, .chats__lines { scrollbar-width: thin; scrollbar-color: rgba(111, 224, 168, 0.4) transparent; }
+
+/* the pieces of the punched card found in the machine room, in a pocket at
+   the top of the screen; out of the way of a scene like everything else */
+.card-pieces {
+  position: fixed; z-index: 2; top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  display: flex; gap: 6px; padding: 8px; border-radius: 10px;
+  background: rgba(20, 12, 8, 0.72); border: 1px solid rgba(255, 160, 90, 0.25);
+  transition: opacity 260ms ease, visibility 0s;
+}
+.card-pieces svg { display: block; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5)); }
+.stage.is-scene .card-pieces {
+  opacity: 0; visibility: hidden; transition: opacity 260ms ease, visibility 0s 260ms;
+}
