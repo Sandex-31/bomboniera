@@ -40,7 +40,7 @@ export type Voice = { stop: (at?: number) => void };
 type Organ = {
   /** Sounds a whistle now, or at `at` on the context's clock, until it is stopped. */
   start: (note: number, at?: number) => Voice;
-  play: (tune: { note: number; long: boolean }[], onNote?: (k: number) => void) => Promise<void>;
+  play: (tune: readonly { note: number; long: boolean }[], onNote?: (k: number) => void) => Promise<void>;
   puff: () => void;
 };
 

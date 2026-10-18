@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import type { Group, Mesh } from "three";
 import { useTap } from "../Hotspot";
 import { NOTCHES, OBJECTS, canPut, tilt, weigh, type HoistState, type Place, type Thing } from "../../lib/hoist";
-import { Approach, COPPER, FarSide, IRON, SPOTS, onWall } from "./hall";
+import { Approach, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
 
 /*
  * The hoist against the wall: a beam on a post, the cage hanging from its
@@ -264,7 +264,7 @@ export default function Hoist({
 
   return (
     <FarSide a={a}>
-      <group {...onWall(a, 0.3, 0)}>
+      <group {...onWall(a, 0.3, 0)} {...machine("hoist")}>
         <pointLight position={[0.2, 1.5, 0.7]} color="#FFC890" intensity={2.4} distance={2.4} />
         <pointLight position={[0.25, 0.35, 0.9]} color="#FFC890" intensity={1.6} distance={1.6} />
         {!active && (

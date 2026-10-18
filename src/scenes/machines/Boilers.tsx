@@ -22,7 +22,7 @@ import {
   type Damper,
   type Shape,
 } from "../../lib/boilers";
-import { COPPER, FAR, FIRE, FarSide, IRON, onWall } from "./hall";
+import { COPPER, FAR, FIRE, FarSide, IRON, onWall, machine } from "./hall";
 
 /*
  * The three boilers along the far wall. Seen from across the hall they are
@@ -216,7 +216,7 @@ function Boiler({
   const { position, "rotation-y": turn } = onWall(angle, INSET, 0);
 
   return (
-    <group position={position} rotation-y={turn}>
+    <group position={position} rotation-y={turn} {...machine("boilers")}>
       <group {...bodyTap}>
         <mesh position={[0, 0.55, 0]}>
           <cylinderGeometry args={[0.3, 0.32, 1.1, 20]} />

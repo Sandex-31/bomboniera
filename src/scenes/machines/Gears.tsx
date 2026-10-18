@@ -17,7 +17,7 @@ import {
   type Spin,
   type Turn,
 } from "../../lib/gears";
-import { Approach, COPPER, FarSide, IRON, SPOTS, onWall } from "./hall";
+import { Approach, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
 
 /*
  * The gear board on the wall. A gear is taken off the rack under the board
@@ -281,7 +281,7 @@ export default function Gears({
   return (
     <FarSide a={a}>
       {/* stood off the wall so the curve of the bricks clears its corners */}
-      <group {...onWall(a, 0.3, y - FRAME_MID)}>
+      <group {...onWall(a, 0.3, y - FRAME_MID)} {...machine("gears")}>
         <pointLight position={[0, 0.8, 0.55]} color="#FFC890" intensity={2.2} distance={2.2} />
         {!active && (
           <group position={[0, FRAME_MID, 0]}>

@@ -1695,3 +1695,9 @@ button { font: inherit; color: inherit; }
 .stage.is-scene .card-pieces {
   opacity: 0; visibility: hidden; transition: opacity 260ms ease, visibility 0s 260ms;
 }
+.card-pieces__piece {
+  display: block; padding: 2px; border: 0; border-radius: 6px; background: transparent;
+  transition: transform 160ms ease, background 160ms ease;
+}
+button.card-pieces__piece { cursor: pointer; }
+.card-pieces__piece.is-held { transform: translateY(4px) scale(1.12); background: rgba(255, 210, 122, 0.35); }

@@ -38,7 +38,7 @@ export const SPOTS: Record<Exclude<MachineId, "press">, { a: number; y: number; 
   pipes: { a: FAR + 1.65, y: 1, zoom: 4.3, polar: 1.5 },
   gears: { a: FAR - 1.65, y: 0.95, zoom: 3.9, polar: 1.5 },
   hoist: { a: FAR + 2.68, y: 0.7, zoom: 3.9, polar: 1.35 },
-  organ: { a: FAR - 2.68, y: 1, zoom: 2.3, polar: 1.1 },
+  organ: { a: FAR - 2.68, y: 0.86, zoom: 3.9, polar: 1.4 },
 };
 
 /** Placed against the wall at angle `a`, `inset` in from it, turned to face the middle. */
@@ -92,15 +92,25 @@ export function FarSide({ a, children }: { a: number; children: ReactNode }) {
 }
 
 /**
- * Only what can be seen takes a tap. Three's raycaster tests objects whether
- * they are drawn or not, and `FarSide` hides things by not drawing them: left
- * alone, a panel hidden behind the camera would catch every tap meant for the
- * machine in front of it.
+ * Only what can be seen takes a tap, and in front of a machine, only that
+ * machine. Three's raycaster tests objects whether they are drawn or not, and
+ * `FarSide` hides things by not drawing them: left alone, a panel hidden
+ * behind the camera would catch every tap meant for the machine in front of
+ * it. And a neighbouring machine at the edge of the shot, or the pad that
+ * walks up to it, would catch the taps meant for this one.
  */
-export function onlySeen(hits: Intersection[]): Intersection[] {
+export function onlySeen(hits: Intersection[], focus: MachineId | null = null): Intersection[] {
   const seen = (o: Object3D | null): boolean => !o || (o.visible && seen(o.parent));
-  return hits.filter((h) => seen(h.object));
+  const machine = (o: Object3D | null): string | null => (!o ? null : (o.userData.machine ?? machine(o.parent)));
+  return hits.filter((h) => {
+    if (!seen(h.object)) return false;
+    const m = machine(h.object);
+    return focus === null || m === null || m === focus;
+  });
 }
+
+/** Marks a machine's group, so that taps can tell which machine they landed on. */
+export const machine = (id: MachineId) => ({ userData: { machine: id } });
 
 /**
  * Seen from across the hall, a machine on the side wall shows only its edge.

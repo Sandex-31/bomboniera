@@ -17,16 +17,19 @@ import CameraRig from "./CameraRig";
 import { tappedJustNow, useTap } from "./Hotspot";
 import Rotom from "./Rotom";
 import Keeper from "./Keeper";
-import CardPieces, { type PieceId } from "../components/CardPieces";
+import CardPieces from "../components/CardPieces";
 import Boilers, { BOILER_ANGLES, doorAt } from "./machines/Boilers";
 import Pipes from "./machines/Pipes";
 import Gears from "./machines/Gears";
 import Hoist from "./machines/Hoist";
-import { BOILERS_KEY, GEARS_KEY, HOIST_KEY, PIPES_KEY, boilerLine } from "../data/puzzle";
+import Organ from "./machines/Organ";
+import { BOILERS_KEY, GEARS_KEY, HOIST_KEY, ORGAN_KEY, PIPES_KEY, boilerLine, cardLine } from "../data/puzzle";
 import { loadBoilers, steamOf, type BoilerState } from "../lib/boilers";
 import { flow as steamFlow, loadPipes, type PipesState } from "../lib/pipes";
 import { loadGears, spin as spinGears, type GearsState } from "../lib/gears";
 import { loadHoist, type HoistState } from "../lib/hoist";
+import { MELODY, assembled, loadOrgan, type OrganState, type PieceId } from "../lib/card";
+import { organ as organVoice } from "../lib/organ";
 import { FLIGHT, type View } from "./focus";
 import { BURN_MS, moveMs, type Move } from "../lib/descent";
 import {
@@ -260,37 +263,6 @@ function Steam({ position, every, reduced }: { position: [number, number, number
   );
 }
 
-/**
- * Where a machine stands, until it is built: an iron plate on the wall with
- * a copper rim, which a tap walks up to. The machines of the next chapters
- * replace these one at a time.
- */
-function Spot({ id, onPick }: { id: Exclude<MachineId, "press">; onPick: (id: MachineId) => void }) {
-  const { a, y } = SPOTS[id];
-  const tap = useTap(() => onPick(id));
-  return (
-    <FarSide a={a}>
-      <group {...onWall(a, 0.05, y)} {...tap}>
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[1.06, 0.86]} />
-          {/* faintly lit by the fire, or it is lost in the dark */}
-          <meshStandardMaterial
-            color={COPPER}
-            emissive="#FF8A3A"
-            emissiveIntensity={0.18}
-            metalness={0.7}
-            roughness={0.4}
-          />
-        </mesh>
-        <mesh>
-          <planeGeometry args={[1, 0.8]} />
-          <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.6} />
-        </mesh>
-      </group>
-    </FarSide>
-  );
-}
-
 /** Rotom, eased to where it is put and to the size it is wanted at. */
 function Carried({
   at,
@@ -378,6 +350,21 @@ export default function Engine({
       /* storage unavailable — the hoist still works for this visit */
     }
   }, [hoist]);
+  /** The organ: the card on its lectern, and whether the tune has been played. */
+  const [organ, setOrgan] = useState<OrganState>(loadOrgan);
+  useEffect(() => {
+    try {
+      localStorage.setItem(ORGAN_KEY, JSON.stringify(organ));
+    } catch {
+      /* storage unavailable — the organ still plays for this visit */
+    }
+  }, [organ]);
+  /** The piece of card taken out of the pocket to be laid on the lectern. */
+  const [inHand, setInHand] = useState<PieceId | null>(null);
+  /** The whistle the organ sounds as it plays the tune back by itself. */
+  const [playing, setPlaying] = useState<number | null>(null);
+  /** Which line Rotom is saying, if any. */
+  const [line, setLine] = useState(boilerLine);
   /** Which boiler Rotom has been put in, if any. Not kept: a reload finds it in the middle. */
   const [inside, setInside] = useState<number | null>(null);
   /** When Rotom was last blown out of a boiler, black with soot. */
@@ -386,6 +373,9 @@ export default function Engine({
   const [saying, setSaying] = useState(false);
   /** The machine the camera stands in front of, if any. */
   const [focus, setFocus] = useState<MachineId | null>(start ?? null);
+  /** The same, for the tap filter, which is set up once with the canvas. */
+  const focusRef = useRef(focus);
+  focusRef.current = focus;
   /** Which boiler, when it is the boilers. */
   const [which, setWhich] = useState(1);
   const [zapAt, setZapAt] = useState(0);
@@ -498,6 +488,7 @@ export default function Engine({
       setBoilers((b) => ({ ...b, lit: b.lit.map((l, k) => l || k === i) }));
       setInside(null);
       if (firstFire) {
+        setLine(boilerLine);
         setScene(true);
         setSaying(true);
       }
@@ -510,6 +501,27 @@ export default function Engine({
   const said = () => {
     setSaying(false);
     setScene(false);
+  };
+
+  /** The card laid whole for the first time: Rotom has something to say about it. */
+  const changeOrgan = (next: OrganState) => {
+    if (!assembled(organ.lectern) && assembled(next.lectern)) {
+      setLine(cardLine);
+      setScene(true);
+      setSaying(true);
+    }
+    setOrgan(next);
+  };
+  /** The tune pulled right: the organ plays it back by itself, then its latch springs. */
+  const played = () => {
+    setScene(true);
+    void organVoice()
+      .play(MELODY, (k) => setPlaying(MELODY[k].note))
+      .then(() => {
+        setPlaying(null);
+        setOrgan((o) => ({ ...o, played: true }));
+        setScene(false);
+      });
   };
 
   /** The pieces of the punched card in the visitor's pocket. */
@@ -525,7 +537,7 @@ export default function Engine({
         orthographic
         dpr={[1, 1.75]}
         camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
-        events={(store) => ({ ...events(store), filter: onlySeen })}
+        events={(store) => ({ ...events(store), filter: (hits) => onlySeen(hits, focusRef.current) })}
         onPointerMissed={back}
         onPointerUp={drop}
       >
@@ -648,9 +660,19 @@ export default function Engine({
           onPick={() => pick("hoist")}
           onChange={setHoist}
         />
-        {(["organ"] as const).map((id) => (
-          <Spot key={id} id={id} onPick={pick} />
-        ))}
+        <Organ
+          state={organ}
+          steam={steam.outlets.triangolo === "ok"}
+          fan={turning.shafts.ventola}
+          inHand={inHand}
+          active={focus === "organ" && !scene}
+          reduced={reduced}
+          playing={playing}
+          onPick={() => pick("organ")}
+          onChange={changeOrgan}
+          onLay={() => setInHand(null)}
+          onPlayed={played}
+        />
 
         {/* the way down from the sarcophagus, through where the ceiling would
           be: a rim and the dark above it. Tapping it goes back up. */}
@@ -695,12 +717,18 @@ export default function Engine({
               />
             </Suspense>
           </group>
-          {saying && (
+          {saying && (focus === null || focus === "boilers") && (
             <Html position={[0, 2.1, 0]} center zIndexRange={[6, 0]}>
-              <Keeper line={boilerLine} last reduced={reduced} onNext={said} />
+              <Keeper line={line} last reduced={reduced} onNext={said} />
             </Html>
           )}
         </Carried>
+        {/* in front of a machine on the wall Rotom is out of the shot: it speaks from over the machine */}
+        {saying && focus !== null && focus !== "boilers" && focus !== "press" && (
+          <Html position={onWall(SPOTS[focus].a, 0.9, SPOTS[focus].y + 0.55).position} center zIndexRange={[6, 0]}>
+            <Keeper line={line} last reduced={reduced} onNext={said} />
+          </Html>
+        )}
 
         <CameraRig view={view} controls={controls} reduced={reduced} onFlight={setFlying} fit={[FIT_W, FIT_W]} />
         <OrbitControls
@@ -716,7 +744,11 @@ export default function Engine({
           maxAzimuthAngle={view.spread.azimuth >= Math.PI ? Infinity : view.azimuth + view.spread.azimuth}
         />
       </Canvas>
-      <CardPieces found={found} />
+      <CardPieces
+        found={found.filter((p) => !organ.lectern.some((l) => l?.piece === p))}
+        inHand={inHand}
+        onTake={focus === "organ" && !scene ? setInHand : undefined}
+      />
     </>
   );
 }

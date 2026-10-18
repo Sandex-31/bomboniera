@@ -1,9 +1,12 @@
+import type { PieceId } from "../lib/card";
+
 /**
  * The pieces of the punched card found so far, kept at the edge of the
  * screen like things in a pocket. Only their shape shows here: the holes are
- * read on the organ's lectern, once the pieces are put back together.
+ * read on the organ's lectern, once the pieces are put back together. In
+ * front of the organ a piece can be taken out of the pocket with a tap, to
+ * be laid on the lectern.
  */
-export type PieceId = "A" | "B" | "C";
 
 /** Each piece torn off along its own jagged line, so the three never look alike. */
 const TEARS: Record<PieceId, string> = {
@@ -12,18 +15,45 @@ const TEARS: Record<PieceId, string> = {
   C: "M4 2 H30 V40 H4 L1 33 L5 27 L1 20 L6 13 L2 7 Z",
 };
 
-export default function CardPieces({ found }: { found: PieceId[] }) {
+export default function CardPieces({
+  found,
+  inHand,
+  onTake,
+}: {
+  found: PieceId[];
+  /** The piece taken out to be laid down, if any. */
+  inHand?: PieceId | null;
+  /** Taking a piece out, or putting it back; absent where there is nothing to lay it on. */
+  onTake?: (piece: PieceId | null) => void;
+}) {
   if (found.length === 0) return null;
   return (
     <div className="card-pieces" aria-label="pezzi di scheda">
-      {found.map((id) => (
-        <svg key={id} viewBox="0 0 33 42" width="33" height="42" aria-hidden="true">
-          <path d={TEARS[id]} fill="#E8DCC0" stroke="#8A7650" strokeWidth="1" />
-          {[10, 20, 30].map((y) => (
-            <circle key={y} cx={id === "B" ? 16 : 14} cy={y} r="2.2" fill="#3A2E22" />
-          ))}
-        </svg>
-      ))}
+      {found.map((id) => {
+        const art = (
+          <svg viewBox="0 0 33 42" width="33" height="42" aria-hidden="true">
+            <path d={TEARS[id]} fill="#E8DCC0" stroke="#8A7650" strokeWidth="1" />
+            {[10, 20, 30].map((y) => (
+              <circle key={y} cx={id === "B" ? 16 : 14} cy={y} r="2.2" fill="#3A2E22" />
+            ))}
+          </svg>
+        );
+        return onTake ? (
+          <button
+            key={id}
+            className={`card-pieces__piece${inHand === id ? " is-held" : ""}`}
+            aria-pressed={inHand === id}
+            aria-label="pezzo di scheda"
+            onClick={() => onTake(inHand === id ? null : id)}
+          >
+            {art}
+          </button>
+        ) : (
+          <span key={id} className="card-pieces__piece">
+            {art}
+          </span>
+        );
+      })}
     </div>
   );
 }

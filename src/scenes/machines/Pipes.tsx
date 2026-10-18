@@ -21,7 +21,7 @@ import {
   type PipesState,
 } from "../../lib/pipes";
 import type { Shape } from "../../lib/boilers";
-import { Approach, COPPER, FarSide, IRON, SPOTS, onWall } from "./hall";
+import { Approach, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
 
 /*
  * The panel of steam pipes on the wall. Every piece is a tap: a fitting turns
@@ -390,7 +390,7 @@ export default function Pipes({
   return (
     <FarSide a={a}>
       {/* stood off the wall far enough that the curve of the bricks clears its corners */}
-      <group {...onWall(a, 0.22, y)}>
+      <group {...onWall(a, 0.22, y)} {...machine("pipes")}>
         {/* a caged lamp over the panel, so it can be worked with the boilers still cold */}
         <pointLight position={[0, H * CELL * 0.75, 0.55]} color="#FFC890" intensity={2.2} distance={2.2} />
         {!active && (

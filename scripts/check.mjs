@@ -1016,6 +1016,9 @@ try {
     const hoist = await vite5.ssrLoadModule("/src/lib/hoist.ts");
     const hung = hoist.hoistFrom(store.get(puzzle.HOIST_KEY));
     assert.ok(hoist.tilt(hung) === 0 && hung.piece, "the jump leaves the hoist down");
+    const card = await vite5.ssrLoadModule("/src/lib/card.ts");
+    const organ = card.organFrom(store.get(puzzle.ORGAN_KEY));
+    assert.ok(card.assembled(organ.lectern) && organ.played, "the jump leaves the organ unplayed");
 
     // the floor the visitor is on: whatever is stored, it lands on a real floor
     assert.equal(puzzle.floorFrom(null), 0, "never been down is the island");
@@ -1730,6 +1733,41 @@ try {
     for (const bad of ["x", "{}", JSON.stringify({ ...h.START, where: { ...h.START.where, palla: 1, ruota: 1 } })])
       assert.deepEqual(h.hoistFrom(bad), h.START, `${bad} is not a hoist`);
     console.log(`ok — the hoist: ${settings} settings of the beam, one level, and the scale enough to find it`);
+
+    /* the punched card: it carries the tune, and goes back together one way */
+    const c = await vite13.ssrLoadModule("/src/lib/card.ts");
+    const read = Array.from({ length: c.COLS }, (_, col) => {
+      const row = c.CARD.findIndex((r) => r[col] !== null);
+      return { note: row, long: c.CARD[row][col] === "fessura" };
+    });
+    assert.deepEqual(read, c.MELODY, "the card does not carry the tune");
+    assert.equal(new Set(c.MELODY.map((m) => m.note)).size, c.ROWS, "a whistle is never played");
+    assert.ok(c.CARD.every((row) => row.length === c.COLS) && c.CARD.flat().filter(Boolean).length === c.COLS);
+    const layings = [];
+    const orders = [["A", "B", "C"], ["A", "C", "B"], ["B", "A", "C"], ["B", "C", "A"], ["C", "A", "B"], ["C", "B", "A"]];
+    for (const order of orders) {
+      for (let f = 0; f < 64; f++) {
+        const lectern = order.map((piece, s) => ({ piece, flipH: Boolean((f >> (2 * s)) & 1), flipV: Boolean((f >> (2 * s + 1)) & 1) }));
+        if (c.assembled(lectern)) layings.push(lectern);
+      }
+    }
+    assert.equal(layings.length, 1, `the card goes together ${layings.length} ways`);
+    assert.deepEqual(layings[0], c.solvedOrgan().lectern, "the card goes together some other way");
+    assert.ok(!c.assembled([null, null, null]) && !c.assembled(c.solvedOrgan().lectern.slice(0, 2).concat([null])));
+    // the edges alone do not decide it, nor the pins alone: both are needed
+    const flipAll = ["C", "B", "A"].map((piece) => ({ piece, flipH: true, flipV: false }));
+    assert.ok(!c.assembled(flipAll), "the card read back to front still goes together");
+    // the tune, pulled: short and long count, the rhythm between does not
+    const pull = (notes) => notes.reduce((done, { note, long }) => c.step(done, note, long ? 900 : 150), 0);
+    assert.equal(pull(c.MELODY), c.MELODY.length, "the tune itself is refused");
+    assert.notEqual(pull(c.MELODY.map((m, k) => (k === 2 ? { ...m, long: false } : m))), c.MELODY.length, "a short pull where a long one goes");
+    assert.equal(c.step(5, c.MELODY[0].note, 100), 1, "a wrong note that starts the tune afresh is not counted");
+    assert.equal(c.step(5, 2, 100), 0);
+    assert.deepEqual(c.organFrom(JSON.stringify(c.solvedOrgan())), c.solvedOrgan());
+    assert.deepEqual(c.organFrom(null), c.EMPTY);
+    for (const bad of ["x", "{}", JSON.stringify({ lectern: [{ piece: "A", flipH: false, flipV: false }, { piece: "A", flipH: false, flipV: false }, null], played: false })])
+      assert.deepEqual(c.organFrom(bad), c.EMPTY, `${bad} is not an organ`);
+    console.log(`ok — the card: ${c.MELODY.length} notes on ${c.ROWS} whistles, ${orders.length * 64} ways to lay it, one right`);
   } finally {
     await vite13.close();
   }
