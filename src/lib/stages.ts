@@ -46,6 +46,7 @@ import { solvedPipes } from "./pipes";
 import { solvedGears } from "./gears";
 import { solvedHoist } from "./hoist";
 import { solvedOrgan } from "./card";
+import { solvedPress } from "./press";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
 function levers(): boolean[] {
@@ -101,14 +102,14 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "ingranaggi", key: GEARS_KEY, solved: solvedGears },
   { label: "montacarichi", key: HOIST_KEY, solved: solvedHoist },
   { label: "organo", key: ORGAN_KEY, solved: solvedOrgan },
+  { label: "pressa", key: PRESS_KEY, solved: solvedPress },
 ];
 
 /**
  * What the puzzle keeps that is not a stop of its own: which chats have been
- * opened, and how deep the visitor has been. Wiped with the rest. The
- * machines of the third floor wait here until each has a stop of its own.
+ * opened, and how deep the visitor has been. Wiped with the rest.
  */
-export const WIPED = [CHAT_KEY, DEPTH_KEY, PRESS_KEY];
+export const WIPED = [CHAT_KEY, DEPTH_KEY];
 
 /**
  * Wipes the whole chain, then solves the first `upTo` stops of it.

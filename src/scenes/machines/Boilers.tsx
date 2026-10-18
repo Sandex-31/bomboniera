@@ -8,7 +8,7 @@ import {
   type MeshStandardMaterial,
   type PointLight,
 } from "three";
-import { useTap } from "../Hotspot";
+import { tookTap, useTap } from "../Hotspot";
 import {
   DRAWER_BOILER,
   GREEN,
@@ -414,7 +414,10 @@ export default function Boilers({
 
   useEffect(() => {
     if (pumping === null) return;
-    const up = () => finish(release(needle.current));
+    const up = () => {
+      tookTap();
+      finish(release(needle.current));
+    };
     window.addEventListener("pointerup", up);
     window.addEventListener("pointercancel", up);
     return () => {

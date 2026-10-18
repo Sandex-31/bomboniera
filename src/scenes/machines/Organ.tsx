@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Line } from "@react-three/drei";
 import { DoubleSide, Shape as ShapePath, type Group, type Mesh, type MeshBasicMaterial } from "three";
-import { useTap } from "../Hotspot";
+import { tookTap, useTap } from "../Hotspot";
 import {
   CARD,
   HANDLES,
@@ -270,6 +270,7 @@ export default function Organ({
     const up = (e: PointerEvent) => {
       const k = pulled;
       const held = e.timeStamp - pullStart.current;
+      tookTap();
       setPulled(null);
       voice.current?.stop();
       voice.current = null;

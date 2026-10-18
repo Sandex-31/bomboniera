@@ -43,6 +43,11 @@ let lastTap = -Infinity;
  */
 export const tappedJustNow = () => performance.now() - lastTap < 350;
 
+/** For a press or a drag handled without `useTap`: it took the finger, and the click after it is not a tap on nothing. */
+export const tookTap = () => {
+  lastTap = performance.now();
+};
+
 /**
  * Tap handling that survives a thumb.
  *

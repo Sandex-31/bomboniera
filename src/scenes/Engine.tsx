@@ -23,13 +23,25 @@ import Pipes from "./machines/Pipes";
 import Gears from "./machines/Gears";
 import Hoist from "./machines/Hoist";
 import Organ from "./machines/Organ";
-import { BOILERS_KEY, GEARS_KEY, HOIST_KEY, ORGAN_KEY, PIPES_KEY, boilerLine, cardLine } from "../data/puzzle";
+import Press, { HOLE_R as PRESS_HOLE_R } from "./machines/Press";
+import {
+  BOILERS_KEY,
+  GEARS_KEY,
+  HOIST_KEY,
+  ORGAN_KEY,
+  PIPES_KEY,
+  PRESS_KEY,
+  boilerLine,
+  cardLine,
+  pressLine,
+} from "../data/puzzle";
 import { loadBoilers, steamOf, type BoilerState } from "../lib/boilers";
 import { flow as steamFlow, loadPipes, type PipesState } from "../lib/pipes";
 import { loadGears, spin as spinGears, type GearsState } from "../lib/gears";
 import { loadHoist, type HoistState } from "../lib/hoist";
 import { MELODY, assembled, loadOrgan, type OrganState, type PieceId } from "../lib/card";
 import { organ as organVoice } from "../lib/organ";
+import { BLOWS, BREAK_MS, LINE_MS, loadPress, type PressState } from "../lib/press";
 import { FLIGHT, type View } from "./focus";
 import { BURN_MS, moveMs, type Move } from "../lib/descent";
 import {
@@ -73,8 +85,14 @@ const HALL_VIEW: View = {
 };
 
 /** Up under the hole, looking at where Rotom is about to come through, and where it burns. */
+/**
+ * Where Rotom floats in the hall, and comes in and goes out through the
+ * ceiling: off to the left of the press, which stands in the middle.
+ */
+const ASIDE: [number, number, number] = [-0.85, 0, 0.85];
+
 const CEILING_VIEW: View = {
-  target: [0, 1.5, 0],
+  target: [ASIDE[0], 1.5, ASIDE[2]],
   azimuth: Math.PI / 4,
   polar: 0.8,
   zoom: 2,
@@ -263,6 +281,23 @@ function Steam({ position, every, reduced }: { position: [number, number, number
   );
 }
 
+/** The camera shaken by each blow of the hammer. */
+function Shaker({ at, reduced }: { at: number; reduced: boolean }) {
+  const offset = useRef(new Vector3());
+  useFrame(({ camera }) => {
+    camera.position.sub(offset.current);
+    offset.current.set(0, 0, 0);
+    if (reduced || !Number.isFinite(at)) return;
+    const t = performance.now() - at;
+    const hit = BLOWS.map((b) => t - b).find((d) => d >= 0 && d < 350);
+    if (hit === undefined) return;
+    const k = (1 - hit / 350) * 0.06;
+    offset.current.set(Math.sin(t * 0.21) * k, Math.sin(t * 0.17 + 1) * k, Math.sin(t * 0.13 + 2) * k);
+    camera.position.add(offset.current);
+  });
+  return null;
+}
+
 /** Rotom, eased to where it is put and to the size it is wanted at. */
 function Carried({
   at,
@@ -363,6 +398,18 @@ export default function Engine({
   const [inHand, setInHand] = useState<PieceId | null>(null);
   /** The whistle the organ sounds as it plays the tune back by itself. */
   const [playing, setPlaying] = useState<number | null>(null);
+  /** The press: whether the big lever has been pulled. */
+  const [press, setPress] = useState<PressState>(loadPress);
+  useEffect(() => {
+    try {
+      localStorage.setItem(PRESS_KEY, JSON.stringify(press));
+    } catch {
+      /* storage unavailable — the press still falls for this visit */
+    }
+  }, [press]);
+  /** When the lever was pulled on this visit, and whether the floor has given way yet. */
+  const [finaleAt, setFinaleAt] = useState(-Infinity);
+  const [broken, setBroken] = useState(press.pulled);
   /** Which line Rotom is saying, if any. */
   const [line, setLine] = useState(boilerLine);
   /** Which boiler Rotom has been put in, if any. Not kept: a reload finds it in the middle. */
@@ -479,7 +526,7 @@ export default function Engine({
         ? waitBy(which)
         : focus && focus !== "press"
           ? outOfTheWay(SPOTS[focus].a)
-          : [0, 0, 0];
+          : ASIDE;
 
   /** What came of the bellows. */
   const outcome = (i: number, what: "out" | "lit" | "spat") => {
@@ -512,6 +559,29 @@ export default function Engine({
     }
     setOrgan(next);
   };
+  /** The big lever pulled: three blows of the hammer, the floor gives way, Rotom has the last word. */
+  const finale = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => () => finale.current.forEach(clearTimeout), []);
+  const pull = () => {
+    if (press.pulled) return;
+    setPress({ pulled: true });
+    setScene(true);
+    const speak = () => {
+      setLine(pressLine);
+      setSaying(true);
+    };
+    if (reduced) {
+      setBroken(true);
+      speak();
+      return;
+    }
+    setFinaleAt(performance.now());
+    finale.current.push(
+      setTimeout(() => setBroken(true), BREAK_MS),
+      setTimeout(speak, LINE_MS),
+    );
+  };
+
   /** The tune pulled right: the organ plays it back by itself, then its latch springs. */
   const played = () => {
     setScene(true);
@@ -522,6 +592,13 @@ export default function Engine({
         setOrgan((o) => ({ ...o, played: true }));
         setScene(false);
       });
+  };
+
+  /** The three latches of the big lever: each lets go once its machine is right. */
+  const latches = {
+    quadrato: steam.outlets.quadrato === "ok",
+    volano: turning.shafts.volano === "ok",
+    organo: organ.played,
   };
 
   /** The pieces of the punched card in the visitor's pocket. */
@@ -545,11 +622,12 @@ export default function Engine({
         <ambientLight intensity={DARK.ambient + PER_BOILER.ambient * burning} color="#FFC8A0" />
         <hemisphereLight args={["#FFD0A0", "#1A0E08", DARK.hemi + PER_BOILER.hemi * burning]} />
         {/* Heat Rotom is the one fire left: it lights the middle of the hall */}
-        <pointLight position={[0, 1.2, 0]} color="#FF8A3A" intensity={1.6} distance={3.2} />
+        <pointLight position={[ASIDE[0], 1.2, ASIDE[2]]} color="#FF8A3A" intensity={1.6} distance={3.2} />
 
-        {/* the floor: iron plates, riveted in rings */}
+        {/* the floor: iron plates, riveted in rings, and once the press is
+            through, a hole in the middle of them */}
         <mesh rotation-x={-Math.PI / 2}>
-          <circleGeometry args={[HALL_R, 48]} />
+          {broken ? <ringGeometry args={[PRESS_HOLE_R, HALL_R, 48]} /> : <circleGeometry args={[HALL_R, 48]} />}
           <meshStandardMaterial color="#3A332E" metalness={0.5} roughness={0.75} />
         </mesh>
         {[0.8, 1.6].map((r) => (
@@ -676,7 +754,7 @@ export default function Engine({
 
         {/* the way down from the sarcophagus, through where the ceiling would
           be: a rim and the dark above it. Tapping it goes back up. */}
-        <group position={[0, HOLE_Y, 0]} visible={focus === null} {...up}>
+        <group position={[ASIDE[0], HOLE_Y, ASIDE[2]]} visible={focus === null} {...up}>
           <mesh rotation-x={-Math.PI / 2}>
             <ringGeometry args={[HOLE_R, HOLE_R + 0.06, 40]} />
             {/* lit by the fire below, or it is lost against the dark */}
@@ -693,11 +771,23 @@ export default function Engine({
             <meshBasicMaterial transparent opacity={0} depthWrite={false} />
           </mesh>
         </group>
-        <mesh position={[0, HOLE_Y - 0.5, 0]} visible={focus === null}>
+        <mesh position={[ASIDE[0], HOLE_Y - 0.5, ASIDE[2]]} visible={focus === null}>
           <cylinderGeometry args={[HOLE_R, HOLE_R * 1.6, 1, 24, 1, true]} />
           <meshBasicMaterial color="#FFB070" transparent opacity={0.1} depthWrite={false} />
         </mesh>
 
+        <Shaker at={finaleAt} reduced={reduced} />
+        <Press
+          latches={latches}
+          turning={turning.shafts.volano === "ok"}
+          pulled={press.pulled}
+          finaleAt={finaleAt}
+          broken={broken}
+          active={focus === "press" && !scene}
+          reduced={reduced}
+          onPick={() => pick("press")}
+          onPull={pull}
+        />
         <Carried
           at={at}
           size={inside !== null && !held ? 0.35 : focus === "boilers" ? 0.5 : focus && focus !== "press" ? 0.6 : 1}
@@ -717,7 +807,7 @@ export default function Engine({
               />
             </Suspense>
           </group>
-          {saying && (focus === null || focus === "boilers") && (
+          {saying && (focus === null || focus === "boilers" || focus === "press") && (
             <Html position={[0, 2.1, 0]} center zIndexRange={[6, 0]}>
               <Keeper line={line} last reduced={reduced} onNext={said} />
             </Html>

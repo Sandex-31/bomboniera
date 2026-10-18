@@ -1019,6 +1019,8 @@ try {
     const card = await vite5.ssrLoadModule("/src/lib/card.ts");
     const organ = card.organFrom(store.get(puzzle.ORGAN_KEY));
     assert.ok(card.assembled(organ.lectern) && organ.played, "the jump leaves the organ unplayed");
+    const thePress = await vite5.ssrLoadModule("/src/lib/press.ts");
+    assert.ok(thePress.pressFrom(store.get(puzzle.PRESS_KEY)).pulled, "the jump leaves the press up");
 
     // the floor the visitor is on: whatever is stored, it lands on a real floor
     assert.equal(puzzle.floorFrom(null), 0, "never been down is the island");
@@ -1768,6 +1770,19 @@ try {
     for (const bad of ["x", "{}", JSON.stringify({ lectern: [{ piece: "A", flipH: false, flipV: false }, { piece: "A", flipH: false, flipV: false }, null], played: false })])
       assert.deepEqual(c.organFrom(bad), c.EMPTY, `${bad} is not an organ`);
     console.log(`ok — the card: ${c.MELODY.length} notes on ${c.ROWS} whistles, ${orders.length * 64} ways to lay it, one right`);
+
+    /* the press: three latches, all needed; a finale that ends in the hole */
+    const pr = await vite13.ssrLoadModule("/src/lib/press.ts");
+    assert.ok(pr.free({ quadrato: true, volano: true, organo: true }));
+    for (const k of ["quadrato", "volano", "organo"])
+      assert.ok(!pr.free({ quadrato: true, volano: true, organo: true, [k]: false }), `the lever comes down without ${k}`);
+    assert.ok(pr.BLOWS.length === 3 && pr.BLOWS.every((b) => b < pr.BREAK_MS) && pr.BREAK_MS < pr.LINE_MS);
+    assert.deepEqual(pr.pressFrom(null), pr.STILL);
+    assert.deepEqual(pr.pressFrom("x"), pr.STILL);
+    assert.deepEqual(pr.pressFrom(JSON.stringify(pr.solvedPress())), pr.solvedPress());
+    const { pressLine, boilerLine, cardLine } = await vite13.ssrLoadModule("/src/data/puzzle.ts");
+    for (const l of [pressLine, boilerLine, cardLine]) assert.ok(l.startsWith("Rotom:"));
+    console.log("ok — the press: three latches, three blows, and the floor gives way");
   } finally {
     await vite13.close();
   }
