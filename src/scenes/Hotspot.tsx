@@ -31,6 +31,18 @@ type Props = {
 /** How far a finger may drift between press and release and still be a tap. */
 const TAP_SLOP = 14;
 
+/** When a tap was last taken by something in a scene. */
+let lastTap = -Infinity;
+
+/**
+ * Whether a tap was just taken. A tap ends in a click, and the click is
+ * aimed afresh: if the tap took away what was under the finger (a gear put
+ * on a peg replaces the peg's pad), the click finds nothing there and reads
+ * as a tap on the empty scene. Whatever handles taps on nothing asks this
+ * first.
+ */
+export const tappedJustNow = () => performance.now() - lastTap < 350;
+
 /**
  * Tap handling that survives a thumb.
  *
@@ -56,6 +68,7 @@ export function useTap(onTap: () => void, enabled = true) {
       const moved = Math.hypot(e.nativeEvent.clientX - start.x, e.nativeEvent.clientY - start.y);
       if (moved > TAP_SLOP) return; // it was a drag to turn the camera
       e.stopPropagation();
+      lastTap = performance.now();
       onTap();
     },
   };

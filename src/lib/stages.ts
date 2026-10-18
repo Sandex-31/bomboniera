@@ -44,6 +44,7 @@ import { PHRASES } from "../data/babel";
 import { solvedBoilers } from "./boilers";
 import { solvedPipes } from "./pipes";
 import { solvedGears } from "./gears";
+import { solvedHoist } from "./hoist";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
 function levers(): boolean[] {
@@ -97,6 +98,7 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "caldaie", key: BOILERS_KEY, solved: solvedBoilers },
   { label: "tubi", key: PIPES_KEY, solved: solvedPipes },
   { label: "ingranaggi", key: GEARS_KEY, solved: solvedGears },
+  { label: "montacarichi", key: HOIST_KEY, solved: solvedHoist },
 ];
 
 /**
@@ -104,7 +106,7 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
  * opened, and how deep the visitor has been. Wiped with the rest. The
  * machines of the third floor wait here until each has a stop of its own.
  */
-export const WIPED = [CHAT_KEY, DEPTH_KEY, HOIST_KEY, ORGAN_KEY, PRESS_KEY];
+export const WIPED = [CHAT_KEY, DEPTH_KEY, ORGAN_KEY, PRESS_KEY];
 
 /**
  * Wipes the whole chain, then solves the first `upTo` stops of it.

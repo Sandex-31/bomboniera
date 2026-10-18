@@ -14,17 +14,19 @@ import {
   type MeshBasicMaterial,
 } from "three";
 import CameraRig from "./CameraRig";
-import { useTap } from "./Hotspot";
+import { tappedJustNow, useTap } from "./Hotspot";
 import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import CardPieces, { type PieceId } from "../components/CardPieces";
 import Boilers, { BOILER_ANGLES, doorAt } from "./machines/Boilers";
 import Pipes from "./machines/Pipes";
 import Gears from "./machines/Gears";
-import { BOILERS_KEY, GEARS_KEY, PIPES_KEY, boilerLine } from "../data/puzzle";
+import Hoist from "./machines/Hoist";
+import { BOILERS_KEY, GEARS_KEY, HOIST_KEY, PIPES_KEY, boilerLine } from "../data/puzzle";
 import { loadBoilers, steamOf, type BoilerState } from "../lib/boilers";
 import { flow as steamFlow, loadPipes, type PipesState } from "../lib/pipes";
 import { loadGears, spin as spinGears, type GearsState } from "../lib/gears";
+import { loadHoist, type HoistState } from "../lib/hoist";
 import { FLIGHT, type View } from "./focus";
 import { BURN_MS, moveMs, type Move } from "../lib/descent";
 import {
@@ -320,6 +322,7 @@ export default function Engine({
   onUp,
   arrivedAt,
   first,
+  start,
 }: {
   reduced: boolean;
   /** Whether a scene is playing, for the desktop to clear itself. */
@@ -330,6 +333,8 @@ export default function Engine({
   arrivedAt: number;
   /** Whether that was the first time down, which is the long way. */
   first: boolean;
+  /** A machine to start in front of instead of the whole hall: for looking at one on its own. */
+  start?: MachineId;
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
   const [flying, setFlying] = useState(false);
@@ -364,6 +369,15 @@ export default function Engine({
   }, [gears]);
   const driven = steam.outlets.tondo === "ok";
   const turning = useMemo(() => spinGears(gears, driven), [gears, driven]);
+  /** The hoist: what hangs where, and whether its crate has been opened. */
+  const [hoist, setHoist] = useState<HoistState>(loadHoist);
+  useEffect(() => {
+    try {
+      localStorage.setItem(HOIST_KEY, JSON.stringify(hoist));
+    } catch {
+      /* storage unavailable — the hoist still works for this visit */
+    }
+  }, [hoist]);
   /** Which boiler Rotom has been put in, if any. Not kept: a reload finds it in the middle. */
   const [inside, setInside] = useState<number | null>(null);
   /** When Rotom was last blown out of a boiler, black with soot. */
@@ -371,7 +385,7 @@ export default function Engine({
   /** Rotom says its line over the first boiler lit. */
   const [saying, setSaying] = useState(false);
   /** The machine the camera stands in front of, if any. */
-  const [focus, setFocus] = useState<MachineId | null>(null);
+  const [focus, setFocus] = useState<MachineId | null>(start ?? null);
   /** Which boiler, when it is the boilers. */
   const [which, setWhich] = useState(1);
   const [zapAt, setZapAt] = useState(0);
@@ -387,7 +401,7 @@ export default function Engine({
   const [move, setMove] = useState<Move | undefined>(() =>
     arriving ? { at: arrivedAt, kind: "in", dir: "down", fast: !first } : undefined,
   );
-  const [view, setView] = useState(arriving ? CEILING_VIEW : HALL_VIEW);
+  const [view, setView] = useState(arriving ? CEILING_VIEW : start ? VIEWS[start] : HALL_VIEW);
   const [scene, setScene] = useState(arriving);
   useEffect(() => {
     if (!arriving) return;
@@ -399,29 +413,20 @@ export default function Engine({
   useEffect(() => onScene(scene), [scene, onScene]);
 
   /** Walking up to a machine, and back to the whole hall. Not during a scene. */
-  /**
-   * When the camera last set off towards a machine. The tap that sent it
-   * there ends in a click, and by then what was tapped may be gone from under
-   * the finger (a machine's approach pad goes once it is being worked): that
-   * click must not count as a tap on nothing, which would send it back.
-   */
-  const pickedAt = useRef(-Infinity);
   const pick = (id: MachineId) => {
     if (scene) return;
-    pickedAt.current = performance.now();
     setFocus(id);
     setView(VIEWS[id]);
   };
   const pickBoiler = (i: number) => {
     if (scene) return;
-    pickedAt.current = performance.now();
     setFocus("boilers");
     setWhich(i);
     setInside(null);
     setView(BOILER_VIEWS[i]);
   };
   const back = () => {
-    if (scene || focus === null || performance.now() - pickedAt.current < 400) return;
+    if (scene || focus === null || tappedJustNow()) return;
     setFocus(null);
     setView(HALL_VIEW);
   };
@@ -508,7 +513,11 @@ export default function Engine({
   };
 
   /** The pieces of the punched card in the visitor's pocket. */
-  const found: PieceId[] = [...(boilers.piece ? (["A"] as const) : []), ...(gears.piece ? (["B"] as const) : [])];
+  const found: PieceId[] = [
+    ...(boilers.piece ? (["A"] as const) : []),
+    ...(gears.piece ? (["B"] as const) : []),
+    ...(hoist.piece ? (["C"] as const) : []),
+  ];
 
   return (
     <>
@@ -631,7 +640,15 @@ export default function Engine({
           onPick={() => pick("gears")}
           onChange={setGears}
         />
-        {(["hoist", "organ"] as const).map((id) => (
+        <Hoist
+          state={hoist}
+          winding={turning.shafts.argano === "ok"}
+          active={focus === "hoist" && !scene}
+          reduced={reduced}
+          onPick={() => pick("hoist")}
+          onChange={setHoist}
+        />
+        {(["organ"] as const).map((id) => (
           <Spot key={id} id={id} onPick={pick} />
         ))}
 

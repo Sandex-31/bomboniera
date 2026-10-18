@@ -35,10 +35,10 @@ export const SPOTS: Record<Exclude<MachineId, "press">, { a: number; y: number; 
   // from higher up than the rest, so Rotom in the middle hangs below the
   // boilers on the screen instead of in front of the middle one
   boilers: { a: FAR, y: 0.3, zoom: 1.45, polar: 0.85 },
-  pipes: { a: FAR + 1.75, y: 1, zoom: 4.3, polar: 1.5 },
-  gears: { a: FAR - 1.75, y: 0.95, zoom: 3.9, polar: 1.5 },
-  hoist: { a: FAR + Math.PI - 0.6, y: 0.9, zoom: 2.3, polar: 1.1 },
-  organ: { a: FAR + Math.PI + 0.6, y: 1, zoom: 2.3, polar: 1.1 },
+  pipes: { a: FAR + 1.65, y: 1, zoom: 4.3, polar: 1.5 },
+  gears: { a: FAR - 1.65, y: 0.95, zoom: 3.9, polar: 1.5 },
+  hoist: { a: FAR + 2.68, y: 0.7, zoom: 3.9, polar: 1.35 },
+  organ: { a: FAR - 2.68, y: 1, zoom: 2.3, polar: 1.1 },
 };
 
 /** Placed against the wall at angle `a`, `inset` in from it, turned to face the middle. */

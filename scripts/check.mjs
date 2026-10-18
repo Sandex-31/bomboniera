@@ -1013,6 +1013,9 @@ try {
     const gears = await vite5.ssrLoadModule("/src/lib/gears.ts");
     const board = gears.spin(gears.gearsFrom(store.get(puzzle.GEARS_KEY)), true);
     assert.ok(Object.values(board.shafts).every((v) => v === "ok"), "the jump leaves the gears wrong");
+    const hoist = await vite5.ssrLoadModule("/src/lib/hoist.ts");
+    const hung = hoist.hoistFrom(store.get(puzzle.HOIST_KEY));
+    assert.ok(hoist.tilt(hung) === 0 && hung.piece, "the jump leaves the hoist down");
 
     // the floor the visitor is on: whatever is stored, it lands on a real floor
     assert.equal(puzzle.floorFrom(null), 0, "never been down is the island");
@@ -1669,6 +1672,64 @@ try {
     for (const bad of ["x", "{}", '{"placed":{"0":0,"2":0},"piece":false}', '{"placed":{"0":0,"2":6},"piece":false}'])
       assert.deepEqual(g.gearsFrom(bad), g.EMPTY, `${bad} is not a board that can be built`);
     console.log(`ok — the gears: ${g.PEGS.length} pegs, ${g.RACK.length} in the rack, ${used} to place, one way to turn all three`);
+
+    /* the hoist: one way to level the beam, and the scale enough to find it */
+    const h = await vite13.ssrLoadModule("/src/lib/hoist.ts");
+    const w = h.weightsForTest();
+    const things = [...h.OBJECTS];
+    const levels = [];
+    let settings = 0;
+    const hang = (i, used, where) => {
+      if (i === things.length) {
+        settings++;
+        if (h.tilt({ ...h.START, where }) === 0) levels.push({ ...where });
+        return;
+      }
+      hang(i + 1, used, { ...where, [things[i]]: "posto" });
+      for (let k = 1; k <= h.NOTCHES; k++) {
+        if (!used.has(k)) hang(i + 1, new Set([...used, k]), { ...where, [things[i]]: k });
+      }
+    };
+    hang(0, new Set(), {});
+    assert.equal(levels.length, 1, `the beam levels ${levels.length} ways`);
+    assert.deepEqual(levels[0], h.solvedHoist().where, "the stored way does not level the beam");
+    const hung = things.filter((t) => typeof levels[0][t] === "number");
+    assert.ok(hung.length >= 3, "the beam levels with fewer than three things");
+    const heaviestOut = [...hung].sort((a, b) => w[b] - w[a]);
+    assert.ok(
+      !heaviestOut.every((t, k) => k === 0 || levels[0][t] < levels[0][heaviestOut[k - 1]]),
+      "the answer is just the heaviest the furthest out",
+    );
+    // what the scale can show: one or two things a pan, which side goes down
+    const singles = things.map((_, i) => [i]);
+    const pairs = things.flatMap((_, i) => things.map((_, j) => (i < j ? [i, j] : null)).filter(Boolean));
+    const loads = [...singles, ...pairs];
+    const shown = (ws) =>
+      loads.flatMap((a) =>
+        loads
+          .filter((b) => !b.some((x) => a.includes(x)))
+          .map((b) => Math.sign(b.reduce((s, x) => s + ws[x], 0) - a.reduce((s, x) => s + ws[x], 0))),
+      );
+    const truth = shown(things.map((t) => w[t]));
+    const alike = [];
+    const pick = (ws) => {
+      if (ws.length === things.length) {
+        if (shown(ws).every((v, k) => v === truth[k])) alike.push(ws);
+        return;
+      }
+      for (let v = 1; v <= 12; v++) if (!ws.includes(v)) pick([...ws, v]);
+    };
+    pick([]);
+    assert.equal(alike.length, 1, `${alike.length} sets of weights look the same on the scale`);
+    // the scale and the beam read the same weights
+    const scale = { ...h.START, where: { ...h.START.where, palla: "sinistra", ruota: "destra", secchio: "destra" } };
+    assert.equal(h.weigh(scale), 0, "six is not two and four on the scale");
+    assert.equal(h.canPut({ ...h.START, where: { ...h.START.where, palla: 2 } }, "ruota", 2), false, "two things on one notch");
+    assert.deepEqual(h.hoistFrom(JSON.stringify(h.solvedHoist())), h.solvedHoist());
+    assert.deepEqual(h.hoistFrom(null), h.START);
+    for (const bad of ["x", "{}", JSON.stringify({ ...h.START, where: { ...h.START.where, palla: 1, ruota: 1 } })])
+      assert.deepEqual(h.hoistFrom(bad), h.START, `${bad} is not a hoist`);
+    console.log(`ok — the hoist: ${settings} settings of the beam, one level, and the scale enough to find it`);
   } finally {
     await vite13.close();
   }
