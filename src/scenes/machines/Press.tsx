@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BackSide, type Group, type Mesh } from "three";
+import { BackSide, type Group, type Mesh, type PointLight } from "three";
 import { tookTap, useTap } from "../Hotspot";
 import { BLOWS, BREAK_MS, free, type Latches } from "../../lib/press";
-import { COPPER, IRON, machine } from "./hall";
+import { COPPER, IRON, Lamp, machine } from "./hall";
 import { ShapeMark } from "./Pipes";
 
 /*
@@ -21,6 +21,8 @@ const BEAM_Y = 1.75;
 const HEAD_UP = 1.15;
 const HEAD_DOWN = 0.18;
 const HEAD_GONE = -0.12;
+/** Where the piston rod ends, up inside the steam cylinder. */
+const ROD_TOP = BEAM_Y + 0.15;
 /** Where the floor gives way. */
 export const HOLE_R = 0.55;
 /** How far the lever's handle swings, from up to pulled. */
@@ -109,6 +111,8 @@ export default function Press({
   onPull: () => void;
 }) {
   const head = useRef<Group>(null);
+  const rod = useRef<Mesh>(null);
+  const hole = useRef<PointLight>(null);
   const wheel = useRef<Group>(null);
   const handle = useRef<Group>(null);
   const chunks = useRef<(Mesh | null)[]>([]);
@@ -155,6 +159,12 @@ export default function Press({
       y = HEAD_DOWN + (HEAD_GONE - HEAD_DOWN) * Math.min(1, (t - BREAK_MS) / 800);
     }
     if (head.current) head.current.position.y = y;
+    // the piston rod reaches from the head up into the cylinder, however far down the head is
+    if (rod.current) {
+      rod.current.scale.y = ROD_TOP - y;
+      rod.current.position.y = (ROD_TOP + y) / 2;
+    }
+    if (hole.current) hole.current.intensity = broken ? 4 : 0;
     if (wheel.current && turning && !reduced) wheel.current.rotation.z -= dt * (pulled && t < BREAK_MS ? 6 : 1.4);
     if (handle.current) {
       const shake = Math.max(0, 1 - (performance.now() - refusedAt.current) / 400);
@@ -182,6 +192,13 @@ export default function Press({
   });
 
   return (
+    <>
+    {/* a lamp over the press, so its iron reads against the dark; lit even
+        while the press is hidden, as a light that comes and goes stutters the
+        hall: see Boilers */}
+    <Lamp position={[0.4, 2.3, 0.9]} intensity={3} distance={3.2} />
+    {/* the light of the floor below, there from the start and only turned up when it breaks, for the same reason */}
+    <pointLight ref={hole} position={[0, -0.1, 0]} color="#DCEBFF" intensity={0} distance={2.5} />
     <group {...machine("press")} visible={!hidden}>
       {/* the hole through the floor, and the cold white light of the floor below */}
       {broken && (
@@ -195,7 +212,6 @@ export default function Press({
             <circleGeometry args={[HOLE_R, 32]} />
             <meshBasicMaterial color="#EAF4FF" />
           </mesh>
-          <pointLight position={[0, -0.1, 0]} color="#DCEBFF" intensity={4} distance={2.5} />
         </group>
       )}
       {Array.from({ length: 6 }, (_, k) => (
@@ -220,8 +236,6 @@ export default function Press({
         );
       })}
 
-      {/* a lamp over the press, so its iron reads against the dark */}
-      <pointLight position={[0.4, 2.3, 0.9]} color="#FFC890" intensity={3} distance={3.2} />
       <group rotation-y={FACING} {...tap}>
         {/* the frame: two columns and the beam across them */}
         {[-FRAME_X, FRAME_X].map((x) => (
@@ -240,11 +254,11 @@ export default function Press({
           <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
         </mesh>
         {/* the hammer, on its piston */}
+        <mesh ref={rod} position={[0, (ROD_TOP + HEAD_UP) / 2, 0]} scale-y={ROD_TOP - HEAD_UP}>
+          <cylinderGeometry args={[0.035, 0.035, 1, 12]} />
+          <meshStandardMaterial color="#9A9A9A" metalness={0.85} roughness={0.25} />
+        </mesh>
         <group ref={head} position={[0, HEAD_UP, 0]}>
-          <mesh position={[0, (BEAM_Y - HEAD_UP) / 2 + 0.15, 0]}>
-            <cylinderGeometry args={[0.035, 0.035, BEAM_Y - HEAD_UP + 0.3, 12]} />
-            <meshStandardMaterial color="#9A9A9A" metalness={0.85} roughness={0.25} />
-          </mesh>
           <mesh>
             <boxGeometry args={[0.5, 0.3, 0.5]} />
             <meshStandardMaterial color="#2A2624" metalness={0.7} roughness={0.45} />
@@ -256,6 +270,11 @@ export default function Press({
         </group>
         {/* the flywheel, on the right column, turned by the gear board */}
         <group position={[FRAME_X + 0.09, 1.25, 0]} rotation-y={Math.PI / 2}>
+          {/* its axle, out of the column */}
+          <mesh position={[0, 0, -0.04]} rotation-x={Math.PI / 2}>
+            <cylinderGeometry args={[0.03, 0.03, 0.1, 12]} />
+            <meshStandardMaterial color="#4A4440" metalness={0.75} roughness={0.4} />
+          </mesh>
           <group ref={wheel}>
             <mesh>
               <torusGeometry args={[0.3, 0.035, 10, 32]} />
@@ -272,7 +291,21 @@ export default function Press({
 
         {/* the big lever, out in front, and its three latches */}
         <group position={[-0.62, 0, 0.55]}>
-          <mesh position={[0, 0.2, 0]}>
+          {/* a tap on the base throws the lever too, once its latches let go */}
+          <mesh
+            position={[0, 0.2, 0]}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              if (!active) return onPick();
+              if (pulled) return;
+              if (!ready) {
+                refusedAt.current = performance.now();
+                return;
+              }
+              tookTap();
+              onPull();
+            }}
+          >
             <boxGeometry args={[0.42, 0.4, 0.22]} />
             <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.5} />
           </mesh>
@@ -309,5 +342,6 @@ export default function Press({
         </group>
       </group>
     </group>
+    </>
   );
 }

@@ -18,7 +18,7 @@ import {
   type PieceId,
 } from "../../lib/card";
 import { organ, type Voice } from "../../lib/organ";
-import { Approach, BRASS, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
+import { Approach, Lamp, BRASS, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
 
 /*
  * The steam organ on the wall: six brass whistles over a windchest, a chain
@@ -200,21 +200,24 @@ function Fog({ thick, reduced }: { thick: number; reduced: boolean }) {
     puffs.current.forEach((p, k) => {
       if (!p) return;
       const m = p.material as MeshBasicMaterial;
-      m.opacity += (thick * 0.9 - m.opacity) * 0.05;
+      // thick enough that two layers of it lose the handles' shapes, in a
+      // grey dim enough to sit in the room rather than glare as white discs
+      m.opacity += (thick * 0.8 - m.opacity) * 0.05;
       p.visible = m.opacity > 0.01;
       if (!reduced) p.position.x = handleX(k % ROWS) + Math.sin(t * 0.4 + k) * 0.05;
     });
   });
   return (
     <>
-      {Array.from({ length: ROWS * 2 }, (_, k) => (
+      {/* three layers: above the handles, below them, and right over them */}
+      {Array.from({ length: ROWS * 3 }, (_, k) => (
         <mesh
           key={k}
           ref={(m) => void (puffs.current[k] = m)}
-          position={[handleX(k % ROWS), HANDLE_Y + (k < ROWS ? 0.03 : -0.08), 0.12 + (k < ROWS ? 0 : 0.02)]}
+          position={[handleX(k % ROWS), HANDLE_Y + [0.03, -0.08, -0.025][Math.floor(k / ROWS)], 0.12 + Math.floor(k / ROWS) * 0.02]}
         >
-          <sphereGeometry args={[0.15, 12, 10]} />
-          <meshBasicMaterial color="#D8D4CE" transparent opacity={0} depthWrite={false} />
+          <sphereGeometry args={[0.11 + ((k * 5) % 7) * 0.012, 12, 10]} />
+          <meshBasicMaterial color="#A39B93" transparent opacity={0} depthWrite={false} />
         </mesh>
       ))}
     </>
@@ -348,10 +351,14 @@ export default function Organ({
   };
 
   return (
-    <FarSide a={a}>
+    <>
+    {/* a lamp for the whistles and one for the handles, outside FarSide: see Boilers */}
+    <group {...onWall(a, 0.3, 0)}>
+      <Lamp position={[0, 1.4, 0.8]} intensity={2.4} distance={2.4} />
+      <Lamp position={[0, 0.35, 0.8]} intensity={1.4} distance={1.6} />
+    </group>
+    <FarSide a={a} id="organ">
       <group {...onWall(a, 0.3, 0)} {...machine("organ")}>
-        <pointLight position={[0, 1.4, 0.8]} color="#FFC890" intensity={2.4} distance={2.4} />
-        <pointLight position={[0, 0.35, 0.8]} color="#FFC890" intensity={1.4} distance={1.6} />
         {!active && (
           <group position={[0, y, 0]}>
             <Approach w={1.6} h={1.8} onPick={onPick} />
@@ -450,6 +457,7 @@ export default function Organ({
         </mesh>
       </group>
     </FarSide>
+    </>
   );
 }
 
@@ -481,15 +489,22 @@ function Slot({
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
       {/* the lever that lifts the piece back out */}
-      <group position={[slotX(s) + w / 2, LECTERN_Y - 0.05, 0.03]} {...lift}>
-        <mesh rotation-z={laid ? -0.5 : 0.5}>
-          <boxGeometry args={[0.07, 0.014, 0.014]} />
-          <meshStandardMaterial color="#9A9A9A" metalness={0.8} roughness={0.3} />
+      {/* on a round base, which is what takes the tap; the arm leans right while a piece is in */}
+      <group position={[slotX(s) + w / 2, LECTERN_Y - 0.06, 0.03]} {...lift}>
+        <mesh rotation-x={Math.PI / 2}>
+          <cylinderGeometry args={[0.032, 0.032, 0.012, 18]} />
+          <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.5} />
         </mesh>
-        <mesh position={[laid ? 0.03 : -0.03, laid ? -0.017 : -0.017, 0]}>
-          <sphereGeometry args={[0.014, 10, 8]} />
-          <meshStandardMaterial color="#B0201A" roughness={0.5} />
-        </mesh>
+        <group position={[0, 0, 0.01]} rotation-z={laid ? -0.6 : 0.6}>
+          <mesh position={[0, 0.03, 0]}>
+            <boxGeometry args={[0.012, 0.06, 0.01]} />
+            <meshStandardMaterial color="#9A9A9A" metalness={0.8} roughness={0.3} />
+          </mesh>
+          <mesh position={[0, 0.062, 0.004]}>
+            <sphereGeometry args={[0.016, 10, 8]} />
+            <meshStandardMaterial color="#B0201A" roughness={0.5} />
+          </mesh>
+        </group>
         <mesh>
           <sphereGeometry args={[0.06, 8, 6]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />

@@ -1,7 +1,7 @@
 import { useRef, type ReactNode } from "react";
 import { useTap } from "../Hotspot";
 import { useFrame } from "@react-three/fiber";
-import type { Group, Intersection, Object3D } from "three";
+import type { Group, Intersection, Object3D, PointLight } from "three";
 import type { View } from "../focus";
 
 /*
@@ -74,19 +74,42 @@ export const PRESS_VIEW: View = {
   spread: { azimuth: 0.4, polar: 0.2 },
 };
 
+/** The machine the camera stands in front of, set by the hall every render, read by `FarSide`. */
+export const focused: { current: MachineId | null } = { current: null };
+/** How many boilers burn, set by the hall every render, read by `Lamp`. */
+export const burning = { current: 0 };
+
 /**
- * Shown only while it is on the far side of the hall from the camera. The
+ * A machine's lamp: dark while the hall is cold, coming up with the first
+ * boiler lit. Always in the scene, never hidden, only turned down: a light
+ * that comes and goes makes three.js recompile every material in the hall.
+ */
+export function Lamp({ position, intensity, distance }: { position: [number, number, number]; intensity: number; distance: number }) {
+  const light = useRef<PointLight>(null);
+  useFrame((_, dt) => {
+    if (!light.current) return;
+    const goal = burning.current > 0 ? intensity : 0;
+    light.current.intensity += (goal - light.current.intensity) * Math.min(1, dt * 2);
+  });
+  return <pointLight ref={light} position={position} color="#FFC890" intensity={0} distance={distance} />;
+}
+
+/**
+ * Shown only while it is on the far side of the hall from the camera, and,
+ * when it is a machine, while no other machine is being worked. The
  * wall is drawn from the inside only, so its near half never stands in the
  * way; pipes and gears are solid all round, and on the near half they would
  * hang in front of everything. As the camera goes round, they come and go
  * with the wall behind them.
  */
-export function FarSide({ a, children }: { a: number; children: ReactNode }) {
+export function FarSide({ a, id, children }: { a: number; id?: MachineId; children: ReactNode }) {
   const group = useRef<Group>(null);
   useFrame(({ camera }) => {
     if (!group.current) return;
     const towards = Math.atan2(camera.position.z, camera.position.x);
-    group.current.visible = Math.cos(a - towards) < 0.25;
+    // in front of one machine, its neighbours on the wall crowd the edges of the shot
+    const crowding = id !== undefined && focused.current !== null && focused.current !== id;
+    group.current.visible = !crowding && Math.cos(a - towards) < 0.25;
   });
   return <group ref={group}>{children}</group>;
 }

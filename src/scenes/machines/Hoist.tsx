@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import type { Group, Mesh } from "three";
 import { useTap } from "../Hotspot";
 import { NOTCHES, OBJECTS, canPut, tilt, weigh, type HoistState, type Place, type Thing } from "../../lib/hoist";
-import { Approach, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
+import { Approach, Lamp, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
 
 /*
  * The hoist against the wall: a beam on a post, the cage hanging from its
@@ -27,11 +27,11 @@ const DROP = 0.13;
 const PAN_DROP = 0.2;
 /** Where each thing lies when it is not hung or weighed. */
 const HOME: Record<Thing, [number, number, number]> = {
-  palla: [-0.14, 0.05, 0.42],
-  incudine: [0.06, 0.05, 0.46],
-  campana: [0.26, 0.05, 0.42],
-  secchio: [0.46, 0.05, 0.46],
-  ruota: [0.66, 0.05, 0.42],
+  palla: [-0.14, 0, 0.42],
+  incudine: [0.06, 0, 0.46],
+  campana: [0.26, 0, 0.42],
+  secchio: [0.46, 0, 0.46],
+  ruota: [0.66, 0, 0.42],
 };
 /** The cage, down in the pit and up at the top. */
 const CAGE_DOWN = -0.12;
@@ -103,7 +103,8 @@ function Shape({ thing }: { thing: Thing }) {
     case "ruota":
       // a broken gear: a ring of teeth with a bite out of it
       return (
-        <group position={[0, 0.055, 0]}>
+        // up by its teeth's reach, so it stands on them and not through the floor
+        <group position={[0, 0.064, 0]}>
           <mesh>
             <torusGeometry args={[0.04, 0.012, 8, 18, Math.PI * 1.6]} />
             <meshStandardMaterial color="#8A6A3A" metalness={0.7} roughness={0.4} />
@@ -263,10 +264,14 @@ export default function Hoist({
   );
 
   return (
-    <FarSide a={a}>
+    <>
+    {/* a lamp for the beam and one for the things on the floor, outside FarSide: see Boilers */}
+    <group {...onWall(a, 0.3, 0)}>
+      <Lamp position={[0.2, 1.5, 0.7]} intensity={2.4} distance={2.4} />
+      <Lamp position={[0.25, 0.35, 0.9]} intensity={2.2} distance={1.8} />
+    </group>
+    <FarSide a={a} id="hoist">
       <group {...onWall(a, 0.3, 0)} {...machine("hoist")}>
-        <pointLight position={[0.2, 1.5, 0.7]} color="#FFC890" intensity={2.4} distance={2.4} />
-        <pointLight position={[0.25, 0.35, 0.9]} color="#FFC890" intensity={1.6} distance={1.6} />
         {!active && (
           <group position={[0.2, y, 0]}>
             <Approach w={1.4} h={1.7} onPick={onPick} />
@@ -413,5 +418,6 @@ export default function Hoist({
         ))}
       </group>
     </FarSide>
+    </>
   );
 }
