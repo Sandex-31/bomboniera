@@ -40,7 +40,7 @@ gioco. I nomi sono quelli di `src/lib/well/sprites.ts`: se una misura cambia, va
 
 ## Musica
 
-- `music.mp3` (o `.ogg`): una traccia di sottofondo del gioco, scelta da Salvo, che possa andare in
+- `music.ogg` (o `.mp3`): una traccia di sottofondo del gioco, scelta da Salvo, che possa andare in
   loop.
 
 ## Suoni

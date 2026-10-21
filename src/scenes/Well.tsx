@@ -27,6 +27,7 @@ import { useWallPillars } from "./well/WallPillars";
 import { useWallTv } from "./well/WallTv";
 import { useWallCrows } from "./well/WallCrows";
 import { useWallBuds } from "./well/WallBuds";
+import { startMusic, stopMusic } from "../lib/wellMusic";
 
 /*
  * The fourth floor: the well, in the rock under the machine room. A round
@@ -171,7 +172,13 @@ export default function Well({
   /** Rotom is saying its line on going into the first wall. */
   const [telling, setTelling] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  useEffect(
+    () => () => {
+      timers.current.forEach(clearTimeout);
+      stopMusic(0);
+    },
+    [],
+  );
   useEffect(() => {
     if (!arriving) return;
     const ms = moveMs(!first);
@@ -232,6 +239,7 @@ export default function Well({
   const up = useTap(() => {
     if (scene) return;
     setScene(true);
+    stopMusic(reduced ? 300 : moveMs(true) * 0.8);
     setMove({ at: performance.now(), kind: "out", dir: "up", fast: true });
     timers.current.push(setTimeout(onUp, reduced ? 0 : moveMs(true) * 0.8));
   });
@@ -393,6 +401,7 @@ export default function Well({
       camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
       events={(store) => ({ ...events(store), filter: reachable })}
       onPointerMissed={back}
+      onPointerDown={startMusic}
     >
       <color attach="background" args={["#05070B"]} />
       <ambientLight intensity={0.06} color="#9DB4D8" />

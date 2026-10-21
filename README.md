@@ -311,3 +311,13 @@ sopra un ritaglio di 22 secondi (da 0:38,5) di **«Genesis Retake Light»** di
 `src/assets/organo/genesis-retake-light.mp3`, tagliato ai frame dall'mp3
 originale senza ricodificarlo; tutti i diritti restano ai loro autori.
 L'organo invece è sintetizzato con Web Audio (`src/lib/organ.ts`).
+
+## Crediti di Animal Well
+
+Il pozzo del quarto piano è un omaggio a ***Animal Well*** (2024) di **Billy Basso**, Shared Memory, pubblicato da Bigmode. Ne usa gli sprite, i tile, un
+brano della colonna sonora e i suoni (le note del flauto, il corvo, gli
+interruttori, il baule, il telefono), tutti di proprietà dei loro autori. I
+file non stanno nel repository: li fornisce Salvo a parte e vanno in
+`src/assets/animalwell/` (l'elenco è nel suo `README.md`). Finché un file
+manca, il pozzo disegna un segnaposto e i suoni sono un bip di Web Audio.
+`npm test` fallisce se questa citazione sparisce dal README.

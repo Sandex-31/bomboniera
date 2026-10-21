@@ -2326,3 +2326,33 @@ try {
     await vite.close();
   }
 }
+
+/* ---------------------------------------------------------- il pozzo: niente parole, crediti
+ * The walls of the well say nothing in writing, like the machines; and Animal
+ * Well's credit has to be in the README (it is owed whether or not the files
+ * are in the project yet, and surely once any is).
+ */
+{
+  const { readFileSync, readdirSync } = await import("node:fs");
+  const dir = new URL("../src/scenes/well/", import.meta.url);
+  const files = readdirSync(dir).filter((f) => /^Wall.*\.tsx$/.test(f));
+  assert.ok(files.length >= 4, "the walls of the well are not where they should be");
+  for (const f of files) {
+    const src = readFileSync(new URL(f, dir), "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/\/\/.*$/gm, "");
+    assert.ok(!/\b(fillText|strokeText)\b/.test(src), `${f} paints text on its canvas`);
+    const text = [...src.matchAll(/>\s*([^<>{}\n]*[A-Za-zÀ-ÿ0-9][^<>{}\n]*?)\s*<\/?[A-Za-z]/g)]
+      .map((m) => m[1].trim())
+      .filter((t) => !/^[\s\w.()[\]!?:&|=+\-*/%,'"`]*(=>|&&|\|\||\?|:)/.test(t) && !/^(null|true|false)\)/.test(t));
+    assert.deepEqual(text, [], `${f} writes something: ${text.join(" | ")}`);
+    assert.ok(!/<Text\b|<Text3D\b|<Html\b/.test(src), `${f} has a text element or an HTML overlay`);
+    assert.ok(!/aria-label/.test(src), `${f} labels something in words`);
+  }
+  const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
+  assert.ok(
+    /Billy Basso/.test(readme) && /Shared Memory/.test(readme) && /Animal Well/.test(readme) && /Bigmode/.test(readme),
+    "the Animal Well credit is not in the README",
+  );
+  console.log(`ok — the ${files.length} walls of the well write nothing; Animal Well is credited`);
+}
