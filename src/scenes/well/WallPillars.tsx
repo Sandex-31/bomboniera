@@ -7,6 +7,8 @@ import {
   DIGIT_DOTS,
   DOT_REACH,
   MAP,
+  TO_MAP,
+  TO_PHONE,
   NUMBER,
   PILLARS,
   WALL_SPAN,
@@ -68,9 +70,6 @@ const holeAt = (d: number): [number, number] => {
 const STOP: [number, number] = [PHONE.x + 80 * Math.cos(toRad(STOP_DEG)), PHONE.y + 80 * Math.sin(toRad(STOP_DEG))];
 /** How near the stop a dragged hole has to be let go. */
 const STOP_REACH = 24;
-/** The two buttons that swap the map and the telephone: the telephone at the top right, the map at the top left. */
-const TO_PHONE: Rect = { x: 288, y: 12, w: 16, h: 16 };
-const TO_MAP: Rect = { x: 16, y: 12, w: 16, h: 16 };
 
 function disc(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, colour: string) {
   ctx.fillStyle = colour;
@@ -273,7 +272,8 @@ export function useWallPillars({
         view.current = view.current === "map" ? "phone" : "map";
         return;
       }
-      const next = stampPillar(s, "pilastri", p, lantern.current);
+      // the pillars are not there to be tapped under the telephone
+      const next = view.current === "map" ? stampPillar(s, "pilastri", p, lantern.current) : null;
       if (next) commit(next);
       return;
     }
@@ -343,10 +343,11 @@ export function useWallPillars({
     d.at = p;
   };
 
-  const onRelease = () => {
+  const onRelease = (cancelled = false) => {
     const d = drag.current;
     drag.current = null;
-    if (!d) return;
+    // a cancelled touch finishes nothing
+    if (!d || cancelled) return;
     if (d.kind === "map") {
       if (joins(NUMBER[d.k], d.path)) commit({ ...now.current, joined: now.current.joined.map((v, i) => v || i === d.k) });
       return;

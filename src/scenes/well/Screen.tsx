@@ -87,7 +87,7 @@ export default function Screen({
   /** A finger came down on the screen, moved while down, and lifted or left it: for walls with something to drag. */
   onPress?: (p: [number, number]) => void;
   onDrag?: (p: [number, number]) => void;
-  onRelease?: () => void;
+  onRelease?: (cancelled?: boolean) => void;
   /** The camera stands in front of it, no scene is playing, and Rotom is inside. */
   active: boolean;
   /** The room is dark but round the finger. */
@@ -180,10 +180,10 @@ export default function Screen({
   }, active);
 
   const pressed = useRef(false);
-  const release = () => {
+  const release = (cancelled = false) => {
     if (!pressed.current) return;
     pressed.current = false;
-    onRelease?.();
+    onRelease?.(cancelled);
   };
   const point = (e: ThreeEvent<PointerEvent>) => {
     if (!active || !e.uv) return null;
@@ -218,7 +218,7 @@ export default function Screen({
           const p = point(e);
           if (p && pressed.current) onDrag?.(p);
         }}
-        onPointerCancel={release}
+        onPointerCancel={() => release(true)}
         onPointerOut={() => {
           release();
           if (active) finger.current = null;

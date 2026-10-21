@@ -90,6 +90,10 @@ export const DOT_REACH = 6;
 /** Half the size of a group's box, dots and all. */
 export const GROUP_HALF = { w: SPACING + 2, h: 2 * SPACING + 2 };
 
+/** The two buttons that swap the map and the telephone: the telephone at the top right, the map at the top left. */
+export const TO_PHONE = { x: 288, y: 12, w: 16, h: 16 };
+export const TO_MAP = { x: 16, y: 12, w: 16, h: 16 };
+
 /** Where pillar `k`'s group stands: in the direction of the pillar from the middle of the map, out to the edge of the screen. */
 export function groupCentre(k: number): [number, number] {
   const a = pillarAngle(k);

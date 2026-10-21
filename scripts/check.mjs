@@ -1934,6 +1934,16 @@ try {
     assert.ok(t.w >= px.TOUCH && t.h >= px.TOUCH && t.x + t.w / 2 === 14 && t.y + t.h / 2 === 14, "touchRect is not about the middle");
     assert.ok(px.TOUCH * (343 / 320) >= 44, "TOUCH is under 44 CSS px");
     const boxes = pl.PILLARS.map((_, k) => pl.groupCentre(k));
+    // and no group, nor a finger's reach of it, is under a button that swaps the views
+    for (const to of [pl.TO_PHONE, pl.TO_MAP]) {
+      const b = px.touchRect(to);
+      boxes.forEach(([x, y], k) =>
+        assert.ok(
+          x + pl.GROUP_HALF.w + pl.DOT_REACH <= b.x || x - pl.GROUP_HALF.w - pl.DOT_REACH >= b.x + b.w || y - pl.GROUP_HALF.h - pl.DOT_REACH >= b.y + b.h || y + pl.GROUP_HALF.h + pl.DOT_REACH <= b.y,
+          `group ${k} is under a view button`,
+        ),
+      );
+    }
     boxes.forEach(([x, y], k) => {
       assert.ok(x - pl.GROUP_HALF.w >= 0 && x + pl.GROUP_HALF.w <= px.W && y - pl.GROUP_HALF.h >= 0 && y + pl.GROUP_HALF.h <= px.H, `group ${k} is off the screen`);
       assert.ok(Math.hypot(x - pl.MAP.x, y - pl.MAP.y) > pl.MAP.r + 20, `group ${k} sits on the map`);
