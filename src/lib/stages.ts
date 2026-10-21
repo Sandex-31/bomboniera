@@ -57,9 +57,10 @@ import { solvedPillars, solvedUv } from "./well/pillars";
 import { solvedTv } from "./well/tv";
 import { solvedCrows } from "./well/crows";
 import { solvedBuds } from "./well/buds";
+import { solvedMural } from "./well/mural";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
-function levers(): boolean[] {
+export function levers(): boolean[] {
   for (let n = 0; n < 1 << SLOTS.length; n++) {
     const bank = SLOTS.map((_, i) => Boolean((n >> i) & 1));
     if (solvedTape(bank)) return bank;
@@ -119,6 +120,7 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "tv", key: WELL_TV_KEY, solved: solvedTv },
   { label: "corvi", key: WELL_CROWS_KEY, solved: solvedCrows },
   { label: "boccioli", key: WELL_BUDS_KEY, solved: solvedBuds },
+  { label: "murale", key: WELL_MURAL_KEY, solved: solvedMural },
 ];
 
 /**
@@ -129,7 +131,6 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
 export const WIPED = [
   CHAT_KEY,
   DEPTH_KEY,
-  WELL_MURAL_KEY,
   WELL_INSIDE_KEY,
 ];
 

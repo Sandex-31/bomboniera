@@ -11,7 +11,7 @@ import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
-import { WELL_BUDS_KEY, WELL_CROWS_KEY, WELL_INSIDE_KEY, WELL_PILLARS_KEY, WELL_TV_KEY, flameLine, insideFrom, wallLine, wellLine } from "../data/puzzle";
+import { WELL_BUDS_KEY, WELL_CROWS_KEY, WELL_INSIDE_KEY, WELL_MURAL_KEY, WELL_PILLARS_KEY, WELL_TV_KEY, flameLine, insideFrom, muralLine, wallLine, wellLine } from "../data/puzzle";
 import { Approach, Carried, FarSide, WALL_H, facing, onlySeen, onWall } from "./machines/hall";
 import { SCREEN_Y, WALL_ANGLES, WELL_R, type WallId } from "./well/wall";
 import Screen, { INSET, PANEL } from "./well/Screen";
@@ -20,6 +20,9 @@ import { savedTv, type TvState } from "../lib/well/tv";
 import { savedCrows, type CrowsState } from "../lib/well/crows";
 import { savedBuds, type BudsState } from "../lib/well/buds";
 import { firstFlame, type Flames } from "../lib/well/flames";
+import { lit, place, savedMural, type MuralState, type PieceId } from "../lib/well/mural";
+import Altar, { PANEL_Y, PIT_R } from "./well/Altar";
+import Mural from "../components/Mural";
 import { useWallPillars } from "./well/WallPillars";
 import { useWallTv } from "./well/WallTv";
 import { useWallCrows } from "./well/WallCrows";
@@ -63,6 +66,23 @@ const CEILING_VIEW: View = {
   zoom: 2.2,
   spread: { azimuth: 0.1, polar: 0.05 },
 };
+
+/** Square in front of the mural over the altar, close enough for its pieces to be a finger wide on a phone. */
+const PANEL_VIEW: View = {
+  target: [0, PANEL_Y, 0],
+  azimuth: Math.PI / 4,
+  polar: 1.5,
+  zoom: 4.4,
+  spread: { azimuth: 0.05, polar: 0.03 },
+};
+
+/** Rotom's dive into the well once it opens: over it, down to the rim, and back up, as there is no floor below yet. */
+const DIVE: [number, number, number][] = [
+  [0, 0.7, 0],
+  [0, -0.15, 0],
+  [0, 0.8, 0],
+];
+const DIVE_MS = 1000;
 
 /** Where the camera stands to work a wall, and how high on it the screen is. */
 const WALL_SPOT = { y: SCREEN_Y, zoom: 5.5, polar: 1.45 };
@@ -178,7 +198,7 @@ export default function Well({
   const pick = (id: Focus) => {
     if (scene) return;
     setFocus(id);
-    setView(VIEWS[id]);
+    setView(id === "altar" && lit(flames()) && !mural.done ? PANEL_VIEW : VIEWS[id]);
     // the first wall: Rotom flies into it while the camera walks up, then has its say
     if (id !== "altar" && !inside) {
       setScene(true);
@@ -217,9 +237,6 @@ export default function Well({
   });
   const zap = useTap(() => {
     if (!scene) setZapAt(performance.now());
-  });
-  const altar = useTap(() => {
-    if (focus !== "altar") pick("altar");
   });
 
   /** The fourth wall's state, which the pillars of every wall write to; kept as it changes. */
@@ -268,8 +285,11 @@ export default function Well({
   };
   /** Which walls have given their flame, from their states. */
   const flames = (): Flames => ({ tv: tvState.flame, corvi: crowsState.flame, boccioli: budsState.flame, pilastri: pillars.flame });
-  /** The flame of `wall` was just taken: it rises out of the screen, and if it is the floor's first the scene says its line. */
+  /** When each flame taken this visit sets off from its wall for its candle on the altar. */
+  const [flights, setFlights] = useState<Partial<Record<WallId, number>>>({});
+  /** The flame of `wall` was just taken: it rises out of the screen and flies to its candle, and if it is the floor's first the scene says its line. */
   const flamed = (wall: WallId) => {
+    setFlights((f) => ({ ...f, [wall]: performance.now() + (reduced ? 0 : 1800) }));
     if (!firstFlame({ ...flames(), [wall]: true }, wall)) return;
     timers.current.push(
       setTimeout(() => {
@@ -278,6 +298,50 @@ export default function Well({
       }, reduced ? 0 : 1800),
     );
   };
+  /** The community mural on the altar, kept as it changes. */
+  const [mural, setMural] = useState<MuralState>(savedMural);
+  /**
+   * The finale, once the mural is whole: the last piece is seen landing, Rotom
+   * says its line, then the well opens and he dives in. A reload finds the
+   * well open.
+   */
+  const [finale, setFinale] = useState<"landing" | "saying" | null>(null);
+  /** Where Rotom is in his dive, if he is diving. */
+  const [dive, setDive] = useState<[number, number, number] | null>(null);
+  const placed = (slot: number, piece: PieceId | null) => {
+    const next = place(mural, slot, piece);
+    setMural(next);
+    try {
+      localStorage.setItem(WELL_MURAL_KEY, JSON.stringify(next));
+    } catch {
+      // private mode: it will not be there next time
+    }
+    if (!next.done || mural.done) return;
+    setScene(true);
+    setFinale("landing");
+    timers.current.push(
+      setTimeout(() => {
+        setFinale("saying");
+        setView(VIEWS.altar);
+      }, reduced ? 0 : 900),
+    );
+  };
+  const muralSaid = () => {
+    setFinale(null);
+    if (reduced) {
+      setScene(false);
+      return;
+    }
+    DIVE.forEach((p, i) => timers.current.push(setTimeout(() => setDive(p), i * DIVE_MS)));
+    timers.current.push(
+      setTimeout(() => {
+        setDive(null);
+        setScene(false);
+      }, DIVE.length * DIVE_MS),
+    );
+  };
+  const open = mural.done && finale === null;
+
   const wall4 = useWallPillars({ state: pillars, set: keepPillars, uvOn, onFlame: () => flamed("pilastri") });
   const { onNote: tvNote, ...wall1 } = useWallTv({
     state: tvState,
@@ -319,7 +383,7 @@ export default function Well({
       flute.current = () => {};
     };
   });
-  const at: [number, number, number] = wall ? intoTheWall(WALL_ANGLES[wall]) : ASIDE;
+  const at: [number, number, number] = wall ? intoTheWall(WALL_ANGLES[wall]) : (dive ?? ASIDE);
 
   return (
     <>
@@ -339,7 +403,7 @@ export default function Well({
 
       {/* the floor: dark stone */}
       <mesh rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[WELL_R, 64]} />
+        <ringGeometry args={[PIT_R, WELL_R, 64]} />
         <meshStandardMaterial color="#14181F" roughness={0.9} />
       </mesh>
       {/* the wall, from the inside only */}
@@ -382,15 +446,20 @@ export default function Well({
         </Html>
       )}
 
-      {/* the altar, in the middle, under the light */}
-      <mesh position={[0, 0.25, 0]} {...altar}>
-        <cylinderGeometry args={[0.45, 0.55, 0.5, 24]} />
-        <meshStandardMaterial color="#3A4150" roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 0.51, 0]} rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[0.4, 24]} />
-        <meshStandardMaterial color="#8FA3BF" emissive="#6F8CB5" emissiveIntensity={0.35} roughness={0.5} />
-      </mesh>
+      {/* the altar, in the middle, under the light, on the slab over the well */}
+      <Altar
+        flames={flames()}
+        flying={flights}
+        open={open}
+        reduced={reduced}
+        onPick={() => focus !== "altar" && pick("altar")}
+        panel={focus === "altar" && lit(flames()) && (!mural.done || finale === "landing") ? <Mural state={mural} onPlace={placed} /> : null}
+      />
+      {finale === "saying" && (
+        <Html position={[0, 1.5, 0]} center zIndexRange={[6, 0]}>
+          <Keeper line={muralLine} last reduced={reduced} onNext={muralSaid} />
+        </Html>
+      )}
 
       {/* the way up: the hole in the ceiling, a rim and the light behind it. Tapping it goes back up. */}
       <group position={[0, HOLE_Y, 0]} visible={focus === null} {...HOLE} {...up}>

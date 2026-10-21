@@ -1954,7 +1954,7 @@ try {
 
     const { STAGES } = await vite15.ssrLoadModule("/src/lib/stages.ts");
     const labels = STAGES.map((st) => st.label);
-    assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri", "tv", "corvi", "boccioli"], "the lantern, the pillars, the tv, the crows and the buds are not after the fourth floor");
+    assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri", "tv", "corvi", "boccioli", "murale"], "the lantern, the pillars, the tv, the crows, the buds and the mural are not after the fourth floor");
     console.log("ok — pozzo: pilastri, 9017432 in senso orario, cifre sui puntini, telefono");
   } finally {
     await vite15.close();
@@ -2209,6 +2209,60 @@ try {
     console.log(`ok — pozzo: boccioli, il raggio raggiunge i boccioli in ordine ${order.join(",")}`);
   } finally {
     await vite18.close();
+  }
+}
+
+/* ---------------------------------------------------------- pozzo: murale
+ * The community mural on the altar: one piece per puzzle already solved, put
+ * back top to bottom in the order the puzzles come, with decoys left out. It
+ * opens only once the four candles are lit.
+ */
+{
+  const vite19 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const mu = await vite19.ssrLoadModule("/src/lib/well/mural.ts");
+    const { STAGES } = await vite19.ssrLoadModule("/src/lib/stages.ts");
+    const labels = STAGES.map((st) => st.label);
+    // each piece and the stop it was won at: the slots go down the chain
+    const FROM = { lost: "labirinto", occhio: "specchi", stella: "pianta", codice: "comprensorio", nastro: "macchinario", babele: "lingue: 3 frasi", scheda: "organo" };
+    assert.deepEqual([...mu.SLOTS].sort(), Object.keys(FROM).sort(), "the slots are not the seven pieces");
+    const at = mu.SLOTS.map((p) => labels.indexOf(FROM[p]));
+    assert.ok(at.every((i) => i >= 0), "a piece comes from no stop");
+    at.slice(1).forEach((i, k) => assert.ok(i > at[k], `${mu.SLOTS[k + 1]} is above ${mu.SLOTS[k]} in the chain`));
+    const decoys = mu.PIECES.filter((p) => !mu.SLOTS.includes(p));
+    assert.ok(decoys.length >= 4, "under four decoys");
+    assert.ok(mu.SLOTS.every((p) => mu.PIECES.includes(p)), "a slot's piece is not on offer");
+    assert.equal(new Set(mu.PIECES).size, mu.PIECES.length, "a piece is on offer twice");
+    // a piece moves, it is never in two slots
+    let s = mu.place(mu.START, 0, "lost");
+    s = mu.place(s, 2, "lost");
+    assert.equal(s.placed[0], null, "the piece stayed where it was");
+    assert.equal(s.placed[2], "lost");
+    assert.equal(s.placed.filter((p) => p === "lost").length, 1, "the piece was copied");
+    s = mu.place(s, 2, "occhio");
+    assert.ok(!s.placed.includes("lost"), "a piece put over another leaves both");
+    assert.equal(mu.place(s, 2, null).placed[2], null, "a slot does not empty");
+    // done only on the exact order
+    const fill = (order) => order.reduce((st, p, i) => mu.place(st, i, p), mu.START);
+    assert.ok(fill(mu.SLOTS).done, "the right order is not done");
+    assert.ok(!fill([...mu.SLOTS.slice(0, 5), mu.SLOTS[6], mu.SLOTS[5]]).done, "two swapped is done");
+    assert.ok(!fill([...mu.SLOTS.slice(0, 6), decoys[0]]).done, "a decoy is done");
+    assert.ok(!fill(mu.SLOTS.slice(0, 6)).done, "six of seven is done");
+    // the panel opens only with the four flames
+    const all = { tv: true, corvi: true, boccioli: true, pilastri: true };
+    assert.ok(mu.lit(all));
+    for (const w of Object.keys(all)) assert.ok(!mu.lit({ ...all, [w]: false }), `lit without ${w}`);
+    // garbage reads back as the empty mural
+    for (const bad of [null, "x", "{}", "[]", JSON.stringify({ placed: [] }), JSON.stringify({ placed: Array(7).fill("nope") }), JSON.stringify({ placed: Array(7).fill("lost") })])
+      assert.deepEqual(mu.loadMural(bad), mu.START, `${bad} loads`);
+    assert.deepEqual(mu.loadMural(JSON.stringify(mu.solvedMural())), mu.solvedMural());
+    assert.ok(mu.solvedMural().done);
+    const stop = STAGES.find((st) => st.label === "murale");
+    assert.ok(stop && stop.solved().done, "the mural stop is not done");
+    assert.equal(labels[labels.indexOf("boccioli") + 1], "murale", "murale is not after boccioli");
+    console.log(`ok — pozzo: murale, ${mu.SLOTS.length} pezzi in ordine di piano, ${decoys.length} falsi`);
+  } finally {
+    await vite19.close();
   }
 }
 
