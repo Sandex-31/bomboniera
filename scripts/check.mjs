@@ -2175,7 +2175,10 @@ try {
     const { follow } = await vite18.ssrLoadModule("/src/lib/flute.ts");
     const order = bu.budOrder();
     assert.deepEqual([...order].sort(), [0, 1, 2, 3], "the order is not a permutation of the buds");
-    assert.notDeepEqual(order, [0, 1, 2, 3], "the buds read left to right");
+    assert.ok(order.filter((k, i) => k === i).length <= 1, "more than one bud is in its place in the list");
+    const fh = bu.firstHidden();
+    assert.ok(fh >= 0, "no hidden mirror on the path");
+    bu.traceMural().slice(0, fh).forEach(([x, y]) => assert.ok(!bu.MURAL.mirrors.some((m) => m.hidden && m.cell[0] === x && m.cell[1] === y), "a hidden mirror comes before the split"));
     const path = bu.traceMural();
     const hidden = bu.MURAL.mirrors.filter((m) => m.hidden);
     assert.ok(hidden.length >= 2, "under two hidden mirrors");

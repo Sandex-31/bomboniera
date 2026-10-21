@@ -37,12 +37,12 @@ export const MURAL: {
     { cell: [1, 1], m: "/", hidden: false },
     { cell: [5, 1], m: "\\", hidden: false },
   ],
-  // listed left to right, so that reading them so is wrong
+  // listed so that at most one stands in its place in the beam's order
   buds: [
     { cell: [1, 3], whistle: 3 },
     { cell: [3, 3], whistle: 1 },
-    { cell: [4, 1], whistle: 0 },
     { cell: [5, 3], whistle: 4 },
+    { cell: [4, 1], whistle: 0 },
   ],
 };
 
@@ -67,6 +67,11 @@ export function traceMural(): Cell[] {
     y += STEP[dir][1];
   }
   return cells;
+}
+
+/** Where in `traceMural()` the beam first meets a hidden mirror: before it the drawing shows the beam, after it only the UV light does. */
+export function firstHidden(): number {
+  return traceMural().findIndex(([x, y]) => MURAL.mirrors.some((m) => m.hidden && m.cell[0] === x && m.cell[1] === y));
 }
 
 /** The indices of `MURAL.buds` in the order the beam reaches them. */

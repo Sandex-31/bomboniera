@@ -4,7 +4,7 @@ import { SPRITES, drawSprite } from "../../lib/well/sprites";
 import { follow, type Played } from "../../lib/flute";
 import { organ } from "../../lib/organ";
 import { bounce, type Dir } from "../../lib/beam";
-import { BUD_TUNE, MURAL, TURTLE_TUNE, budOrder, traceMural, type BudsState } from "../../lib/well/buds";
+import { BUD_TUNE, MURAL, TURTLE_TUNE, budOrder, firstHidden, traceMural, type BudsState } from "../../lib/well/buds";
 import type { PillarsState } from "../../lib/well/pillars";
 import { paintPillars, stampPillar } from "./pillarPaint";
 import type { Painter } from "./Screen";
@@ -31,6 +31,8 @@ const WHISTLE_MS = 450;
 const VEC: readonly (readonly [number, number])[] = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]];
 
 const tile = SPRITES.tile;
+/** The point handed to `uvAt`, reused so that a frame allocates none. */
+const PT: [number, number] = [0, 0];
 
 /** The middle of a cell, in screen pixels. */
 const centre = ([c, r]: readonly [number, number]): [number, number] => [MX + c * CELL + CELL / 2, MY + r * CELL + CELL / 2];
@@ -55,6 +57,26 @@ const BEAM: [number, number][] = (() => {
   return pts;
 })();
 
+/** The beam up to the first hidden mirror, always drawn; the rest is only where the UV light falls. */
+const SEEN = BEAM.slice(0, firstHidden() + 2);
+/** The rest of the beam, as points a pixel-pair apart, tested against the light each frame. */
+const DARK: number[] = (() => {
+  const rest = BEAM.slice(firstHidden() + 1);
+  const out: number[] = [];
+  for (let i = 1; i < rest.length; i++) {
+    const [x0, y0] = rest[i - 1];
+    const [x1, y1] = rest[i];
+    const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 2);
+    for (let k = 0; k < n; k++) out.push(x0 + ((x1 - x0) * k) / n, y0 + ((y1 - y0) * k) / n);
+  }
+  return out;
+})();
+/** Each mirror's two ends, and its middle. */
+const MIRRORS = MURAL.mirrors.map(({ cell, m, hidden }) => {
+  const [x, y] = centre(cell);
+  return { x, y, hidden, x0: x - 7, x1: x + 7, y0: m === "/" ? y + 7 : y - 7, y1: m === "/" ? y - 7 : y + 7 };
+});
+const SOURCE_Y = centre(MURAL.source.cell)[1];
 const BUD_RECTS: Rect[] = MURAL.buds.map((b) => {
   const [x, y] = centre(b.cell);
   return { x: x - SPRITES.bud.w / 2, y: y - SPRITES.bud.h / 2, w: SPRITES.bud.w, h: SPRITES.bud.h };
@@ -146,32 +168,36 @@ export function useWallBuds({
         ctx.strokeStyle = "#FFE9A0";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(BEAM[0][0], BEAM[0][1]);
-        for (let i = 1; i < BEAM.length; i++) ctx.lineTo(BEAM[i][0], BEAM[i][1]);
+        ctx.moveTo(SEEN[0][0], SEEN[0][1]);
+        for (let i = 1; i < SEEN.length; i++) ctx.lineTo(SEEN[i][0], SEEN[i][1]);
         ctx.stroke();
+        // beyond the first hidden mirror the beam shows only in the light of the lantern
+        ctx.fillStyle = "#FFE9A0";
+        for (let i = 0; i < DARK.length; i += 2) {
+          PT[0] = DARK[i];
+          PT[1] = DARK[i + 1];
+          if (uvAt(PT)) ctx.fillRect(DARK[i] - 1, DARK[i + 1] - 1, 2, 2);
+        }
 
         // the mirrors; the hidden ones only where the light of the lantern falls
         ctx.strokeStyle = "#9DB4D8";
-        for (let i = 0; i < MURAL.mirrors.length; i++) {
-          const { cell, m, hidden } = MURAL.mirrors[i];
-          const [x, y] = centre(cell);
-          if (hidden && !uvAt([x, y])) continue;
-          ctx.strokeStyle = hidden ? "#FF4FD8" : "#9DB4D8";
-          ctx.beginPath();
-          if (m === "/") {
-            ctx.moveTo(x - 7, y + 7);
-            ctx.lineTo(x + 7, y - 7);
-          } else {
-            ctx.moveTo(x - 7, y - 7);
-            ctx.lineTo(x + 7, y + 7);
+        for (let i = 0; i < MIRRORS.length; i++) {
+          const q = MIRRORS[i];
+          if (q.hidden) {
+            PT[0] = q.x;
+            PT[1] = q.y;
+            if (!uvAt(PT)) continue;
           }
+          ctx.strokeStyle = q.hidden ? "#FF4FD8" : "#9DB4D8";
+          ctx.beginPath();
+          ctx.moveTo(q.x0, q.y0);
+          ctx.lineTo(q.x1, q.y1);
           ctx.stroke();
         }
 
         // the buds: lit once sung right, all of them when the flame is given
-        const sy = centre(MURAL.source.cell)[1];
         ctx.fillStyle = "#FFE9A0";
-        ctx.fillRect(MX - 6, sy - 3, 6, 6);
+        ctx.fillRect(MX - 6, SOURCE_Y - 3, 6, 6);
         for (let k = 0; k < MURAL.buds.length; k++) {
           const lit = s.flame || ORDER.indexOf(k) < s.played;
           drawSprite(ctx, "bud", BUD_RECTS[k].x, BUD_RECTS[k].y, lit ? 1 : 0);
