@@ -1903,6 +1903,11 @@ try {
     assert.equal(follow(tune, 1, played(4, 0)), 0, "a short note passes for the long one asked");
     assert.equal(follow(tune, 1, played(4, 0), false), 2, "length is not ignored when not strict");
     assert.equal(follow(tune, 0, played(2, 2000), false), 1);
+    const { sampleFor } = await vite.ssrLoadModule("/src/lib/fluteVoice.ts");
+    const files = { "../a/flute-u.wav": "U", "../a/flute-ul.ogg": "UL", "../a/flute-ur.wav": "UR" };
+    assert.equal(sampleFor(files, 0), "U", "flute-u.wav is not found for up");
+    assert.equal(sampleFor(files, 7), "UL", "flute-ul.ogg is not found for up-left");
+    assert.equal(sampleFor({ "../a/flute-ur.wav": "UR" }, 0), undefined, "flute-ur.wav answers for up");
     console.log("ok — flauto: otto note, lunga da " + LONG_MS + " ms, follow");
   } finally {
     await vite.close();

@@ -11,7 +11,7 @@ import { fluteVoice, type Voice } from "../lib/fluteVoice";
 
 /** Arrow size, and how far from the centre each sits: arrows are at least 44 CSS px. */
 const BTN = 52;
-const RING = 64;
+const RING = 70;
 const SIZE = 2 * RING + BTN;
 /** The arrow glyph points up; each direction turns it by its angle. */
 const NAMES = ["in alto", "in alto a destra", "a destra", "in basso a destra", "in basso", "in basso a sinistra", "a sinistra", "in alto a sinistra"];
@@ -27,7 +27,7 @@ const CSS = `
 export default function FluteRose({ onNote, disabled }: { onNote: (p: Played) => void; disabled?: boolean }) {
   const root = useRef<HTMLDivElement>(null);
   const [held, setHeld] = useState<number | null>(null);
-  const hold = useRef<{ note: Note; at: number; voice: Voice } | null>(null);
+  const hold = useRef<{ note: Note; at: number; voice: Voice; pointer: number } | null>(null);
   // the latest props, read by listeners that are made once
   const props = useRef({ onNote, disabled });
   props.current = { onNote, disabled };
@@ -37,12 +37,14 @@ export default function FluteRose({ onNote, disabled }: { onNote: (p: Played) =>
     if (!el) return;
     const end = (e: PointerEvent) => {
       const h = hold.current;
-      if (!h) return;
+      // another finger lifting is not the one holding
+      if (!h || e.pointerId !== h.pointer) return;
       hold.current = null;
       setHeld(null);
       h.voice.stop();
+      // a cancelled press stops the sound and plays no note
       // timed by the pointer's own clock, not by when this code got to hear of it
-      props.current.onNote(played(h.note, e.timeStamp - h.at));
+      if (e.type === "pointerup") props.current.onNote(played(h.note, e.timeStamp - h.at));
     };
     const down = (e: PointerEvent) => {
       // native listeners: the canvas listens on a parent, and React's would be too late to keep it off
@@ -52,7 +54,7 @@ export default function FluteRose({ onNote, disabled }: { onNote: (p: Played) =>
       e.preventDefault();
       const note = Number(b.dataset.note) as Note;
       b.setPointerCapture(e.pointerId);
-      hold.current = { note, at: e.timeStamp, voice: fluteVoice().start(note) };
+      hold.current = { note, at: e.timeStamp, voice: fluteVoice().start(note), pointer: e.pointerId };
       setHeld(note);
     };
     const quiet = (e: Event) => e.stopPropagation();

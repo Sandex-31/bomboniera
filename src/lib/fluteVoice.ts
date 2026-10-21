@@ -18,8 +18,10 @@ const SAMPLES = import.meta.glob("../assets/animalwell/flute-*.{wav,ogg,mp3}", {
   query: "?url",
   import: "default",
 }) as Record<string, string>;
-const sampleUrl = (k: number) =>
-  Object.entries(SAMPLES).find(([path]) => new RegExp(`/flute-${DIRS[k]}\.\w+$`).test(path))?.[1];
+/** The sample for note `k` among `samples` (path to url), if there is one. */
+export const sampleFor = (samples: Record<string, string>, k: number) =>
+  Object.entries(samples).find(([path]) => new RegExp(String.raw`/flute-${DIRS[k]}\.\w+$`).test(path))?.[1];
+const sampleUrl = (k: number) => sampleFor(SAMPLES, k);
 
 const ATTACK = 0.05;
 const RELEASE = 0.15;
