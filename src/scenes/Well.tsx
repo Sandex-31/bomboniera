@@ -5,6 +5,8 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { BackSide, type Intersection, type Object3D } from "three";
 import CameraRig from "./CameraRig";
 import { tappedJustNow, useTap } from "./Hotspot";
+import FluteRose from "../components/FluteRose";
+import type { Played } from "../lib/flute";
 import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
@@ -241,9 +243,16 @@ export default function Well({
   });
 
   const wall = focus !== null && focus !== "altar" ? focus : null;
+  /**
+   * Where the flute's notes go. Each wall's room, once it has one, sets
+   * `flute.current` to its own rules while it is the wall worked (and clears
+   * it on leaving); until then the notes only sound.
+   */
+  const flute = useRef<(p: Played) => void>(() => {});
   const at: [number, number, number] = wall ? intoTheWall(WALL_ANGLES[wall]) : ASIDE;
 
   return (
+    <>
     <Canvas
       orthographic
       dpr={[1, 1.75]}
@@ -352,5 +361,7 @@ export default function Well({
         maxAzimuthAngle={view.spread.azimuth >= Math.PI ? Infinity : view.azimuth + view.spread.azimuth}
       />
     </Canvas>
+    {wall && !scene && <FluteRose onNote={(p) => flute.current(p)} />}
+    </>
   );
 }

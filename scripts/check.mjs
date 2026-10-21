@@ -1879,3 +1879,32 @@ try {
   }
   console.log(`ok — the ${files.length} machine files write nothing`);
 }
+
+/* ---------------------------------------------------------- il flauto
+ * Eight notes, one per direction; a hold of LONG_MS or more is a long note.
+ * `follow` counts the notes right in a row; a wrong one starts over, and
+ * counts as the first if it is one.
+ */
+{
+  const vite = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const { DIRS, played, follow } = await vite.ssrLoadModule("/src/lib/flute.ts");
+    const { LONG_MS } = await vite.ssrLoadModule("/src/lib/card.ts");
+    assert.equal(DIRS.length, 8);
+    assert.equal(played(3, LONG_MS - 1).long, false, "449 ms is a short note");
+    assert.equal(played(3, LONG_MS).long, true, "450 ms is a long note");
+    assert.equal(played(5, 10).note, 5);
+    const tune = [played(2, 0), played(4, 1000), played(0, 0), played(7, 0)];
+    let n = 0;
+    for (const p of tune) n = follow(tune, n, p);
+    assert.equal(n, tune.length, "the whole tune does not count through");
+    assert.equal(follow(tune, 2, played(6, 0)), 0, "a wrong note in the middle does not reset");
+    assert.equal(follow(tune, 2, played(2, 0)), 1, "a wrong note that is the first does not count as one");
+    assert.equal(follow(tune, 1, played(4, 0)), 0, "a short note passes for the long one asked");
+    assert.equal(follow(tune, 1, played(4, 0), false), 2, "length is not ignored when not strict");
+    assert.equal(follow(tune, 0, played(2, 2000), false), 1);
+    console.log("ok — flauto: otto note, lunga da " + LONG_MS + " ms, follow");
+  } finally {
+    await vite.close();
+  }
+}
