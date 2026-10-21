@@ -11,12 +11,15 @@ import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
-import { WELL_INSIDE_KEY, insideFrom, wallLine, wellLine } from "../data/puzzle";
+import { WELL_INSIDE_KEY, WELL_PILLARS_KEY, flameLine, insideFrom, wallLine, wellLine } from "../data/puzzle";
 import { Approach, Carried, FarSide, WALL_H, facing, onlySeen, onWall } from "./machines/hall";
 import { SCREEN_Y, WALL_ANGLES, WELL_R, type WallId } from "./well/wall";
 import Screen, { INSET, PANEL, type Painter } from "./well/Screen";
 import { H, W } from "../lib/well/pixels";
 import { SPRITES, drawSprite, type SpriteId } from "../lib/well/sprites";
+import { savedPillars, type PillarsState } from "../lib/well/pillars";
+import { paintPillars, stampPillar } from "./well/pillarPaint";
+import { useWallPillars } from "./well/WallPillars";
 
 /*
  * The fourth floor: the well, in the rock under the machine room. A round
@@ -99,12 +102,11 @@ function testWall(cast: SpriteId[]): Painter {
   };
 }
 
-/** What each wall shows until its task gives it its room, and whether it is dark or under the lantern. */
-const TEST: Record<WallId, { paint: Painter; dark?: boolean; uv?: boolean }> = {
-  tv: { paint: testWall(["chinchilla", "chest", "tv", "blockPink", "blockBlue", "switchGreen"]), uv: true },
-  corvi: { paint: testWall(["porcupine", "switchYellow", "crow", "crow", "flame"]) },
-  boccioli: { paint: testWall(["turtle", "bud", "bud", "switchPink"]) },
-  pilastri: { paint: testWall(["ghost", "candle", "phone", "face"]), dark: true },
+/** What the walls without a room of their own show yet: the fourth has its own, in WallPillars. */
+const TEST: Record<Exclude<WallId, "pilastri">, Painter> = {
+  tv: testWall(["chinchilla", "chest", "tv", "blockPink", "blockBlue", "switchGreen"]),
+  corvi: testWall(["porcupine", "switchYellow", "crow", "crow", "flame"]),
+  boccioli: testWall(["turtle", "bud", "bud", "switchPink"]),
 };
 
 const WALLS = Object.keys(WALL_ANGLES) as WallId[];
@@ -242,6 +244,35 @@ export default function Well({
     if (focus !== "altar") pick("altar");
   });
 
+  /** The fourth wall's state, which the pillars of every wall write to; kept as it changes. */
+  const [pillars, setPillars] = useState<PillarsState>(savedPillars);
+  const keepPillars = (next: PillarsState) => {
+    setPillars(next);
+    try {
+      localStorage.setItem(WELL_PILLARS_KEY, JSON.stringify(next));
+    } catch {
+      // private mode: it will not be there next time
+    }
+  };
+  /** The UV lantern, switched on and off with a button once it has been taken. */
+  const [uvOn, setUvOn] = useState(false);
+  /** The flame of the fourth wall has flown: Rotom says its line. */
+  const [flaming, setFlaming] = useState(false);
+  const wall4 = useWallPillars({
+    state: pillars,
+    set: keepPillars,
+    uvOn,
+    onFlame: () => {
+      // the flame rises out of the screen, and then the scene says its line
+      timers.current.push(
+        setTimeout(() => {
+          setScene(true);
+          setFlaming(true);
+        }, reduced ? 0 : 1800),
+      );
+    },
+  });
+
   const wall = focus !== null && focus !== "altar" ? focus : null;
   /**
    * Where the flute's notes go. Each wall's room, once it has one, sets
@@ -285,15 +316,24 @@ export default function Well({
       {/* the four walls, each a screen, walked up to with a tap */}
       {WALLS.map((id) => (
         <FarSide key={id} a={WALL_ANGLES[id]}>
-          <Screen
-            a={WALL_ANGLES[id]}
-            paint={TEST[id].paint}
-            onTap={() => {}}
-            active={focus === id && !scene}
-            dark={TEST[id].dark}
-            uv={TEST[id].uv}
-            reduced={reduced}
-          />
+          {id === "pilastri" ? (
+            <Screen a={WALL_ANGLES[id]} {...wall4} active={focus === id && !scene} uv={pillars.uv && uvOn} reduced={reduced} />
+          ) : (
+            <Screen
+              a={WALL_ANGLES[id]}
+              paint={(ctx, t, uvAt) => {
+                TEST[id](ctx, t, uvAt);
+                paintPillars(ctx, id, pillars, uvAt);
+              }}
+              onTap={(p) => {
+                const next = stampPillar(pillars, id, p, uvOn);
+                if (next) keepPillars(next);
+              }}
+              active={focus === id && !scene}
+              uv={pillars.uv && uvOn}
+              reduced={reduced}
+            />
+          )}
           {focus !== id && (
             <group {...onWall(WALL_ANGLES[id], INSET, SCREEN_Y, WELL_R)}>
               <Approach w={PANEL.w} h={PANEL.h} onPick={() => pick(id)} />
@@ -301,6 +341,19 @@ export default function Well({
           )}
         </FarSide>
       ))}
+      {flaming && (
+        <Html position={onWall(WALL_ANGLES.pilastri, 0.9, SCREEN_Y + 0.3, WELL_R).position} center zIndexRange={[6, 0]}>
+          <Keeper
+            line={flameLine}
+            last
+            reduced={reduced}
+            onNext={() => {
+              setFlaming(false);
+              setScene(false);
+            }}
+          />
+        </Html>
+      )}
       {telling && wall && (
         <Html position={onWall(WALL_ANGLES[wall], 0.9, SCREEN_Y + 0.3, WELL_R).position} center zIndexRange={[6, 0]}>
           <Keeper line={wallLine} last reduced={reduced} onNext={told} />
@@ -362,6 +415,33 @@ export default function Well({
       />
     </Canvas>
     {wall && !scene && <FluteRose onNote={(p) => flute.current(p)} />}
+    {wall && !scene && pillars.uv && (
+      <button
+        type="button"
+        aria-label="Lanterna UV"
+        aria-pressed={uvOn}
+        onClick={() => setUvOn((on) => !on)}
+        style={{
+          position: "fixed",
+          left: 12,
+          bottom: 12,
+          zIndex: 20,
+          width: 52,
+          height: 52,
+          borderRadius: "50%",
+          border: "2px solid #9DB4D8",
+          background: uvOn ? "#8A4BFF" : "rgba(10,14,22,.72)",
+          color: uvOn ? "#fff" : "#DCEBFF",
+          padding: 0,
+          touchAction: "manipulation",
+        }}
+      >
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M9 3h6M12 3v2M8 8a4 4 0 0 1 8 0v8H8zM7 16h10v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z" />
+          {uvOn && <path d="M3 9l2 1M21 9l-2 1M4 14l2-.5M20 14l-2-.5" />}
+        </svg>
+      </button>
+    )}
     </>
   );
 }

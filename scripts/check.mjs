@@ -1853,6 +1853,79 @@ try {
   }
 }
 
+/* ---------------------------------------------------------- pozzo: pilastri
+ * Seven pillars on the four walls, listed clockwise from the arrival point;
+ * each stamps a group of dots on the map, and the groups, joined, are the
+ * digits of the number to dial: 9017432. Clockwise is the direction the wall
+ * angles grow, as seen from above.
+ */
+{
+  const vite15 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const pl = await vite15.ssrLoadModule("/src/lib/well/pillars.ts");
+    const { WALL_ANGLES } = await vite15.ssrLoadModule("/src/scenes/well/wall.ts");
+    assert.equal(pl.PILLARS.length, 7);
+    assert.equal(pl.NUMBER.join(""), "9017432");
+    for (const wall of Object.keys(WALL_ANGLES)) assert.ok(pl.PILLARS.some((p) => p.wall === wall), `no pillar on ${wall}`);
+    const turns = pl.PILLARS.map((_, k) => pl.pillarTurn(k));
+    turns.forEach((t, k) => k && assert.ok(t >= turns[k - 1], `pillar ${k} is not clockwise of pillar ${k - 1}`));
+    assert.ok(turns[0] >= 0 && turns[6] < 2 * Math.PI, "the pillars do not fit one turn from the arrival point");
+
+    const sets = new Set();
+    for (let d = 0; d <= 9; d++) {
+      const dots = pl.DIGIT_DOTS[d];
+      assert.ok(dots && dots.length >= 5, `digit ${d} has no dots`);
+      dots.forEach(([c, r]) => assert.ok(c >= 0 && c <= 2 && r >= 0 && r <= 4, `digit ${d} leaves the 3x5 grid`));
+      const key = dots.map((p) => p.join(",")).sort().join(" ");
+      assert.equal(new Set(dots.map((p) => p.join(","))).size, dots.length, `digit ${d} repeats a dot`);
+      assert.ok(!sets.has(key), `digit ${d} has the dots of another digit`);
+      sets.add(key);
+    }
+    const ids = [0, 1, 2, 3, 4, 5];
+    assert.ok(pl.joins(2, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) && pl.joins(1, [0, 1, 2, 3, 4, 5]), "the stroke order does not join");
+    assert.ok(pl.joins(1, [5, 4, 3, 2, 1, 0]), "backwards does not join");
+    assert.ok(!pl.joins(1, [0, 1, 3, 4, 5]), "a skipped dot joins");
+    assert.ok(!pl.joins(1, [0, 1, 2, 3, 4]), "a short path joins");
+    assert.ok(!pl.joins(1, [...ids, 0]), "a long path joins");
+    assert.ok(!pl.joins(1, []), "no path joins");
+
+    let s = pl.START;
+    for (const [i, d] of pl.NUMBER.entries()) {
+      const r = pl.dial(s, d);
+      assert.ok(!r.busy, `digit ${i} of the number is busy`);
+      assert.equal(r.state.flame, i === 6, `the flame comes at digit ${i}`);
+      s = r.state;
+    }
+    assert.deepEqual(pl.dial(pl.START, 8).state.dialled, [], "a wrong digit stays dialled");
+    for (let n = 0; n < 7; n++) {
+      let t = pl.START;
+      pl.NUMBER.slice(0, n).forEach((d) => (t = pl.dial(t, d).state));
+      const wrong = pl.dial(t, (pl.NUMBER[n] + 1) % 10);
+      assert.ok(wrong.busy && wrong.state.dialled.length === 0 && !wrong.state.flame, `a wrong digit after ${n} is not busy`);
+    }
+
+    assert.deepEqual(pl.loadPillars("x"), pl.START, "junk is not the start");
+    assert.deepEqual(pl.loadPillars(null), pl.START);
+    assert.deepEqual(pl.loadPillars(JSON.stringify({ ...pl.START, stamped: [true] })), pl.START, "a short list loads");
+    assert.deepEqual(pl.loadPillars(JSON.stringify(pl.solvedPillars())), pl.solvedPillars(), "the solved state does not load");
+    assert.ok(pl.solvedPillars().flame && pl.solvedPillars().uv, "the solved pillars have no flame");
+    const uv = pl.solvedUv();
+    assert.ok(uv.uv && uv.switches.every(Boolean) && !uv.flame && uv.stamped.every((b) => !b), "the lantern stop is more than the lantern");
+    assert.ok(!pl.START.uv && !pl.START.flame);
+
+    assert.ok(pl.ghostsScared(1000, 1000) && pl.ghostsScared(1000, 4999), "the ghosts return early");
+    assert.ok(!pl.ghostsScared(1000, 5000) && !pl.ghostsScared(-Infinity, 0), "the ghosts stay away");
+
+    const { STAGES } = await vite15.ssrLoadModule("/src/lib/stages.ts");
+    const labels = STAGES.map((st) => st.label);
+    assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri"], "the lantern and the pillars are not after the fourth floor");
+    console.log("ok — pozzo: pilastri, 9017432 in senso orario, cifre sui puntini, telefono");
+  } finally {
+    await vite15.close();
+  }
+}
+
+
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,
  * movement and sound only. No text between their tags, no text element, no

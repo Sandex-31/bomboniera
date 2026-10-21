@@ -71,6 +71,9 @@ export default function Screen({
   a,
   paint,
   onTap,
+  onPress,
+  onDrag,
+  onRelease,
   active,
   dark = false,
   uv = false,
@@ -81,6 +84,10 @@ export default function Screen({
   paint: Painter;
   /** A tap on the screen, in pixels. It acts at once: Rotom only runs after it. */
   onTap: (p: [number, number]) => void;
+  /** A finger came down on the screen, moved while down, and lifted or left it: for walls with something to drag. */
+  onPress?: (p: [number, number]) => void;
+  onDrag?: (p: [number, number]) => void;
+  onRelease?: () => void;
   /** The camera stands in front of it, no scene is playing, and Rotom is inside. */
   active: boolean;
   /** The room is dark but round the finger. */
@@ -172,6 +179,12 @@ export default function Screen({
     onTap(p);
   }, active);
 
+  const pressed = useRef(false);
+  const release = () => {
+    if (!pressed.current) return;
+    pressed.current = false;
+    onRelease?.();
+  };
   const point = (e: ThreeEvent<PointerEvent>) => {
     if (!active || !e.uv) return null;
     finger.current = toPixel(e.uv);
@@ -189,11 +202,22 @@ export default function Screen({
         {...SCREEN}
         onPointerDown={(e) => {
           down.current = point(e);
+          if (down.current) {
+            pressed.current = true;
+            onPress?.(down.current);
+          }
           tap.onPointerDown(e);
         }}
-        onPointerUp={tap.onPointerUp}
-        onPointerMove={point}
+        onPointerUp={(e) => {
+          release();
+          tap.onPointerUp(e);
+        }}
+        onPointerMove={(e) => {
+          const p = point(e);
+          if (p && pressed.current) onDrag?.(p);
+        }}
         onPointerOut={() => {
+          release();
           if (active) finger.current = null;
         }}
       >
