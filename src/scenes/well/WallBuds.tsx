@@ -251,7 +251,9 @@ export function useWallBuds({
     organ();
     const s = now.current;
     if (s.turtles) return;
-    heard.current = follow(TURTLE_TUNE, heard.current, p);
+    const before = heard.current;
+    heard.current = follow(TURTLE_TUNE, before, p);
+    if (heard.current !== before + 1) organ().puff();
     if (heard.current < TURTLE_TUNE.length) return;
     heard.current = 0;
     raisedAt.current = performance.now();

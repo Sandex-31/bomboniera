@@ -42,6 +42,8 @@ export default function FluteRose({ onNote, disabled }: { onNote: (p: Played) =>
       hold.current = null;
       setHeld(null);
       h.voice.stop();
+      // pointerup is a sure activation on iOS, where a touch pointerdown is not
+      fluteVoice().resume();
       // a cancelled press stops the sound and plays no note
       // timed by the pointer's own clock, not by when this code got to hear of it
       if (e.type === "pointerup") props.current.onNote(played(h.note, e.timeStamp - h.at));

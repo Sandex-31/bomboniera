@@ -158,6 +158,14 @@ export default function Mural({ state, onPlace }: { state: MuralState; onPlace: 
     if (moved && !drag.moved) e.currentTarget.setPointerCapture(e.pointerId);
     setDrag({ ...drag, x: e.clientX, y: e.clientY, moved });
   };
+  /** A cancelled press drops nothing: it only lets go. */
+  const cancel = (e: PointerEvent<HTMLDivElement>) => {
+    stop(e);
+    if (drag && e.pointerId === drag.id) {
+      setDrag(null);
+      setHeld(null);
+    }
+  };
   const up = (e: PointerEvent<HTMLDivElement>) => {
     stop(e);
     if (!drag || e.pointerId !== drag.id) return;
@@ -183,7 +191,7 @@ export default function Mural({ state, onPlace }: { state: MuralState; onPlace: 
       onPointerDown={stop}
       onPointerMove={move}
       onPointerUp={up}
-      onPointerCancel={up}
+      onPointerCancel={cancel}
       onClick={stop}
       onWheel={stop}
     >

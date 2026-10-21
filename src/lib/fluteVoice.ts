@@ -27,9 +27,9 @@ const ATTACK = 0.05;
 const RELEASE = 0.15;
 
 export type Voice = { stop: () => void };
-type Flute = { start: (note: number) => Voice; puff: () => void };
+type Flute = { start: (note: number) => Voice; puff: () => void; resume: () => void };
 
-const silent: Flute = { start: () => ({ stop: () => {} }), puff: () => {} };
+const silent: Flute = { start: () => ({ stop: () => {} }), puff: () => {}, resume: () => {} };
 let made: Flute | null = null;
 
 /** The flute, made on first use. Call it from inside a tap or a press. */
@@ -148,5 +148,10 @@ function fluteOn(ctx: AudioContext): Flute {
     s.stop(t + 0.4);
   };
 
-  return { start, puff };
+  /** Wakes the context from inside a gesture, for the browsers that wake it only there. */
+  const resume = () => {
+    if (ctx.state === "suspended") void ctx.resume();
+  };
+
+  return { start, puff, resume };
 }

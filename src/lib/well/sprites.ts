@@ -82,6 +82,39 @@ function image(id: SpriteId) {
   return images.get(id);
 }
 
+/** Where the face's pupil sits for each of the flute's eight directions (u, ur, r, dr, d, dl, l, ul), from its centre. */
+const GAZE: [number, number][] = [[0, -2], [2, -2], [2, 0], [2, 2], [0, 2], [-2, 2], [-2, 0], [-2, -2]];
+
+/**
+ * The stand-in for a missing sheet, drawn in code so the frames still read
+ * apart: the first is a plain block of the key colour; a block's second is
+ * only its outline (empty); any other second is lighter with a bright core
+ * (lit, open, pressed, in flower); a face shows where it looks with a pupil.
+ */
+function placeholder(ctx: CanvasRenderingContext2D, id: SpriteId, s: Sprite, x: number, y: number, frame: number) {
+  const f = ((frame % s.frames) + s.frames) % s.frames;
+  ctx.fillStyle = s.key;
+  if (id === "face") {
+    ctx.fillRect(x, y, s.w, s.h);
+    const [dx, dy] = GAZE[f];
+    ctx.fillStyle = "#10151D";
+    ctx.fillRect(x + s.w / 2 - 1 + dx, y + s.h / 2 - 1 + dy, 2, 2);
+  } else if (f === 0 || s.frames > 2) {
+    ctx.fillRect(x, y, s.w, s.h);
+  } else if (id === "blockPink" || id === "blockBlue") {
+    ctx.fillRect(x, y, s.w, 1);
+    ctx.fillRect(x, y + s.h - 1, s.w, 1);
+    ctx.fillRect(x, y, 1, s.h);
+    ctx.fillRect(x + s.w - 1, y, 1, s.h);
+  } else {
+    ctx.fillRect(x, y, s.w, s.h);
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.fillRect(x + 1, y + 1, s.w - 2, s.h - 2);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(x + Math.floor(s.w / 2) - 1, y + Math.floor(s.h / 2) - 1, 2, 2);
+  }
+}
+
 /** Frame `frame` of a sprite with its top left at (x, y), facing the other way when `flip`. */
 export function drawSprite(ctx: CanvasRenderingContext2D, id: SpriteId, x: number, y: number, frame = 0, flip = false) {
   const s = SPRITES[id];
@@ -89,8 +122,7 @@ export function drawSprite(ctx: CanvasRenderingContext2D, id: SpriteId, x: numbe
   x = Math.round(x);
   y = Math.round(y);
   if (!img || !img.complete || img.naturalWidth === 0) {
-    ctx.fillStyle = s.key;
-    ctx.fillRect(x, y, s.w, s.h);
+    placeholder(ctx, id, s, x, y, frame);
     return;
   }
   const f = ((frame % s.frames) + s.frames) % s.frames;

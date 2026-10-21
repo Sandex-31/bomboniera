@@ -2,6 +2,7 @@ import { useMemo, useRef } from "react";
 import { H, W, chase, hit, touchRect, type Rect } from "../../lib/well/pixels";
 import { SPRITES, drawSprite } from "../../lib/well/sprites";
 import { follow, type Played } from "../../lib/flute";
+import { fluteVoice } from "../../lib/fluteVoice";
 import {
   BLOCKS,
   CHEST_X,
@@ -128,7 +129,7 @@ export function useWallTv({
               drawSprite(ctx, "face", fx, fy, p.note);
               if (p.long) {
                 ctx.fillStyle = "#10151D";
-                ctx.fillRect(fx + 4, fy + 8, 4, 3);
+                ctx.fillRect(fx + 4, fy + 9, 4, 2);
               }
             } else {
               ctx.fillStyle = "#2C4660";
@@ -174,7 +175,7 @@ export function useWallTv({
         if (dropChest(walker.current.x)) {
           droppedAt.current = performance.now();
           commit({ ...s, chest: true });
-        }
+        } else fluteVoice().puff();
         return;
       }
       if (s.chest && hit(p, touchRect({ x: CHEST_X - CHEST_W / 2, y: FLOOR_Y - 12, w: CHEST_W, h: 12 }))) {
@@ -201,7 +202,9 @@ export function useWallTv({
   const onNote = (p: Played) => {
     const s = now.current;
     if (!s.tv || s.flame) return;
-    heard.current = follow(TV_TUNE, heard.current, p);
+    const before = heard.current;
+    heard.current = follow(TV_TUNE, before, p);
+    if (heard.current !== before + 1) fluteVoice().puff();
     if (heard.current < TV_TUNE.length) return;
     heard.current = 0;
     flameAt.current = performance.now();

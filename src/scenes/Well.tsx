@@ -301,6 +301,9 @@ export default function Well({
     if (!firstFlame({ ...flames(), [wall]: true }, wall)) return;
     timers.current.push(
       setTimeout(() => {
+        // wherever the visitor walked to meanwhile, the line is said in the hall, where it is in view
+        setFocus(null);
+        setView(HALL_VIEW);
         setScene(true);
         setFlaming(wall);
       }, reduced ? 0 : 1800),
@@ -348,7 +351,7 @@ export default function Well({
       }, DIVE.length * DIVE_MS),
     );
   };
-  const open = mural.done && finale === null;
+  const open = mural.done && lit(flames()) && finale === null;
 
   const wall4 = useWallPillars({ state: pillars, set: keepPillars, uvOn, onFlame: () => flamed("pilastri") });
   const { onNote: tvNote, ...wall1 } = useWallTv({
@@ -437,7 +440,7 @@ export default function Well({
         </FarSide>
       ))}
       {flaming && (
-        <Html position={onWall(WALL_ANGLES[flaming], 0.9, SCREEN_Y + 0.3, WELL_R).position} center zIndexRange={[6, 0]}>
+        <Html position={[0, 1.5, 0]} center zIndexRange={[6, 0]}>
           <Keeper
             line={flameLine}
             last
