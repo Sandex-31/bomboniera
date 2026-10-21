@@ -173,7 +173,8 @@ export function useWallCrows({
           }
           lastCaw.current = caw;
         }
-        ctx.fillStyle = "#4A3A2A";
+        // until they have been heard, the perch blinks pink to be tapped
+        ctx.fillStyle = !now.current.heard && !pl && Math.floor(t * 3) % 2 ? "#FF5FA8" : "#4A3A2A";
         ctx.fillRect(PERCH.x, PERCH.y, PERCH.w, PERCH.h);
         CROWS.forEach((c) => {
           const cawing = caw >= 0 && CROW_TUNE[caw].note === c;
@@ -220,7 +221,14 @@ export function useWallCrows({
   /** A note of the flute: it counts once the crows have been heard, and not while they caw. */
   const onNote = (p: Played) => {
     const s = now.current;
-    if (!s.box || !s.heard || s.flame || play.current) return;
+    // notes come from a press: the place to make or wake the audio before a caw is heard
+    crowVoice();
+    if (!s.box || s.flame || play.current) return;
+    // the crows not yet heard (a reload): a note is their cue, in a gesture
+    if (!s.heard) {
+      start(false);
+      return;
+    }
     heard.current = follow(CROW_TUNE, heard.current, p);
     if (heard.current === 0) {
       // wrong: they scatter, settle, and caw from the start
