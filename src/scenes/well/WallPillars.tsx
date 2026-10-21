@@ -1,14 +1,19 @@
 import { useMemo, useRef } from "react";
-import { H, W, hit, type Rect } from "../../lib/well/pixels";
+import { H, W, hit, touchRect, type Rect } from "../../lib/well/pixels";
 import { SPRITES, drawSprite } from "../../lib/well/sprites";
 import {
   ARRIVAL,
   CLOSED,
   DIGIT_DOTS,
+  DOT_REACH,
+  MAP,
   NUMBER,
   PILLARS,
+  WALL_SPAN,
   dial,
+  dotAt,
   ghostsScared,
+  groupCentre,
   joins,
   pillarAngle,
   type PillarsState,
@@ -29,13 +34,12 @@ import { WALL_ANGLES } from "./wall";
  */
 
 const FLOOR = H - 24;
-const SWITCHES = [{ x: 50, y: 126 }, { x: 150, y: 60 }, { x: 250, y: 126 }];
-const CANDLES = SWITCHES.map((s) => ({ x: s.x + 24, y: s.y - 4 }));
+const SWITCHES = [{ x: 50, y: 100 }, { x: 150, y: 60 }, { x: 250, y: 100 }];
+const CANDLES = SWITCHES.map((s) => ({ x: s.x + 40, y: s.y - 4 }));
 const CHEST = { x: 146, y: 138 };
 const PILE: Rect = { x: 28, y: 138, w: 22, h: 18 };
-/** How far a tap may miss a small thing and still have it. */
-const PAD = 4;
-const grow = (r: Rect, n = PAD): Rect => ({ x: r.x - n, y: r.y - n, w: r.w + 2 * n, h: r.h + 2 * n });
+/** Everything small is tapped through a rect of at least TOUCH pixels about it. */
+const grow = (r: Rect): Rect => touchRect(r);
 const near = (a: [number, number], b: [number, number], r: number) => Math.hypot(a[0] - b[0], a[1] - b[1]) <= r;
 
 /** Where a ghost is, in ms: it drifts between two neighbouring switches, so that each is covered some of the time. */
@@ -48,30 +52,25 @@ function ghostAt(g: number, ms: number): [number, number] {
 /** A ghost over a switch is within this of its middle. */
 const COVER = 13;
 
-/* the map: the hall from above, arrival at the bottom right */
-const MAP = { x: 94, y: 88, r: 68 };
-const WALL_SPAN = 0.49;
-const GROUP_R = 46;
-const SPACING = 7;
-/** Reach of a finger on a dot. */
-const DOT_REACH = 4;
-const dotAt = (k: number, i: number): [number, number] => {
-  const a = pillarAngle(k);
-  const [c, r] = DIGIT_DOTS[NUMBER[k]][i];
-  return [Math.round(MAP.x + GROUP_R * Math.cos(a) + (c - 1) * SPACING), Math.round(MAP.y + GROUP_R * Math.sin(a) + (r - 2) * SPACING)];
-};
-
-/* the telephone: ten holes round a dial, and the stop at the lower right */
-const PHONE = { x: 252, y: 88, r: 46 };
-const HOLES_R = 34;
+/* the telephone: ten holes round a dial that fills the screen, and the stop at the lower right */
+const PHONE = { x: 160, y: 90, r: 88 };
+const HOLES_R = 70;
+const HOLE_R = 14;
+/** The nearest hole within this of a press is the one dialled: more than half the 36 px between holes. */
+const HOLE_REACH = 22;
 const STOP_DEG = 40;
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 /** Where the hole of digit `d` is: 1 first, counter-clockwise from the stop, 0 last. */
 const holeAt = (d: number): [number, number] => {
-  const a = toRad(STOP_DEG - 35 - 27 * ((d + 9) % 10));
+  const a = toRad(STOP_DEG - 45 - 30 * ((d + 9) % 10));
   return [PHONE.x + HOLES_R * Math.cos(a), PHONE.y + HOLES_R * Math.sin(a)];
 };
-const STOP: [number, number] = [PHONE.x + 42 * Math.cos(toRad(STOP_DEG)), PHONE.y + 42 * Math.sin(toRad(STOP_DEG))];
+const STOP: [number, number] = [PHONE.x + 80 * Math.cos(toRad(STOP_DEG)), PHONE.y + 80 * Math.sin(toRad(STOP_DEG))];
+/** How near the stop a dragged hole has to be let go. */
+const STOP_REACH = 24;
+/** The two buttons that swap the map and the telephone: the telephone at the top right, the map at the top left. */
+const TO_PHONE: Rect = { x: 288, y: 12, w: 16, h: 16 };
+const TO_MAP: Rect = { x: 16, y: 12, w: 16, h: 16 };
 
 function disc(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, colour: string) {
   ctx.fillStyle = colour;
@@ -168,6 +167,8 @@ export function useWallPillars({
   const busyAt = useRef(-Infinity);
   const flameAt = useRef(-Infinity);
   const drag = useRef<Drag | null>(null);
+  /** Which of the two the screen shows, once the lantern is taken. */
+  const view = useRef<"map" | "phone">("map");
 
   const commit = (next: PillarsState) => {
     now.current = next;
@@ -209,51 +210,55 @@ export function useWallPillars({
           }
         }
       } else {
-        // the map
-        ctx.drawImage(mapBase(), 0, 0);
-        PILLARS.forEach((_, k) => {
-          const a = pillarAngle(k);
-          ctx.fillStyle = s.stamped[k] ? "#FF4FD8" : "#6A5A80";
-          ctx.fillRect(Math.round(MAP.x + (MAP.r - 7) * Math.cos(a)) - 1, Math.round(MAP.y + (MAP.r - 7) * Math.sin(a)) - 1, 3, 3);
-          if (!s.stamped[k]) return;
-          const dots = DIGIT_DOTS[NUMBER[k]];
-          const d = drag.current?.kind === "map" && drag.current.k === k ? drag.current : null;
-          if (s.joined[k]) {
-            dots.forEach((_, i) => i && line(ctx, dotAt(k, i - 1), dotAt(k, i), "#FFE97A"));
-            if (CLOSED.includes(NUMBER[k])) line(ctx, dotAt(k, dots.length - 1), dotAt(k, 0), "#FFE97A");
-          } else if (d) {
-            d.path.forEach((p, i) => i && line(ctx, dotAt(k, d.path[i - 1]), dotAt(k, p), "#FFFFFF"));
-            line(ctx, dotAt(k, d.path[d.path.length - 1]), d.at, "#9FE8FF");
-          }
-          ctx.fillStyle = s.joined[k] ? "#FFE97A" : "#C8D4E8";
-          dots.forEach((_, i) => {
-            const [x, y] = dotAt(k, i);
-            ctx.fillRect(x - 1, y - 1, 3, 3);
+        if (view.current === "map") {
+          ctx.drawImage(mapBase(), 0, 0);
+          drawSprite(ctx, "phone", TO_PHONE.x, TO_PHONE.y);
+          PILLARS.forEach((_, k) => {
+            const a = pillarAngle(k);
+            const tick: [number, number] = [Math.round(MAP.x + (MAP.r - 5) * Math.cos(a)), Math.round(MAP.y + (MAP.r - 5) * Math.sin(a))];
+            ctx.fillStyle = s.stamped[k] ? "#FF4FD8" : "#6A5A80";
+            ctx.fillRect(tick[0] - 1, tick[1] - 1, 3, 3);
+            if (!s.stamped[k]) return;
+            // a faint thread from the pillar's place on the rim to its group
+            line(ctx, tick, groupCentre(k), "#3A3050");
+            const dots = DIGIT_DOTS[NUMBER[k]];
+            const d = drag.current?.kind === "map" && drag.current.k === k ? drag.current : null;
+            if (s.joined[k]) {
+              dots.forEach((_, i) => i && line(ctx, dotAt(k, i - 1), dotAt(k, i), "#FFE97A"));
+              if (CLOSED.includes(NUMBER[k])) line(ctx, dotAt(k, dots.length - 1), dotAt(k, 0), "#FFE97A");
+            } else if (d) {
+              d.path.forEach((p, i) => i && line(ctx, dotAt(k, d.path[i - 1]), dotAt(k, p), "#FFFFFF"));
+              line(ctx, dotAt(k, d.path[d.path.length - 1]), d.at, "#9FE8FF");
+            }
+            ctx.fillStyle = s.joined[k] ? "#FFE97A" : "#C8D4E8";
+            dots.forEach((_, i) => {
+              const [x, y] = dotAt(k, i);
+              ctx.fillRect(x - 2, y - 2, 4, 4);
+            });
           });
-        });
-
-        // the telephone
-        disc(ctx, PHONE.x, PHONE.y, PHONE.r, "#7A2A22");
-        disc(ctx, PHONE.x, PHONE.y, PHONE.r - 3, "#B04030");
-        for (let d = 0; d <= 9; d++) {
-          const [x, y] = holeAt(d);
-          disc(ctx, x, y, 7, drag.current?.kind === "dial" && drag.current.d === d ? "#F2D02A" : "#1A0F0E");
+        } else {
+          // the telephone
+          disc(ctx, PHONE.x, PHONE.y, PHONE.r, "#7A2A22");
+          disc(ctx, PHONE.x, PHONE.y, PHONE.r - 3, "#B04030");
+          for (let d = 0; d <= 9; d++) {
+            const [x, y] = holeAt(d);
+            disc(ctx, x, y, HOLE_R, drag.current?.kind === "dial" && drag.current.d === d ? "#F2D02A" : "#1A0F0E");
+          }
+          disc(ctx, PHONE.x, PHONE.y, 26, "#7A2A22");
+          ctx.fillStyle = "#D8D8D8";
+          ctx.fillRect(Math.round(STOP[0]) - 5, Math.round(STOP[1]) - 2, 11, 5);
+          if (drag.current?.kind === "dial") disc(ctx, drag.current.at[0], drag.current.at[1], 7, "#F2D02A");
+          disc(ctx, TO_MAP.x + 8, TO_MAP.y + 8, 8, "#4A5468");
+          // one lamp for each digit dialled; red while the line is busy
+          const busy = ms - busyAt.current < 1500 && Math.floor((ms - busyAt.current) / 250) % 2 === 0;
+          for (let i = 0; i < NUMBER.length; i++) {
+            ctx.fillStyle = busy ? "#E04040" : i < s.dialled.length ? "#5FD35F" : "#3A4150";
+            ctx.fillRect(232 + i * 10, 8, 6, 6);
+          }
+          // the flame rises out of the telephone and away
+          const rise = (ms - flameAt.current) / 1800;
+          if (rise >= 0 && rise < 1) drawSprite(ctx, "flame", PHONE.x - 4, 76 - rise * 100, Math.floor(t * 8));
         }
-        disc(ctx, PHONE.x, PHONE.y, 14, "#7A2A22");
-        ctx.fillStyle = "#D8D8D8";
-        ctx.fillRect(Math.round(STOP[0]) - 3, Math.round(STOP[1]) - 1, 7, 3);
-        if (drag.current?.kind === "dial") {
-          disc(ctx, drag.current.at[0], drag.current.at[1], 5, "#F2D02A");
-        }
-        // one lamp for each digit dialled; red while the line is busy
-        const busy = ms - busyAt.current < 1500 && Math.floor((ms - busyAt.current) / 250) % 2 === 0;
-        for (let i = 0; i < NUMBER.length; i++) {
-          ctx.fillStyle = busy ? "#E04040" : i < s.dialled.length ? "#5FD35F" : "#3A4150";
-          ctx.fillRect(218 + i * 10, 144, 6, 6);
-        }
-        // the flame rises out of the telephone and away
-        const rise = (ms - flameAt.current) / 1800;
-        if (rise >= 0 && rise < 1) drawSprite(ctx, "flame", PHONE.x - 4, 76 - rise * 100, Math.floor(t * 8));
       }
       paintPillars(ctx, "pilastri", s, uvAt);
     },
@@ -263,6 +268,11 @@ export function useWallPillars({
   const onTap = (p: [number, number]) => {
     const s = now.current;
     if (s.uv) {
+      const to = view.current === "map" ? TO_PHONE : TO_MAP;
+      if (hit(p, grow(to))) {
+        view.current = view.current === "map" ? "phone" : "map";
+        return;
+      }
       const next = stampPillar(s, "pilastri", p, lantern.current);
       if (next) commit(next);
       return;
@@ -293,21 +303,21 @@ export function useWallPillars({
   const onPress = (p: [number, number]) => {
     const s = now.current;
     if (!s.uv) return;
+    if (view.current === "map") {
     let best: { k: number; i: number; d: number } | null = null;
     PILLARS.forEach((_, k) => {
       if (!s.stamped[k] || s.joined[k]) return;
       DIGIT_DOTS[NUMBER[k]].forEach((_, i) => {
-        const d = Math.hypot(...([p[0] - dotAt(k, i)[0], p[1] - dotAt(k, i)[1]] as [number, number]));
+        const d = Math.hypot(p[0] - dotAt(k, i)[0], p[1] - dotAt(k, i)[1]);
         if (d <= DOT_REACH && (!best || d < best.d)) best = { k, i, d };
       });
     });
     const grab = best as { k: number; i: number } | null;
-    if (grab) {
-      drag.current = { kind: "map", k: grab.k, path: [grab.i], at: p };
-      return;
+    if (grab) drag.current = { kind: "map", k: grab.k, path: [grab.i], at: p };
+    return;
     }
     let d0 = -1;
-    let dist = 10;
+    let dist = HOLE_REACH;
     for (let d = 0; d <= 9; d++) {
       const h = Math.hypot(p[0] - holeAt(d)[0], p[1] - holeAt(d)[1]);
       if (h <= dist) {
@@ -341,7 +351,7 @@ export function useWallPillars({
       if (joins(NUMBER[d.k], d.path)) commit({ ...now.current, joined: now.current.joined.map((v, i) => v || i === d.k) });
       return;
     }
-    if (!near(d.at, STOP, 14)) return;
+    if (!near(d.at, STOP, STOP_REACH)) return;
     const { state: next, busy } = dial(now.current, d.d);
     if (busy) {
       busyAt.current = performance.now();

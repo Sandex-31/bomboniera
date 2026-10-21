@@ -1,5 +1,5 @@
 import { WALL_ANGLES, type WallId } from "../../scenes/well/wall";
-import { W } from "./pixels";
+import { H, W } from "./pixels";
 import { WELL_PILLARS_KEY } from "../../data/puzzle";
 
 /*
@@ -30,7 +30,7 @@ export const NUMBER = [9, 0, 1, 7, 4, 3, 2] as const;
 export const PILLAR = { w: 14, h: 56 };
 
 /** How much of the turn round the hall one screen takes up: the panel's width over the wall's radius. */
-const WALL_SPAN = 0.49;
+export const WALL_SPAN = 0.49;
 
 /**
  * Where the visitor arrives, as an angle round the hall: the left edge of the
@@ -80,6 +80,31 @@ export const DIGIT_DOTS: Record<number, [number, number][]> = {
   8: [[0, 0], [1, 0], [2, 0], [2, 1], [1, 2], [2, 3], [2, 4], [1, 4], [0, 4], [0, 3], [0, 2], [0, 1]],
   9: [[0, 4], [1, 4], [2, 3], [2, 2], [2, 1], [1, 0], [0, 1], [0, 2], [1, 2]],
 };
+
+/** The map: the hall from above, small in the middle of the screen, with each pillar's dot group round it. */
+export const MAP = { x: 160, y: 90, r: 30 };
+/** The distance between neighbouring dots, a digit being four of these tall: 60 CSS px on a 390 px phone. */
+export const SPACING = 14;
+/** How near a finger has to be to a dot to be on it: under half the spacing, so no two dots are ever both reached. */
+export const DOT_REACH = 6;
+/** Half the size of a group's box, dots and all. */
+export const GROUP_HALF = { w: SPACING + 2, h: 2 * SPACING + 2 };
+
+/** Where pillar `k`'s group stands: in the direction of the pillar from the middle of the map, out to the edge of the screen. */
+export function groupCentre(k: number): [number, number] {
+  const a = pillarAngle(k);
+  const dx = Math.cos(a);
+  const dy = Math.sin(a);
+  const t = Math.min((W / 2 - GROUP_HALF.w) / Math.max(Math.abs(dx), 1e-9), (H / 2 - GROUP_HALF.h) / Math.max(Math.abs(dy), 1e-9));
+  return [Math.round(MAP.x + t * dx), Math.round(MAP.y + t * dy)];
+}
+
+/** Where dot `i` of pillar `k`'s digit is on the screen. */
+export function dotAt(k: number, i: number): [number, number] {
+  const [gx, gy] = groupCentre(k);
+  const [c, r] = DIGIT_DOTS[NUMBER[k]][i];
+  return [gx + (c - 1) * SPACING, gy + (r - 2) * SPACING];
+}
 
 /** The digits whose stroke comes back to its first dot. */
 export const CLOSED = [0, 8];

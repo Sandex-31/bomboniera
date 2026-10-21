@@ -34,3 +34,17 @@ export function inCircle(p: [number, number], centre: [number, number], r: numbe
 export function hit(p: [number, number], rect: Rect) {
   return p[0] >= rect.x && p[0] < rect.x + rect.w && p[1] >= rect.y && p[1] < rect.y + rect.h;
 }
+
+/**
+ * The least a thing to tap is, in logical pixels. On a 390 px phone the
+ * focused screen is the panel's 1.6 world units at 214 px a unit, 343 CSS px
+ * for 320 logical, so 1.07 CSS px a pixel: 41 logical pixels are 44 CSS px.
+ */
+export const TOUCH = 42;
+
+/** `r` grown about its middle to at least TOUCH on each side. */
+export function touchRect(r: Rect): Rect {
+  const w = Math.max(r.w, TOUCH);
+  const h = Math.max(r.h, TOUCH);
+  return { x: r.x - (w - r.w) / 2, y: r.y - (h - r.h) / 2, w, h };
+}

@@ -18,6 +18,7 @@ import Screen, { INSET, PANEL, type Painter } from "./well/Screen";
 import { H, W } from "../lib/well/pixels";
 import { SPRITES, drawSprite, type SpriteId } from "../lib/well/sprites";
 import { savedPillars, type PillarsState } from "../lib/well/pillars";
+import { firstFlame } from "../lib/well/flames";
 import { paintPillars, stampPillar } from "./well/pillarPaint";
 import { useWallPillars } from "./well/WallPillars";
 
@@ -263,7 +264,9 @@ export default function Well({
     set: keepPillars,
     uvOn,
     onFlame: () => {
-      // the flame rises out of the screen, and then the scene says its line
+      // the other walls' states do not exist yet: their flames are false until their tasks give them
+      if (!firstFlame({ tv: false, corvi: false, boccioli: false, pilastri: true }, "pilastri")) return;
+      // the flame rises out of the screen, and then, the floor's first, the scene says its line
       timers.current.push(
         setTimeout(() => {
           setScene(true);

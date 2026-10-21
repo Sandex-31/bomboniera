@@ -1,4 +1,4 @@
-import { hit } from "../../lib/well/pixels";
+import { hit, touchRect } from "../../lib/well/pixels";
 import { PILLAR, PILLARS, type PillarsState } from "../../lib/well/pillars";
 import type { WallId } from "./wall";
 
@@ -9,14 +9,10 @@ import type { WallId } from "./wall";
  * through `paintPillars` and take taps through `stampPillar`.
  */
 
-/** A little more than the post, so a thumb finds it. */
-const PAD = 5;
-
 /** Which pillar of this wall, by index in PILLARS, is at pixel `p`; -1 for none. */
 export function pillarAt(wall: WallId, p: [number, number]): number {
-  return PILLARS.findIndex(
-    (q) => q.wall === wall && hit(p, { x: q.x - PAD, y: q.y - PAD, w: PILLAR.w + 2 * PAD, h: PILLAR.h + 2 * PAD }),
-  );
+  // a thumb needs more than the post: it is grown to a tappable size
+  return PILLARS.findIndex((q) => q.wall === wall && hit(p, touchRect({ x: q.x, y: q.y, w: PILLAR.w, h: PILLAR.h })));
 }
 
 /** The state after a tap at `p` on `wall`, or null when the tap stamps nothing: no lantern, or not a pillar, or one already stamped. */

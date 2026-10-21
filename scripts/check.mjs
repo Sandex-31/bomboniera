@@ -1916,6 +1916,32 @@ try {
     assert.ok(pl.ghostsScared(1000, 1000) && pl.ghostsScared(1000, 4999), "the ghosts return early");
     assert.ok(!pl.ghostsScared(1000, 5000) && !pl.ghostsScared(-Infinity, 0), "the ghosts stay away");
 
+    // the first flame of the floor is the one that gets the line
+    const { firstFlame } = await vite15.ssrLoadModule("/src/lib/well/flames.ts");
+    const none = { tv: false, corvi: false, boccioli: false, pilastri: false };
+    assert.ok(firstFlame({ ...none, pilastri: true }, "pilastri"), "the only flame is not the first");
+    assert.ok(!firstFlame({ ...none, tv: true, pilastri: true }, "pilastri"), "a second flame is the first");
+    assert.ok(firstFlame({ ...none, tv: true }, "tv"), "a flame alone on its wall is not the first");
+
+    // fingers: every pillar is on its screen, a dot is reached from less than half-way to the next, groups never overlap
+    const px = await vite15.ssrLoadModule("/src/lib/well/pixels.ts");
+    pl.PILLARS.forEach((q, k) =>
+      assert.ok(q.x >= 0 && q.y >= 0 && q.x + pl.PILLAR.w <= px.W && q.y + pl.PILLAR.h <= px.H, `pillar ${k} is off its screen`),
+    );
+    assert.ok(pl.DOT_REACH < pl.SPACING / 2, "two dots can both be under a finger");
+    assert.ok(4 * pl.SPACING * (343 / 320) >= 60, "a digit is under 60 CSS px tall on a 390 px phone");
+    const t = px.touchRect({ x: 10, y: 10, w: 8, h: 8 });
+    assert.ok(t.w >= px.TOUCH && t.h >= px.TOUCH && t.x + t.w / 2 === 14 && t.y + t.h / 2 === 14, "touchRect is not about the middle");
+    assert.ok(px.TOUCH * (343 / 320) >= 44, "TOUCH is under 44 CSS px");
+    const boxes = pl.PILLARS.map((_, k) => pl.groupCentre(k));
+    boxes.forEach(([x, y], k) => {
+      assert.ok(x - pl.GROUP_HALF.w >= 0 && x + pl.GROUP_HALF.w <= px.W && y - pl.GROUP_HALF.h >= 0 && y + pl.GROUP_HALF.h <= px.H, `group ${k} is off the screen`);
+      assert.ok(Math.hypot(x - pl.MAP.x, y - pl.MAP.y) > pl.MAP.r + 20, `group ${k} sits on the map`);
+      boxes.slice(k + 1).forEach(([x2, y2], j) =>
+        assert.ok(Math.abs(x - x2) >= 2 * pl.GROUP_HALF.w || Math.abs(y - y2) >= 2 * pl.GROUP_HALF.h, `groups ${k} and ${k + j + 1} overlap`),
+      );
+    });
+
     const { STAGES } = await vite15.ssrLoadModule("/src/lib/stages.ts");
     const labels = STAGES.map((st) => st.label);
     assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri"], "the lantern and the pillars are not after the fourth floor");

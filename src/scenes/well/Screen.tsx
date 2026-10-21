@@ -201,6 +201,8 @@ export default function Screen({
       <mesh
         {...SCREEN}
         onPointerDown={(e) => {
+          // a drag on the screen is the screen's own, and turns nothing else
+          if (active) e.stopPropagation();
           down.current = point(e);
           if (down.current) {
             pressed.current = true;
@@ -216,6 +218,7 @@ export default function Screen({
           const p = point(e);
           if (p && pressed.current) onDrag?.(p);
         }}
+        onPointerCancel={release}
         onPointerOut={() => {
           release();
           if (active) finger.current = null;
