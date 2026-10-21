@@ -37,12 +37,12 @@ export const MURAL: {
     { cell: [1, 1], m: "/", hidden: false },
     { cell: [5, 1], m: "\\", hidden: false },
   ],
-  // listed so that at most one stands in its place in the beam's order
+  // placed so that, ranked by column, at most one is reached in its place
   buds: [
     { cell: [1, 3], whistle: 3 },
+    { cell: [2, 1], whistle: 0 },
     { cell: [3, 3], whistle: 1 },
     { cell: [5, 3], whistle: 4 },
-    { cell: [4, 1], whistle: 0 },
   ],
 };
 

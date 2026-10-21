@@ -2175,11 +2175,14 @@ try {
     const { follow } = await vite18.ssrLoadModule("/src/lib/flute.ts");
     const order = bu.budOrder();
     assert.deepEqual([...order].sort(), [0, 1, 2, 3], "the order is not a permutation of the buds");
-    assert.ok(order.filter((k, i) => k === i).length <= 1, "more than one bud is in its place in the list");
-    const fh = bu.firstHidden();
-    assert.ok(fh >= 0, "no hidden mirror on the path");
-    bu.traceMural().slice(0, fh).forEach(([x, y]) => assert.ok(!bu.MURAL.mirrors.some((m) => m.hidden && m.cell[0] === x && m.cell[1] === y), "a hidden mirror comes before the split"));
     const path = bu.traceMural();
+    // what the visitor sees: the buds ranked by column (then row), reached in the beam's order
+    const rank = bu.MURAL.buds.map((b, k) => bu.MURAL.buds.filter((o) => o.cell[0] < b.cell[0] || (o.cell[0] === b.cell[0] && o.cell[1] < b.cell[1])).length);
+    assert.ok(order.map((k) => rank[k]).filter((r, i) => r === i).length <= 1, "more than one bud is reached in its left-to-right place");
+    const fh = bu.firstHidden();
+    const hm = bu.MURAL.mirrors.find((m) => m.hidden && m.cell[0] === path[fh]?.[0] && m.cell[1] === path[fh]?.[1]);
+    assert.ok(hm, "the first hidden mirror is not on the path");
+    assert.ok(order.some((k) => path.findIndex(([x, y]) => x === bu.MURAL.buds[k].cell[0] && y === bu.MURAL.buds[k].cell[1]) > fh), "every bud is reached before the dark part: UV is not needed");
     const hidden = bu.MURAL.mirrors.filter((m) => m.hidden);
     assert.ok(hidden.length >= 2, "under two hidden mirrors");
     hidden.forEach((m) => assert.ok(path.some(([x, y]) => x === m.cell[0] && y === m.cell[1]), "a hidden mirror is off the path"));
