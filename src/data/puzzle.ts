@@ -102,12 +102,12 @@ export const LOCK_KEY = 'bomboniera.puzzle.lucchetto';
 
 /**
  * Which floor of the tower the visitor is on: 0 the island, 1 Babel, 2 the
- * machine room. Missing means they have never been down.
+ * machine room, 3 the well. Missing means they have never been down.
  */
 export const FLOOR_KEY = 'bomboniera.puzzle.piano';
 
 /** How many floors are built so far, the island included. */
-export const FLOORS = 3;
+export const FLOORS = 4;
 
 /** The stored floor, read back: anything that is not a floor is the island. */
 export function floorFrom(stored: string | null): number {
@@ -150,6 +150,21 @@ export const ORGAN_KEY = 'bomboniera.puzzle.organo';
 
 /** Whether the big lever was pulled and the press went through the floor. */
 export const PRESS_KEY = 'bomboniera.puzzle.pressa';
+
+/** What the TV on the wall of the well has been taught. */
+export const WELL_TV_KEY = 'bomboniera.puzzle.pozzo.tv';
+
+/** The crows of the well: which of them have been seen to. */
+export const WELL_CROWS_KEY = 'bomboniera.puzzle.pozzo.corvi';
+
+/** The buds of the well: which of them have opened. */
+export const WELL_BUDS_KEY = 'bomboniera.puzzle.pozzo.boccioli';
+
+/** The pillars of the well: where each was left. */
+export const WELL_PILLARS_KEY = 'bomboniera.puzzle.pozzo.pilastri';
+
+/** The mural of the well, and how much of it has been uncovered. */
+export const WELL_MURAL_KEY = 'bomboniera.puzzle.pozzo.murale';
 
 /** The read phrases, read back: anything that is not a list of distinct phrases is none. */
 export function langFrom(stored: string | null): number[] {
@@ -217,6 +232,34 @@ export const cardLine = 'Rotom: TODO — la battuta della scheda ricomposta.';
  * TODO: da scrivere — questa riga è segnaposto.
  */
 export const pressLine = 'Rotom: TODO — la battuta della pressa.';
+
+/**
+ * What it says on landing in the well, as Frost Rotom.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const wellLine = 'Rotom: TODO — la battuta dell’arrivo nel pozzo.';
+
+/**
+ * And what it says at the first of the walls of the well.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const wallLine = 'Rotom: TODO — la battuta della prima parete.';
+
+/**
+ * And what it says once the flame of the well is lit.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const flameLine = 'Rotom: TODO — la battuta della fiamma.';
+
+/**
+ * And what it says once the mural is whole.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const muralLine = 'Rotom: TODO — la battuta del murale.';
 
 /** What it says to anyone who names a silhouette right: right, and useless. */
 export const bravoLine = 'Rotom: Bravo! giusto ma non ti servirá a un bel niente hahahahah';

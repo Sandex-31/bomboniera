@@ -1,4 +1,4 @@
-import { Suspense, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, events, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -47,6 +47,7 @@ import { BURN_MS, moveMs, type Move } from "../lib/descent";
 import {
   BRICK,
   COPPER,
+  Carried,
   FAR,
   FarSide,
   focused,
@@ -95,6 +96,15 @@ const ASIDE: [number, number, number] = [-0.85, 0, 0.85];
 
 const CEILING_VIEW: View = {
   target: [ASIDE[0], 1.5, ASIDE[2]],
+  azimuth: Math.PI / 4,
+  polar: 0.8,
+  zoom: 2,
+  spread: { azimuth: 0.1, polar: 0.05 },
+};
+
+/** Up from the well: the camera waits over the hole in the floor, where Rotom is about to rise. */
+const HOLE_VIEW: View = {
+  target: [0, 0.3, 0],
   azimuth: Math.PI / 4,
   polar: 0.8,
   zoom: 2,
@@ -279,35 +289,13 @@ function Shaker({ at, reduced }: { at: number; reduced: boolean }) {
   return null;
 }
 
-/** Rotom, eased to where it is put and to the size it is wanted at. */
-function Carried({
-  at,
-  size,
-  instant,
-  children,
-}: {
-  at: [number, number, number];
-  size: number;
-  instant: boolean;
-  children: ReactNode;
-}) {
-  const group = useRef<Group>(null);
-  useFrame((_, dt) => {
-    const g = group.current;
-    if (!g) return;
-    const k = instant ? 1 : Math.min(1, dt * 4);
-    g.position.x += (at[0] - g.position.x) * k;
-    g.position.y += (at[1] - g.position.y) * k;
-    g.position.z += (at[2] - g.position.z) * k;
-    g.scale.setScalar(g.scale.x + (size - g.scale.x) * Math.min(1, dt * 5));
-  });
-  return <group ref={group}>{children}</group>;
-}
-
 export default function Engine({
   reduced,
   onScene,
   onUp,
+  onDown,
+  deep,
+  fromBelow,
   arrivedAt,
   first,
   start,
@@ -317,6 +305,12 @@ export default function Engine({
   onScene: (on: boolean) => void;
   /** The hole in the ceiling was tapped: back up to Babel. */
   onUp: () => void;
+  /** Rotom has dropped through the hole the press made: on to the well. */
+  onDown: (first: boolean) => void;
+  /** Whether the visitor has been down to the well before. */
+  deep: boolean;
+  /** Whether they came up from the well, not down from Babel. */
+  fromBelow: boolean;
   /** When the visitor came down, or -Infinity if they were already here. */
   arrivedAt: number;
   /** Whether that was the first time down, which is the long way. */
@@ -415,13 +409,15 @@ export default function Engine({
   /*
    * Coming in: the camera waits under the hole, Rotom drops out of it as it
    * was in Babel and, the first time, catches fire and comes out of the
-   * smoke changed; then the camera stands back to take in the hall.
+   * smoke changed; then the camera stands back to take in the hall. Coming
+   * up from the well it rises out of the hole in the floor instead, as
+   * Frost Rotom until the flash.
    */
   const arriving = Number.isFinite(arrivedAt) && !reduced;
   const [move, setMove] = useState<Move | undefined>(() =>
-    arriving ? { at: arrivedAt, kind: "in", dir: "down", fast: !first } : undefined,
+    arriving ? { at: arrivedAt, kind: "in", dir: fromBelow ? "up" : "down", fast: !first } : undefined,
   );
-  const [view, setView] = useState(arriving ? CEILING_VIEW : start ? VIEWS[start] : HALL_VIEW);
+  const [view, setView] = useState(arriving ? (fromBelow ? HOLE_VIEW : CEILING_VIEW) : start ? VIEWS[start] : HALL_VIEW);
   const [scene, setScene] = useState(arriving);
   useEffect(() => {
     if (!arriving) return;
@@ -468,6 +464,25 @@ export default function Engine({
     setMove({ at: performance.now(), kind: "out", dir: "up", fast: true });
     leaving.current = setTimeout(onUp, reduced ? 0 : moveMs(true) * 0.8);
   });
+  /*
+   * Down through the hole the press made: Rotom comes over it, hangs there a
+   * moment, then spirals in, and the well takes over. The long way the first
+   * time, the short way after.
+   */
+  const [descending, setDescending] = useState(false);
+  const down = useTap(() => {
+    if (scene || !broken) return;
+    const long = !deep;
+    setScene(true);
+    setDescending(true);
+    leaving.current = setTimeout(
+      () => {
+        setMove({ at: performance.now(), kind: "out", dir: "down", fast: !long });
+        leaving.current = setTimeout(() => onDown(long), reduced ? 0 : moveMs(!long) * 0.8);
+      },
+      reduced ? 0 : 900,
+    );
+  });
   const zap = useTap(() => {
     if (!scene) setZapAt(performance.now());
   });
@@ -502,7 +517,9 @@ export default function Engine({
     if (near && boilers.doors[which] && !boilers.lit[which]) setInside(which);
   };
   /** Where Rotom floats: held, in a boiler's mouth, or in the middle. */
-  const at: [number, number, number] = held
+  const at: [number, number, number] = descending || (arriving && fromBelow && scene)
+    ? [0, 0, 0]
+    : held
     ? [held[0], held[1] - 1.12 * 0.5, held[2]]
     : inside !== null
       ? [doorAt(inside)[0], doorAt(inside)[1] - 1.12 * 0.35, doorAt(inside)[2]]
@@ -756,6 +773,12 @@ export default function Engine({
           <meshBasicMaterial color="#FFB070" transparent opacity={0.1} depthWrite={false} />
         </mesh>
 
+        {/* the hole the press made, once it has: tapping it goes down */}
+        <mesh position={[0, 0.02, 0]} rotation-x={-Math.PI / 2} visible={broken && focus === null} {...down}>
+          <circleGeometry args={[PRESS_HOLE_R + 0.1, 32]} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        </mesh>
+
         <Shaker at={finaleAt} reduced={reduced} />
         <Press
           latches={latches}
@@ -779,8 +802,8 @@ export default function Engine({
             <Suspense fallback={null}>
               <Rotom
                 form="heat"
-                from="wash"
-                fire={first}
+                from={fromBelow ? "frost" : "wash"}
+                fire={first && !fromBelow}
                 move={move}
                 reduced={reduced}
                 zapAt={zapAt}

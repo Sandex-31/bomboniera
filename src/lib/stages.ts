@@ -32,6 +32,11 @@ import {
   SKI_KEY,
   TITLES_KEY,
   TOMBINO_KEY,
+  WELL_BUDS_KEY,
+  WELL_CROWS_KEY,
+  WELL_MURAL_KEY,
+  WELL_PILLARS_KEY,
+  WELL_TV_KEY,
 } from "../data/puzzle";
 import { buildMaze, solve } from "./maze";
 import { FLOORS } from "./beam";
@@ -103,13 +108,23 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "montacarichi", key: HOIST_KEY, solved: solvedHoist },
   { label: "organo", key: ORGAN_KEY, solved: solvedOrgan },
   { label: "pressa", key: PRESS_KEY, solved: solvedPress },
+  { label: "quarto piano", key: FLOOR_KEY, solved: () => "3" },
 ];
 
 /**
  * What the puzzle keeps that is not a stop of its own: which chats have been
- * opened, and how deep the visitor has been. Wiped with the rest.
+ * opened, and how deep the visitor has been. Wiped with the rest. The five
+ * keys of the well wait here until the task of each moves it onto a stop.
  */
-export const WIPED = [CHAT_KEY, DEPTH_KEY];
+export const WIPED = [
+  CHAT_KEY,
+  DEPTH_KEY,
+  WELL_TV_KEY,
+  WELL_CROWS_KEY,
+  WELL_BUDS_KEY,
+  WELL_PILLARS_KEY,
+  WELL_MURAL_KEY,
+];
 
 /**
  * Wipes the whole chain, then solves the first `upTo` stops of it.

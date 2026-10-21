@@ -26,6 +26,9 @@ import washGlow from "../assets/rotom/cobblemon/rotom_wash_emissive.png?url";
 import heatGeo from "../assets/rotom/cobblemon/rotom_heat.geo.json";
 import heatSkin from "../assets/rotom/cobblemon/rotom_heat.png?url";
 import heatGlow from "../assets/rotom/cobblemon/rotom_heat_emissive.png?url";
+import frostGeo from "../assets/rotom/cobblemon/rotom_frost.geo.json";
+import frostSkin from "../assets/rotom/cobblemon/rotom_frost.png?url";
+import frostGlow from "../assets/rotom/cobblemon/rotom_frost_emissive.png?url";
 
 /*
  * The models are Cobblemon's (gitlab.com/cable-mc/cobblemon), under the
@@ -35,12 +38,13 @@ import heatGlow from "../assets/rotom/cobblemon/rotom_heat_emissive.png?url";
  */
 
 /** Which of its shapes it has taken. One per floor of the tower. */
-export type RotomForm = "base" | "wash" | "heat";
+export type RotomForm = "base" | "wash" | "heat" | "frost";
 
 const FORMS: Record<RotomForm, { geo: Geo; skin: string; glow: string; light: string }> = {
   base: { geo: baseGeo["minecraft:geometry"][0] as unknown as Geo, skin: baseSkin, glow: baseGlow, light: "#FFAE4A" },
   wash: { geo: washGeo["minecraft:geometry"][0] as unknown as Geo, skin: washSkin, glow: washGlow, light: "#8AD8FF" },
   heat: { geo: heatGeo["minecraft:geometry"][0] as unknown as Geo, skin: heatSkin, glow: heatGlow, light: "#FF7A2A" },
+  frost: { geo: frostGeo["minecraft:geometry"][0] as unknown as Geo, skin: frostSkin, glow: frostGlow, light: "#BFE6FF" },
 };
 
 /**
@@ -136,7 +140,7 @@ function buildForm(form: RotomForm, map: Texture, glowSheet: Texture) {
   };
 }
 
-const ORDER: RotomForm[] = ["base", "wash", "heat"];
+const ORDER: RotomForm[] = ["base", "wash", "heat", "frost"];
 
 /** How long the soot of a boiler stays on it. */
 const SOOT_MS = 3000;

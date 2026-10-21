@@ -1000,7 +1000,15 @@ try {
     assert.ok(solvedTape(read(puzzle.MACHINE_KEY)), "the jump sets the levers wrong");
     const { unlocked } = await vite5.ssrLoadModule("/src/lib/sagome.ts");
     assert.ok(unlocked(read(puzzle.LOCK_KEY)), "the jump leaves the lock shut");
-    assert.equal(puzzle.floorFrom(store.get(puzzle.FLOOR_KEY)), 2, "the last stop leaves the visitor in the machine room");
+    // the walls of the well: four, each its own way round the hall
+    const { WALL_ANGLES } = await vite5.ssrLoadModule("/src/scenes/well/wall.ts");
+    const turns = Object.values(WALL_ANGLES).map((a) => Math.round((((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) * 100));
+    assert.equal(Object.keys(WALL_ANGLES).length, 4, "the well has four walls");
+    assert.equal(new Set(turns).size, 4, "two walls of the well stand on the same angle");
+    // the well comes right after the press, and the last stop leaves the visitor in it
+    const labels = STAGES.map((st) => st.label);
+    assert.equal(labels[labels.indexOf("pressa") + 1], "quarto piano", "the well is not the stop after the press");
+    assert.equal(puzzle.floorFrom(store.get(puzzle.FLOOR_KEY)), 3, "the last stop leaves the visitor in the well");
     // and the way back down from Babel is open, not a sarcophagus still to fill
     const { titlesDone } = await vite5.ssrLoadModule("/src/data/babel.ts");
     assert.ok(titlesDone(read(puzzle.TITLES_KEY)), "the jump leaves the sarcophagus shut");
@@ -1026,6 +1034,8 @@ try {
     assert.equal(puzzle.floorFrom(null), 0, "never been down is the island");
     assert.equal(puzzle.floorFrom("1"), 1);
     assert.equal(puzzle.floorFrom("2"), 2);
+    assert.equal(puzzle.floorFrom("3"), 3, "the well is a floor");
+    assert.equal(puzzle.floorFrom("4"), 0, "there is nothing below the well");
     assert.equal(puzzle.floorFrom("0"), 0, "been down and back up is the island");
     for (const bad of ["", "x", "-1", "1.5", String(puzzle.FLOORS), "99"]) {
       assert.equal(puzzle.floorFrom(bad), 0, `"${bad}" must fall back to the island`);
@@ -1033,7 +1043,8 @@ try {
     // the deepest floor ever reached, which makes the first trip down the long one
     assert.equal(puzzle.depthFrom(null), 0, "never been down");
     assert.equal(puzzle.depthFrom("2"), 2);
-    for (const bad of ["", "x", "-1", "1.5", "3", "99"]) {
+    assert.equal(puzzle.depthFrom("3"), 3, "the well is a depth");
+    for (const bad of ["", "x", "-1", "1.5", "4", "99"]) {
       assert.equal(puzzle.depthFrom(bad), 0, `"${bad}" is no depth`);
     }
 

@@ -32,6 +32,7 @@ import { Manhole, Tower } from "./Tower";
 import Rotom from "./Rotom";
 import Babel from "./Babel";
 import Engine from "./Engine";
+import Well from "./Well";
 import Keeper from "./Keeper";
 import Maze from "../components/Maze";
 import Mirrors from "../components/Mirrors";
@@ -1561,6 +1562,8 @@ function Desk({
   const toBabel = useCallback((first: boolean) => goTo(1, first), [goTo]);
   const upToBabel = useCallback(() => goTo(1, false), [goTo]);
   const toEngine = useCallback((first: boolean) => goTo(2, first), [goTo]);
+  const upToEngine = useCallback(() => goTo(2, false), [goTo]);
+  const toWell = useCallback((first: boolean) => goTo(3, first), [goTo]);
   /** Whether the lock is open, which is what the tower hangs on. */
   const [opened, setOpened] = useState(() => unlocked(loadLock()));
   /** When it opened in this visit; -Infinity is before it, or long since. */
@@ -1706,11 +1709,22 @@ function Desk({
           first={arrival.first}
           fromBelow={arrival.from === 2}
         />
-      ) : (
+      ) : floor === 2 ? (
         <Engine
           reduced={reduced}
           onScene={setScene}
           onUp={upToBabel}
+          onDown={toWell}
+          deep={depth >= 3}
+          fromBelow={arrival.from === 3}
+          arrivedAt={arrival.at}
+          first={arrival.first}
+        />
+      ) : (
+        <Well
+          reduced={reduced}
+          onScene={setScene}
+          onUp={upToEngine}
           arrivedAt={arrival.at}
           first={arrival.first}
         />
