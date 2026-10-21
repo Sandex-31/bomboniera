@@ -54,6 +54,7 @@ import { solvedHoist } from "./hoist";
 import { solvedOrgan } from "./card";
 import { solvedPress } from "./press";
 import { solvedPillars, solvedUv } from "./well/pillars";
+import { solvedTv } from "./well/tv";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
 function levers(): boolean[] {
@@ -113,17 +114,17 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "quarto piano", key: FLOOR_KEY, solved: () => "3" },
   { label: "luce uv", key: WELL_PILLARS_KEY, solved: solvedUv },
   { label: "pilastri", key: WELL_PILLARS_KEY, solved: solvedPillars },
+  { label: "tv", key: WELL_TV_KEY, solved: solvedTv },
 ];
 
 /**
  * What the puzzle keeps that is not a stop of its own: which chats have been
- * opened, and how deep the visitor has been. Wiped with the rest. The four
- * keys of the well wait here until the task of each moves it onto a stop.
+ * opened, and how deep the visitor has been. Wiped with the rest. The
+ * remaining keys of the well wait here until the task of each moves it onto a stop.
  */
 export const WIPED = [
   CHAT_KEY,
   DEPTH_KEY,
-  WELL_TV_KEY,
   WELL_CROWS_KEY,
   WELL_BUDS_KEY,
   WELL_MURAL_KEY,

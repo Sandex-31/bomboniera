@@ -1954,13 +1954,112 @@ try {
 
     const { STAGES } = await vite15.ssrLoadModule("/src/lib/stages.ts");
     const labels = STAGES.map((st) => st.label);
-    assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri"], "the lantern and the pillars are not after the fourth floor");
+    assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri", "tv"], "the lantern, the pillars and the tv are not after the fourth floor");
     console.log("ok — pozzo: pilastri, 9017432 in senso orario, cifre sui puntini, telefono");
   } finally {
     await vite15.close();
   }
 }
 
+
+/* ---------------------------------------------------------- pozzo: tv
+ * The chinchilla walks towards the last tap along blocks that are pink or
+ * blue; the remote swaps them all at once. Left alone he always falls, but
+ * a swap schedule on a 100 ms grid gets him to the sofa. The tune of the
+ * TV is eight notes of the flute.
+ */
+{
+  const vite16 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const tv = await vite16.ssrLoadModule("/src/lib/well/tv.ts");
+    const { follow } = await vite16.ssrLoadModule("/src/lib/flute.ts");
+    const FRAME = 1 / 60;
+    const fresh = () => ({ x: tv.START_X, y: tv.FLOOR_Y, falling: false });
+
+    // left alone, in either colour, he falls before the sofa
+    for (const swapped of [false, true]) {
+      let w = fresh();
+      let fell = false;
+      for (let f = 0; f < 60 * 20 && !fell; f++) {
+        w = tv.walk(w, tv.SOFA_X, swapped, FRAME);
+        fell = w.falling;
+      }
+      assert.ok(fell, `the chinchilla walks to the sofa without a swap (swapped ${swapped})`);
+    }
+
+    // a real search: at each 100 ms, swap or not; every way is tried, a fall ends a way
+    const seen = new Map();
+    function search(k, w, swapped) {
+      const key = k + ":" + swapped;
+      if (seen.has(key)) return seen.get(key);
+      let found = null;
+      if (w.x === tv.SOFA_X) found = [];
+      else if (k < 200) {
+        for (const flip of [false, true]) {
+          const s = flip ? !swapped : swapped;
+          let v = w;
+          let ok = true;
+          for (let f = 0; f < 6 && ok; f++) {
+            v = tv.walk(v, tv.SOFA_X, s, FRAME);
+            ok = !v.falling;
+          }
+          if (!ok) continue;
+          const rest = search(k + 1, v, s);
+          if (rest) {
+            found = [flip, ...rest];
+            break;
+          }
+        }
+      }
+      seen.set(key, found);
+      return found;
+    }
+    const schedule = search(0, fresh(), false);
+    assert.ok(schedule, "no swap schedule reaches the sofa");
+    assert.ok(schedule.some(Boolean), "the sofa is reached without a swap");
+    // and the schedule found really does it, frame by frame
+    {
+      let w = fresh();
+      let swapped = false;
+      for (const flip of schedule) {
+        if (flip) swapped = !swapped;
+        for (let f = 0; f < 6; f++) {
+          w = tv.walk(w, tv.SOFA_X, swapped, FRAME);
+          assert.ok(!w.falling, "the schedule found falls");
+        }
+      }
+      assert.equal(w.x, tv.SOFA_X, "the schedule found stops short of the sofa");
+    }
+    assert.ok(tv.BLOCKS.some((b) => b.pink) && tv.BLOCKS.some((b) => !b.pink));
+    assert.ok(tv.BLOCKS.every((b) => tv.solid(b, false) !== tv.solid(b, true)), "a swap leaves a block as it was");
+
+    // a fall ends back at the start
+    let w = { x: 200, y: tv.FLOOR_Y, falling: true };
+    for (let f = 0; f < 60 * 5 && w.falling; f++) w = tv.walk(w, tv.SOFA_X, false, FRAME);
+    assert.deepEqual(w, fresh(), "a fall does not end at the start");
+
+    assert.ok(tv.dropChest(tv.CHEST_X) && tv.dropChest(tv.CHEST_X + 6) && tv.dropChest(tv.CHEST_X - 6), "the chest does not fall on the spot");
+    assert.ok(!tv.dropChest(tv.CHEST_X + 6.5) && !tv.dropChest(tv.CHEST_X - 7), "the chest falls beside him");
+
+    assert.equal(tv.TV_TUNE.length, 8);
+    let n = 0;
+    for (const p of tv.TV_TUNE) n = follow(tv.TV_TUNE, n, p);
+    assert.equal(n, 8, "the whole TV tune does not count through");
+    assert.ok(tv.TV_TUNE.some((p) => p.long), "the tune has no long note, so no open mouth");
+
+    assert.deepEqual(tv.loadTv("x"), tv.START);
+    assert.deepEqual(tv.loadTv(null), tv.START);
+    assert.deepEqual(tv.loadTv(JSON.stringify({ chest: 1 })), tv.START, "a half state loads");
+    assert.deepEqual(tv.loadTv(JSON.stringify(tv.solvedTv())), tv.solvedTv(), "the solved state does not load");
+
+    const { STAGES } = await vite16.ssrLoadModule("/src/lib/stages.ts");
+    const stop = STAGES.find((st) => st.label === "tv");
+    assert.ok(stop && stop.solved().flame, "the tv stop has no flame");
+    console.log("ok — pozzo: tv, uno scambio a tempo porta il cincilla al divano, melodia di 8 note");
+  } finally {
+    await vite16.close();
+  }
+}
 
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,

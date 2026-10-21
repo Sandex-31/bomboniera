@@ -11,16 +11,18 @@ import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
-import { WELL_INSIDE_KEY, WELL_PILLARS_KEY, flameLine, insideFrom, wallLine, wellLine } from "../data/puzzle";
+import { WELL_INSIDE_KEY, WELL_PILLARS_KEY, WELL_TV_KEY, flameLine, insideFrom, wallLine, wellLine } from "../data/puzzle";
 import { Approach, Carried, FarSide, WALL_H, facing, onlySeen, onWall } from "./machines/hall";
 import { SCREEN_Y, WALL_ANGLES, WELL_R, type WallId } from "./well/wall";
 import Screen, { INSET, PANEL, type Painter } from "./well/Screen";
 import { H, W } from "../lib/well/pixels";
 import { SPRITES, drawSprite, type SpriteId } from "../lib/well/sprites";
 import { savedPillars, type PillarsState } from "../lib/well/pillars";
-import { firstFlame } from "../lib/well/flames";
+import { savedTv, type TvState } from "../lib/well/tv";
+import { firstFlame, type Flames } from "../lib/well/flames";
 import { paintPillars, stampPillar } from "./well/pillarPaint";
 import { useWallPillars } from "./well/WallPillars";
+import { useWallTv } from "./well/WallTv";
 
 /*
  * The fourth floor: the well, in the rock under the machine room. A round
@@ -103,9 +105,8 @@ function testWall(cast: SpriteId[]): Painter {
   };
 }
 
-/** What the walls without a room of their own show yet: the fourth has its own, in WallPillars. */
-const TEST: Record<Exclude<WallId, "pilastri">, Painter> = {
-  tv: testWall(["chinchilla", "chest", "tv", "blockPink", "blockBlue", "switchGreen"]),
+/** What the walls without a room of their own show yet: the first and the fourth have theirs, in WallTv and WallPillars. */
+const TEST: Record<Exclude<WallId, "pilastri" | "tv">, Painter> = {
   corvi: testWall(["porcupine", "switchYellow", "crow", "crow", "flame"]),
   boccioli: testWall(["turtle", "bud", "bud", "switchPink"]),
 };
@@ -258,22 +259,37 @@ export default function Well({
   /** The UV lantern, switched on and off with a button once it has been taken. */
   const [uvOn, setUvOn] = useState(false);
   /** The flame of the fourth wall has flown: Rotom says its line. */
-  const [flaming, setFlaming] = useState(false);
-  const wall4 = useWallPillars({
-    state: pillars,
-    set: keepPillars,
+  const [flaming, setFlaming] = useState<WallId | null>(null);
+  /** The first wall's state, kept as it changes. */
+  const [tvState, setTvState] = useState<TvState>(savedTv);
+  const keepTv = (next: TvState) => {
+    setTvState(next);
+    try {
+      localStorage.setItem(WELL_TV_KEY, JSON.stringify(next));
+    } catch {
+      // private mode: it will not be there next time
+    }
+  };
+  /** Which walls have given their flame, from their states; the crows and the buds have none until their tasks give them. */
+  const flames = (): Flames => ({ tv: tvState.flame, corvi: false, boccioli: false, pilastri: pillars.flame });
+  /** The flame of `wall` was just taken: it rises out of the screen, and if it is the floor's first the scene says its line. */
+  const flamed = (wall: WallId) => {
+    if (!firstFlame({ ...flames(), [wall]: true }, wall)) return;
+    timers.current.push(
+      setTimeout(() => {
+        setScene(true);
+        setFlaming(wall);
+      }, reduced ? 0 : 1800),
+    );
+  };
+  const wall4 = useWallPillars({ state: pillars, set: keepPillars, uvOn, onFlame: () => flamed("pilastri") });
+  const { onNote: tvNote, ...wall1 } = useWallTv({
+    state: tvState,
+    set: keepTv,
+    pillars,
+    setPillars: keepPillars,
     uvOn,
-    onFlame: () => {
-      // the other walls' states do not exist yet: their flames are false until their tasks give them
-      if (!firstFlame({ tv: false, corvi: false, boccioli: false, pilastri: true }, "pilastri")) return;
-      // the flame rises out of the screen, and then, the floor's first, the scene says its line
-      timers.current.push(
-        setTimeout(() => {
-          setScene(true);
-          setFlaming(true);
-        }, reduced ? 0 : 1800),
-      );
-    },
+    onFlame: () => flamed("tv"),
   });
 
   const wall = focus !== null && focus !== "altar" ? focus : null;
@@ -283,6 +299,12 @@ export default function Well({
    * it on leaving); until then the notes only sound.
    */
   const flute = useRef<(p: Played) => void>(() => {});
+  useEffect(() => {
+    flute.current = wall === "tv" ? tvNote : () => {};
+    return () => {
+      flute.current = () => {};
+    };
+  });
   const at: [number, number, number] = wall ? intoTheWall(WALL_ANGLES[wall]) : ASIDE;
 
   return (
@@ -319,13 +341,13 @@ export default function Well({
       {/* the four walls, each a screen, walked up to with a tap */}
       {WALLS.map((id) => (
         <FarSide key={id} a={WALL_ANGLES[id]}>
-          {id === "pilastri" ? (
-            <Screen a={WALL_ANGLES[id]} {...wall4} active={focus === id && !scene} uv={pillars.uv && uvOn} reduced={reduced} />
+          {id === "pilastri" || id === "tv" ? (
+            <Screen a={WALL_ANGLES[id]} {...(id === "tv" ? wall1 : wall4)} active={focus === id && !scene} uv={pillars.uv && uvOn} reduced={reduced} />
           ) : (
             <Screen
               a={WALL_ANGLES[id]}
               paint={(ctx, t, uvAt) => {
-                TEST[id](ctx, t, uvAt);
+                TEST[id as Exclude<WallId, "pilastri" | "tv">](ctx, t, uvAt);
                 paintPillars(ctx, id, pillars, uvAt);
               }}
               onTap={(p) => {
@@ -345,13 +367,13 @@ export default function Well({
         </FarSide>
       ))}
       {flaming && (
-        <Html position={onWall(WALL_ANGLES.pilastri, 0.9, SCREEN_Y + 0.3, WELL_R).position} center zIndexRange={[6, 0]}>
+        <Html position={onWall(WALL_ANGLES[flaming], 0.9, SCREEN_Y + 0.3, WELL_R).position} center zIndexRange={[6, 0]}>
           <Keeper
             line={flameLine}
             last
             reduced={reduced}
             onNext={() => {
-              setFlaming(false);
+              setFlaming(null);
               setScene(false);
             }}
           />
