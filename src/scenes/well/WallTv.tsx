@@ -9,6 +9,7 @@ import {
   LEDGE,
   SOFA_X,
   SPEED,
+  START_END,
   START_X,
   SWITCH,
   TV_TUNE,
@@ -80,7 +81,6 @@ export function useWallTv({
       const ms = performance.now();
       const dt = Math.min(0.1, Math.max(0, (ms - last.current) / 1000));
       last.current = ms;
-      paintPillars(ctx, "tv", other.current.pillars, uvAt);
       const tile = SPRITES.tile;
 
       // the chinchilla: free on the floor of the chest room, on the blocks after
@@ -139,6 +139,8 @@ export function useWallTv({
           const frame = solid(b, swapped.current) ? 0 : 1;
           for (let x = b.x; x < b.x + b.w; x += 8) drawSprite(ctx, b.pink ? "blockPink" : "blockBlue", x, b.y, frame);
         });
+        // the stone the chinchilla starts on, which no swap takes away
+        for (let x = 0; x < START_END; x += tile.w) drawSprite(ctx, "tile", x, FLOOR_Y, (x / tile.w) % tile.frames);
         // the remote, in the colour of the blocks that are full
         ctx.fillStyle = "#20262E";
         ctx.fillRect(REMOTE.x, REMOTE.y, REMOTE.w, REMOTE.h);
@@ -151,6 +153,8 @@ export function useWallTv({
         if (rise >= 0 && rise < 1) drawSprite(ctx, "flame", TVR.x + TVR.w / 2 - 4, TVR.y + 30 - rise * 70, Math.floor(t * 8));
       }
 
+      // the pillars stand on top of the floor, the blocks and the sofa, so that their marks show
+      paintPillars(ctx, "tv", other.current.pillars, uvAt);
       if (s.sofa) drawSprite(ctx, "chinchilla", SOFA_X - 8, FLOOR_Y - 14, 0);
       else drawSprite(ctx, "chinchilla", c.x - 8, c.y - 12, moving ? Math.floor(t * 6) : 0, target.current < c.x);
     },

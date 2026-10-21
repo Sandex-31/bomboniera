@@ -58,7 +58,9 @@ export const BLOCKS: { x: number; y: number; w: number; pink: boolean }[] = Arra
 export const solid = (block: { pink: boolean }, swapped: boolean): boolean => block.pink !== swapped;
 export const SOFA_X = 300;
 
-const supported = (x: number, swapped: boolean) => BLOCKS.some((b) => x >= b.x && x < b.x + b.w && solid(b, swapped));
+/** The start is stone, whatever the colour: a fall ends there, and he must stand still. */
+export const START_END = BLOCKS[1].x;
+const supported = (x: number, swapped: boolean) => x < START_END || BLOCKS.some((b) => x >= b.x && x < b.x + b.w && solid(b, swapped));
 
 /** One step of the chinchilla towards `target`: he falls where no solid block is under him, and a fall ends at the start. */
 export function walk(w: Walker, target: number, swapped: boolean, dt: number): Walker {

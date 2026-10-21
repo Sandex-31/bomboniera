@@ -2037,6 +2037,14 @@ try {
     let w = { x: 200, y: tv.FLOOR_Y, falling: true };
     for (let f = 0; f < 60 * 5 && w.falling; f++) w = tv.walk(w, tv.SOFA_X, false, FRAME);
     assert.deepEqual(w, fresh(), "a fall does not end at the start");
+    // and, in either colour, he then stands at the start instead of falling again
+    for (const swapped of [false, true]) {
+      let v = fresh();
+      for (let f = 0; f < 120; f++) {
+        v = tv.walk(v, tv.START_X, swapped, FRAME);
+        assert.ok(!v.falling && v.x === tv.START_X, `he falls again at the start (swapped ${swapped})`);
+      }
+    }
 
     assert.ok(tv.dropChest(tv.CHEST_X) && tv.dropChest(tv.CHEST_X + 6) && tv.dropChest(tv.CHEST_X - 6), "the chest does not fall on the spot");
     assert.ok(!tv.dropChest(tv.CHEST_X + 6.5) && !tv.dropChest(tv.CHEST_X - 7), "the chest falls beside him");
