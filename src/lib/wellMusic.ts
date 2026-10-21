@@ -9,15 +9,17 @@ const FILES = import.meta.glob("../assets/animalwell/music.{ogg,mp3}", {
   query: "?url",
   import: "default",
 }) as Record<string, string>;
-const URL_ = Object.values(FILES)[0];
+const URL_ = FILES["../assets/animalwell/music.ogg"] ?? FILES["../assets/animalwell/music.mp3"];
 const VOLUME = 0.4;
 
 let audio: HTMLAudioElement | null = null;
+/** Set once the track is told to stop: a tap during the fade must not bring it back. */
+let leaving = false;
 let fading: ReturnType<typeof setInterval> | undefined;
 
 /** Starts the loop if there is a track and it is not playing yet. Call from a tap. */
 export function startMusic() {
-  if (!URL_ || typeof Audio === "undefined") return;
+  if (!URL_ || leaving || typeof Audio === "undefined") return;
   clearInterval(fading);
   if (!audio) {
     audio = new Audio(URL_);
@@ -29,6 +31,7 @@ export function startMusic() {
 
 /** Fades the track out over `ms`, then stops it. */
 export function stopMusic(ms: number) {
+  leaving = true;
   const a = audio;
   if (!a || a.paused) return;
   clearInterval(fading);
@@ -41,4 +44,9 @@ export function stopMusic(ms: number) {
       a.pause();
     }
   }, 50);
+}
+
+/** The floor is mounted (again): taps may start the track once more. */
+export function rearmMusic() {
+  leaving = false;
 }

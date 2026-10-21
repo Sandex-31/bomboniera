@@ -2334,25 +2334,54 @@ try {
  */
 {
   const { readFileSync, readdirSync } = await import("node:fs");
+  /** What a wall painter writes in words, if anything. Empty list = it says nothing. */
+  const writes = (code) => {
+    const src = code.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+    const found = [];
+    if (/\b(fillText|strokeText)\b/.test(src)) found.push("canvas text");
+    if (/<Text\b|<Text3D\b|<Html\b/.test(src)) found.push("text element");
+    if (/\b(title|alt|placeholder|aria-[a-z]+)\s*=/.test(src)) found.push("text attribute");
+    // a string or template literal sitting alone as a child: {"ciao"}, {`ciao`}
+    if (/\{\s*(["'`])[^{}]*?\1\s*\}/.test(src)) found.push("string child");
+    // text next to expressions: take every {…} container out (innermost first), then look between tags
+    let bare = src;
+    for (let prev = ""; prev !== bare; ) {
+      prev = bare;
+      bare = bare.replace(/\{[^{}]*\}/g, "");
+    }
+    for (const m of bare.matchAll(/>\s*([^<>\n]*[A-Za-zÀ-ÿ0-9][^<>\n]*?)\s*<\/?[A-Za-z]/g)) {
+      const t = m[1].trim();
+      // a comparison or an arrow in plain code is not a text node
+      if (!/^[\s\w.()[\]!?:&|=+\-*/%,'"`]*(=>|&&|\|\||\?|:)/.test(t) && !/^(null|true|false)\)/.test(t)) found.push(`text "${t}"`);
+    }
+    return found;
+  };
+  // the guard has teeth: these must be flagged, and a plain painter must pass
+  assert.ok(writes('ctx.fillText("x", 0, 0);').length, "guard misses fillText");
+  assert.ok(writes("ctx.strokeText(s, 0, 0);").length, "guard misses strokeText");
+  assert.ok(writes("const a = () => <b>Ciao {x}</b>;").length, "guard misses text mixed with an expression");
+  assert.ok(writes("const a = () => <b>{x} ciao</b>;").length, "guard misses text after an expression");
+  assert.ok(writes('const a = () => <b>{"ciao"}</b>;').length, "guard misses a string child");
+  assert.ok(writes("const a = () => <b>{`ciao`}</b>;").length, "guard misses a template child");
+  assert.ok(writes('const a = () => <mesh title="ciao" />;').length, "guard misses title=");
+  assert.ok(writes('const a = () => <img alt="x" />;').length, "guard misses alt=");
+  assert.ok(writes('const a = () => <input placeholder="x" />;').length, "guard misses placeholder=");
+  assert.deepEqual(
+    writes("export function paint(c: CanvasRenderingContext2D, n: number) { c.fillStyle = '#fff'; c.fillRect(0, 0, n > 1 ? 4 : 2, 4); return <mesh position={[0, 1, 0]}><boxGeometry /></mesh>; }"),
+    [],
+    "guard flags a plain painter",
+  );
+
   const dir = new URL("../src/scenes/well/", import.meta.url);
   const files = readdirSync(dir).filter((f) => /^Wall.*\.tsx$/.test(f));
   assert.ok(files.length >= 4, "the walls of the well are not where they should be");
   for (const f of files) {
-    const src = readFileSync(new URL(f, dir), "utf8")
-      .replace(/\/\*[\s\S]*?\*\//g, "")
-      .replace(/\/\/.*$/gm, "");
-    assert.ok(!/\b(fillText|strokeText)\b/.test(src), `${f} paints text on its canvas`);
-    const text = [...src.matchAll(/>\s*([^<>{}\n]*[A-Za-zÀ-ÿ0-9][^<>{}\n]*?)\s*<\/?[A-Za-z]/g)]
-      .map((m) => m[1].trim())
-      .filter((t) => !/^[\s\w.()[\]!?:&|=+\-*/%,'"`]*(=>|&&|\|\||\?|:)/.test(t) && !/^(null|true|false)\)/.test(t));
-    assert.deepEqual(text, [], `${f} writes something: ${text.join(" | ")}`);
-    assert.ok(!/<Text\b|<Text3D\b|<Html\b/.test(src), `${f} has a text element or an HTML overlay`);
-    assert.ok(!/aria-label/.test(src), `${f} labels something in words`);
+    assert.deepEqual(writes(readFileSync(new URL(f, dir), "utf8")), [], `${f} writes something`);
   }
   const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
   assert.ok(
     /Billy Basso/.test(readme) && /Shared Memory/.test(readme) && /Animal Well/.test(readme) && /Bigmode/.test(readme),
     "the Animal Well credit is not in the README",
   );
-  console.log(`ok — the ${files.length} walls of the well write nothing; Animal Well is credited`);
+  console.log(`ok — the ${files.length} walls of the well write nothing (guard proven); Animal Well is credited`);
 }
