@@ -105,8 +105,8 @@ export default function Well({
 
   /*
    * Coming in: the camera waits under the hole, Rotom drops out of it as it
-   * was in the machine room and flashes into Frost Rotom, says its line, and
-   * the camera stands back to take in the hall. A reload just finds it all
+   * was in the machine room and flashes into Frost Rotom, says its line (the
+   * first time only), and the camera stands back to take in the hall. A reload just finds it all
    * there.
    */
   const arriving = Number.isFinite(arrivedAt) && !reduced;
@@ -121,7 +121,17 @@ export default function Well({
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   useEffect(() => {
     if (!arriving) return;
-    timers.current.push(setTimeout(() => setSaying(true), moveMs(!first) * 0.7));
+    const ms = moveMs(!first);
+    if (first) {
+      // the first time down it has something to say, and the scene ends with it
+      timers.current.push(setTimeout(() => setSaying(true), ms * 0.7));
+    } else {
+      // the short way is only the drop: the camera stands back and the scene is over
+      timers.current.push(
+        setTimeout(() => setView(HALL_VIEW), ms * 0.6),
+        setTimeout(() => setScene(false), ms * 0.6 + FLIGHT * 1000),
+      );
+    }
     // once, for the arrival this floor was mounted with
   }, []);
   useEffect(() => onScene(scene), [scene, onScene]);
