@@ -1954,7 +1954,7 @@ try {
 
     const { STAGES } = await vite15.ssrLoadModule("/src/lib/stages.ts");
     const labels = STAGES.map((st) => st.label);
-    assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri", "tv", "corvi"], "the lantern, the pillars, the tv and the crows are not after the fourth floor");
+    assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri", "tv", "corvi", "boccioli"], "the lantern, the pillars, the tv, the crows and the buds are not after the fourth floor");
     console.log("ok — pozzo: pilastri, 9017432 in senso orario, cifre sui puntini, telefono");
   } finally {
     await vite15.close();
@@ -2160,6 +2160,49 @@ try {
     console.log(`ok — pozzo: corvi, la barriera a tempo porta il porcospino ai tre gialli in ${win} passi, 8 corvi con il ritmo`);
   } finally {
     await vite17.close();
+  }
+}
+
+/* ---------------------------------------------------------- pozzo: boccioli
+ * The mural's mirrors are fixed. The beam crosses the grid and reaches the
+ * four buds in an order that is not their order on the wall; some mirrors on
+ * its path show only under UV. The turtles rise to a tune painted by water.
+ */
+{
+  const vite18 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const bu = await vite18.ssrLoadModule("/src/lib/well/buds.ts");
+    const { follow } = await vite18.ssrLoadModule("/src/lib/flute.ts");
+    const order = bu.budOrder();
+    assert.deepEqual([...order].sort(), [0, 1, 2, 3], "the order is not a permutation of the buds");
+    assert.notDeepEqual(order, [0, 1, 2, 3], "the buds read left to right");
+    const path = bu.traceMural();
+    const hidden = bu.MURAL.mirrors.filter((m) => m.hidden);
+    assert.ok(hidden.length >= 2, "under two hidden mirrors");
+    hidden.forEach((m) => assert.ok(path.some(([x, y]) => x === m.cell[0] && y === m.cell[1]), "a hidden mirror is off the path"));
+    // the beam leaves the grid after the last bud
+    const [w, h] = bu.MURAL.size;
+    const lastBud = bu.MURAL.buds[order[3]].cell;
+    assert.ok(path.some(([x, y]) => x === lastBud[0] && y === lastBud[1]), "the last bud is not on the path");
+    const end = path[path.length - 1];
+    assert.ok(end[0] === 0 || end[1] === 0 || end[0] === w - 1 || end[1] === h - 1, "the beam does not end at the edge");
+    assert.ok(path.length < w * h * 4, "the beam never leaves");
+    assert.deepEqual(bu.BUD_TUNE, order.map((k) => bu.MURAL.buds[k]));
+    assert.equal(bu.TURTLE_TUNE.length, 4);
+    let n = 0;
+    for (const t of bu.TURTLE_TUNE) n = follow(bu.TURTLE_TUNE, n, t);
+    assert.equal(n, 4, "the turtles' tune does not count through");
+    assert.deepEqual(bu.loadBuds("x"), bu.START);
+    assert.deepEqual(bu.loadBuds(null), bu.START);
+    assert.deepEqual(bu.loadBuds(JSON.stringify({ turtles: true, played: 9, flame: false })), bu.START, "a count past the buds loads");
+    assert.deepEqual(bu.loadBuds(JSON.stringify(bu.solvedBuds())), bu.solvedBuds());
+    const { STAGES } = await vite18.ssrLoadModule("/src/lib/stages.ts");
+    const stop = STAGES.find((st) => st.label === "boccioli");
+    assert.ok(stop && stop.solved().flame, "the buds stop has no flame");
+    assert.equal(STAGES[STAGES.findIndex((st) => st.label === "corvi") + 1].label, "boccioli", "boccioli is not after corvi");
+    console.log(`ok — pozzo: boccioli, il raggio raggiunge i boccioli in ordine ${order.join(",")}`);
+  } finally {
+    await vite18.close();
   }
 }
 

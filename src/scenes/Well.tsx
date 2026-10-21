@@ -11,20 +11,19 @@ import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
-import { WELL_CROWS_KEY, WELL_INSIDE_KEY, WELL_PILLARS_KEY, WELL_TV_KEY, flameLine, insideFrom, wallLine, wellLine } from "../data/puzzle";
+import { WELL_BUDS_KEY, WELL_CROWS_KEY, WELL_INSIDE_KEY, WELL_PILLARS_KEY, WELL_TV_KEY, flameLine, insideFrom, wallLine, wellLine } from "../data/puzzle";
 import { Approach, Carried, FarSide, WALL_H, facing, onlySeen, onWall } from "./machines/hall";
 import { SCREEN_Y, WALL_ANGLES, WELL_R, type WallId } from "./well/wall";
-import Screen, { INSET, PANEL, type Painter } from "./well/Screen";
-import { H, W } from "../lib/well/pixels";
-import { SPRITES, drawSprite, type SpriteId } from "../lib/well/sprites";
+import Screen, { INSET, PANEL } from "./well/Screen";
 import { savedPillars, type PillarsState } from "../lib/well/pillars";
 import { savedTv, type TvState } from "../lib/well/tv";
 import { savedCrows, type CrowsState } from "../lib/well/crows";
+import { savedBuds, type BudsState } from "../lib/well/buds";
 import { firstFlame, type Flames } from "../lib/well/flames";
-import { paintPillars, stampPillar } from "./well/pillarPaint";
 import { useWallPillars } from "./well/WallPillars";
 import { useWallTv } from "./well/WallTv";
 import { useWallCrows } from "./well/WallCrows";
+import { useWallBuds } from "./well/WallBuds";
 
 /*
  * The fourth floor: the well, in the rock under the machine room. A round
@@ -87,30 +86,6 @@ const VIEWS: Record<Focus, View> = {
 function intoTheWall(a: number): [number, number, number] {
   return onWall(a, INSET + 0.05, SCREEN_Y, WELL_R).position;
 }
-
-/**
- * Until the walls have rooms of their own: a floor of tiles, a few sprites
- * standing on it, and a mark that only the UV light shows.
- */
-function testWall(cast: SpriteId[]): Painter {
-  return (ctx, t, uvAt) => {
-    const tile = SPRITES.tile;
-    for (let x = 0; x < W; x += tile.w)
-      for (let y = H - tile.h * 3; y < H; y += tile.h) drawSprite(ctx, "tile", x, y, (x / tile.w + y / tile.h) % tile.frames);
-    cast.forEach((id, i) => {
-      const s = SPRITES[id];
-      drawSprite(ctx, id, ((i + 1) * W) / (cast.length + 1) - s.w / 2, H - tile.h * 3 - s.h, Math.floor(t * 2));
-    });
-    ctx.fillStyle = "#FF4FD8";
-    for (let x = 140; x < 180; x++)
-      for (let y = 40; y < 80; y++) if ((x + y) % 6 === 0 && uvAt([x, y])) ctx.fillRect(x, y, 1, 1);
-  };
-}
-
-/** What the wall without a room of its own shows yet: the others have theirs, in WallTv, WallCrows and WallPillars. */
-const TEST: Record<"boccioli", Painter> = {
-  boccioli: testWall(["turtle", "bud", "bud", "switchPink"]),
-};
 
 const WALLS = Object.keys(WALL_ANGLES) as WallId[];
 
@@ -281,8 +256,18 @@ export default function Well({
       // private mode: it will not be there next time
     }
   };
-  /** Which walls have given their flame, from their states; the buds have none until their task gives it. */
-  const flames = (): Flames => ({ tv: tvState.flame, corvi: crowsState.flame, boccioli: false, pilastri: pillars.flame });
+  /** The third wall's state, kept as it changes. */
+  const [budsState, setBudsState] = useState<BudsState>(savedBuds);
+  const keepBuds = (next: BudsState) => {
+    setBudsState(next);
+    try {
+      localStorage.setItem(WELL_BUDS_KEY, JSON.stringify(next));
+    } catch {
+      // private mode: it will not be there next time
+    }
+  };
+  /** Which walls have given their flame, from their states. */
+  const flames = (): Flames => ({ tv: tvState.flame, corvi: crowsState.flame, boccioli: budsState.flame, pilastri: pillars.flame });
   /** The flame of `wall` was just taken: it rises out of the screen, and if it is the floor's first the scene says its line. */
   const flamed = (wall: WallId) => {
     if (!firstFlame({ ...flames(), [wall]: true }, wall)) return;
@@ -312,6 +297,15 @@ export default function Well({
     onFlame: () => flamed("corvi"),
   });
 
+  const { onNote: budsNote, ...wall3 } = useWallBuds({
+    state: budsState,
+    set: keepBuds,
+    pillars,
+    setPillars: keepPillars,
+    uvOn,
+    onFlame: () => flamed("boccioli"),
+  });
+
   const wall = focus !== null && focus !== "altar" ? focus : null;
   /**
    * Where the flute's notes go. Each wall's room, once it has one, sets
@@ -320,7 +314,7 @@ export default function Well({
    */
   const flute = useRef<(p: Played) => void>(() => {});
   useEffect(() => {
-    flute.current = wall === "tv" ? tvNote : wall === "corvi" ? crowsNote : () => {};
+    flute.current = wall === "tv" ? tvNote : wall === "corvi" ? crowsNote : wall === "boccioli" ? budsNote : () => {};
     return () => {
       flute.current = () => {};
     };
@@ -361,24 +355,7 @@ export default function Well({
       {/* the four walls, each a screen, walked up to with a tap */}
       {WALLS.map((id) => (
         <FarSide key={id} a={WALL_ANGLES[id]}>
-          {id !== "boccioli" ? (
-            <Screen a={WALL_ANGLES[id]} {...(id === "tv" ? wall1 : id === "corvi" ? wall2 : wall4)} active={focus === id && !scene} uv={pillars.uv && uvOn} reduced={reduced} />
-          ) : (
-            <Screen
-              a={WALL_ANGLES[id]}
-              paint={(ctx, t, uvAt) => {
-                TEST.boccioli(ctx, t, uvAt);
-                paintPillars(ctx, id, pillars, uvAt);
-              }}
-              onTap={(p) => {
-                const next = stampPillar(pillars, id, p, uvOn);
-                if (next) keepPillars(next);
-              }}
-              active={focus === id && !scene}
-              uv={pillars.uv && uvOn}
-              reduced={reduced}
-            />
-          )}
+          <Screen a={WALL_ANGLES[id]} {...(id === "tv" ? wall1 : id === "corvi" ? wall2 : id === "boccioli" ? wall3 : wall4)} active={focus === id && !scene} uv={pillars.uv && uvOn} reduced={reduced} />
           {focus !== id && (
             <group {...onWall(WALL_ANGLES[id], INSET, SCREEN_Y, WELL_R)}>
               <Approach w={PANEL.w} h={PANEL.h} onPick={() => pick(id)} />
