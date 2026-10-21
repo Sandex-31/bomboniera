@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { CanvasTexture, NearestFilter, SRGBColorSpace } from "three";
+import { CanvasTexture, NearestFilter, SRGBColorSpace, type Group, type Object3D } from "three";
 import { useTap } from "../Hotspot";
 import { onWall } from "../machines/hall";
 import { H, W, chase, inCircle, toPixel } from "../../lib/well/pixels";
@@ -22,6 +22,9 @@ export const PANEL = { w: 1.6, h: 0.9 };
 /** How far in from the round wall the flat panel hangs, so that its corners clear the curve. */
 export const INSET = 0.12;
 
+/** Marks a screen's panel, so the hall can tell a tap that landed on one. */
+export const SCREEN = { userData: { screen: true } };
+
 /** How far round the finger the dark room is lit, and the UV lantern shows. */
 export const LIGHT_R = 28;
 
@@ -32,6 +35,36 @@ export const finger: { current: [number, number] | null } = { current: null };
  * Paints a wall's room. `uvAt` says whether a pixel is under the UV light:
  * the hidden marks are drawn only where it is true.
  */
+/** How often a screen seen from across the hall is repainted, in seconds. */
+const IDLE_S = 1 / 10;
+
+/** Drawn and seen: `FarSide` hides the walls behind the camera by hiding a parent. */
+function shown(o: Object3D | null): boolean {
+  return !o || (o.visible && shown(o.parent));
+}
+
+/** The dark's soft hole and the lantern's glow, each a square twice the light's radius, made once. */
+let made: { hole: HTMLCanvasElement; glow: HTMLCanvasElement } | null = null;
+function masks() {
+  if (made) return made;
+  const R = LIGHT_R;
+  const square = (stops: [number, string][], from: number) => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 2 * R;
+    const g = c.getContext("2d")!;
+    const fill = g.createRadialGradient(R, R, from, R, R, R);
+    for (const [at, colour] of stops) fill.addColorStop(at, colour);
+    g.fillStyle = fill;
+    g.fillRect(0, 0, 2 * R, 2 * R);
+    return c;
+  };
+  made = {
+    hole: square([[0, "rgba(0,0,0,0)"], [1, "#000"]], R * 0.55),
+    glow: square([[0, "rgba(170,90,255,0.45)"], [0.85, "rgba(140,60,255,0.25)"], [1, "rgba(140,60,255,0)"]], 0),
+  };
+  return made;
+}
+
 export type Painter = (ctx: CanvasRenderingContext2D, t: number, uvAt: (p: [number, number]) => boolean) => void;
 
 export default function Screen({
@@ -81,12 +114,27 @@ export default function Screen({
     if (!active) finger.current = null;
   }, [active]);
 
+  /** What `uvAt` reads: the lantern and the finger as of this frame. One function for the screen's life, not one a frame. */
+  const lit = useRef<{ on: boolean; at: [number, number] | null }>({ on: false, at: null });
+  const uvAt = useMemo(
+    () => (p: [number, number]) => lit.current.on && lit.current.at !== null && inCircle(p, lit.current.at, LIGHT_R),
+    [],
+  );
+  const group = useRef<Group>(null);
+  /** Seconds since the screen was last painted. */
+  const since = useRef(Infinity);
+
   useFrame(({ clock }, dt) => {
+    since.current += dt;
+    // a screen behind the camera is not painted; one seen across the hall only now and then
+    if (!shown(group.current) || (!active && since.current < IDLE_S)) return;
+    const step = Math.min(since.current, 0.1);
+    since.current = 0;
     const t = clock.elapsedTime;
     const at = active ? finger.current : null;
-    const uvAt = (p: [number, number]) => uv && at !== null && inCircle(p, at, LIGHT_R);
+    lit.current.on = uv;
+    lit.current.at = at;
 
-    ctx.globalCompositeOperation = "source-over";
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, W, H);
     paint(ctx, t, uvAt);
@@ -94,28 +142,26 @@ export default function Screen({
     if (active) {
       const g = goal.current;
       if (g[0] !== rotom.current[0]) facingLeft.current = g[0] < rotom.current[0];
-      rotom.current = reduced ? g : chase(rotom.current, g, Math.min(dt, 0.1));
+      rotom.current = reduced ? g : chase(rotom.current, g, step);
       const s = SPRITES.rotomFrost;
       drawSprite(ctx, "rotomFrost", rotom.current[0] - s.w / 2, rotom.current[1] - s.h / 2, reduced ? 0 : Math.floor(t * 4), facingLeft.current);
     }
 
+    const R = LIGHT_R;
     if (dark) {
-      if (at) {
-        const light = ctx.createRadialGradient(at[0], at[1], LIGHT_R * 0.55, at[0], at[1], LIGHT_R);
-        light.addColorStop(0, "rgba(0,0,0,0)");
-        light.addColorStop(1, "#000");
-        ctx.fillStyle = light;
-      } else ctx.fillStyle = "#000";
-      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#000";
+      if (!at) ctx.fillRect(0, 0, W, H);
+      else {
+        // black all round the square the light sits in, and the light's own soft edge inside it
+        const [x, y] = at;
+        ctx.fillRect(0, 0, W, Math.max(0, y - R));
+        ctx.fillRect(0, y + R, W, H);
+        ctx.fillRect(0, y - R, Math.max(0, x - R), 2 * R);
+        ctx.fillRect(x + R, y - R, W, 2 * R);
+        ctx.drawImage(masks().hole, x - R, y - R);
+      }
     }
-    if (uv && at) {
-      const glow = ctx.createRadialGradient(at[0], at[1], 0, at[0], at[1], LIGHT_R);
-      glow.addColorStop(0, "rgba(170,90,255,0.45)");
-      glow.addColorStop(0.85, "rgba(140,60,255,0.25)");
-      glow.addColorStop(1, "rgba(140,60,255,0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(at[0] - LIGHT_R, at[1] - LIGHT_R, LIGHT_R * 2, LIGHT_R * 2);
-    }
+    if (uv && at) ctx.drawImage(masks().glow, at[0] - R, at[1] - R);
     texture.needsUpdate = true;
   });
 
@@ -133,13 +179,14 @@ export default function Screen({
   };
 
   return (
-    <group {...onWall(a, INSET, SCREEN_Y, WELL_R)}>
+    <group ref={group} {...onWall(a, INSET, SCREEN_Y, WELL_R)}>
       {/* the bezel, a little darker than the wall */}
       <mesh position={[0, 0, -0.01]}>
         <planeGeometry args={[PANEL.w + 0.1, PANEL.h + 0.1]} />
         <meshStandardMaterial color="#0C0F14" roughness={0.7} />
       </mesh>
       <mesh
+        {...SCREEN}
         onPointerDown={(e) => {
           down.current = point(e);
           tap.onPointerDown(e);

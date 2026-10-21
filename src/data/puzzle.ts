@@ -163,6 +163,12 @@ export const WELL_BUDS_KEY = 'bomboniera.puzzle.pozzo.boccioli';
 /** The pillars of the well: where each was left. */
 export const WELL_PILLARS_KEY = 'bomboniera.puzzle.pozzo.pilastri';
 
+/** Whether Rotom has gone into the walls of the well, so he says so once. */
+export const WELL_INSIDE_KEY = 'bomboniera.puzzle.pozzo.dentro';
+
+/** Rotom's going in, read back: only the mark it leaves counts. */
+export const insideFrom = (stored: string | null) => stored === '1';
+
 /** The mural of the well, and how much of it has been uncovered. */
 export const WELL_MURAL_KEY = 'bomboniera.puzzle.pozzo.murale';
 

@@ -1844,6 +1844,9 @@ try {
       assert.ok(s.w > 0 && s.h > 0 && s.frames > 0, `${id} has no size`);
       assert.match(s.file, /^src\/assets\/animalwell\/[\w-]+\.png$/, `${id} is not in the originals' folder`);
     }
+    const { insideFrom } = await vite14.ssrLoadModule("/src/data/puzzle.ts");
+    assert.ok(insideFrom("1"), "Rotom forgets he went into the walls");
+    for (const bad of [null, "", "0", "true", "x"]) assert.ok(!insideFrom(bad), `${bad} counts as Rotom inside`);
     console.log(`ok — pozzo: schermo, ${px.W}x${px.H} pixels, ${Object.keys(SPRITES).length} sprites`);
   } finally {
     await vite14.close();

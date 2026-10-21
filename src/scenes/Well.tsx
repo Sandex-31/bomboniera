@@ -2,14 +2,14 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, events } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { BackSide } from "three";
+import { BackSide, type Intersection, type Object3D } from "three";
 import CameraRig from "./CameraRig";
 import { tappedJustNow, useTap } from "./Hotspot";
 import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
-import { wallLine, wellLine } from "../data/puzzle";
+import { WELL_INSIDE_KEY, insideFrom, wallLine, wellLine } from "../data/puzzle";
 import { Approach, Carried, FarSide, WALL_H, facing, onlySeen, onWall } from "./machines/hall";
 import { SCREEN_Y, WALL_ANGLES, WELL_R, type WallId } from "./well/wall";
 import Screen, { INSET, PANEL, type Painter } from "./well/Screen";
@@ -107,6 +107,20 @@ const TEST: Record<WallId, { paint: Painter; dark?: boolean; uv?: boolean }> = {
 
 const WALLS = Object.keys(WALL_ANGLES) as WallId[];
 
+/** Marks the way up, so a tap that also lands on a screen can be kept off it. */
+const HOLE = { userData: { hole: true } };
+const marked = (o: Object3D | null, key: string): boolean => !!o && (o.userData[key] === true || marked(o.parent, key));
+
+/**
+ * What a tap may land on. From across the hall the hole in the ceiling stands
+ * in front of the top of the far wall's screen: where the two overlap, the
+ * screen has the tap, and the hole only what is clear of every screen.
+ */
+function reachable(hits: Intersection[]): Intersection[] {
+  const seen = onlySeen(hits);
+  return seen.some((h) => marked(h.object, "screen")) ? seen.filter((h) => !marked(h.object, "hole")) : seen;
+}
+
 export default function Well({
   reduced,
   onScene,
@@ -145,7 +159,13 @@ export default function Well({
   /** Rotom is saying its line on landing. */
   const [saying, setSaying] = useState(false);
   /** Rotom has gone into the walls, and is pixel art on whichever is worked. */
-  const [inside, setInside] = useState(false);
+  const [inside, setInside] = useState(() => {
+    try {
+      return insideFrom(localStorage.getItem(WELL_INSIDE_KEY));
+    } catch {
+      return false;
+    }
+  });
   /** Rotom is saying its line on going into the first wall. */
   const [telling, setTelling] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -187,6 +207,11 @@ export default function Well({
     setTelling(false);
     setInside(true);
     setScene(false);
+    try {
+      localStorage.setItem(WELL_INSIDE_KEY, "1");
+    } catch {
+      // private mode: he will say it again next time
+    }
   };
   const back = () => {
     if (scene || focus === null || tappedJustNow()) return;
@@ -223,7 +248,7 @@ export default function Well({
       orthographic
       dpr={[1, 1.75]}
       camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
-      events={(store) => ({ ...events(store), filter: (hits) => onlySeen(hits) })}
+      events={(store) => ({ ...events(store), filter: reachable })}
       onPointerMissed={back}
     >
       <color attach="background" args={["#05070B"]} />
@@ -284,7 +309,7 @@ export default function Well({
       </mesh>
 
       {/* the way up: the hole in the ceiling, a rim and the light behind it. Tapping it goes back up. */}
-      <group position={[0, HOLE_Y, 0]} visible={focus === null} {...up}>
+      <group position={[0, HOLE_Y, 0]} visible={focus === null} {...HOLE} {...up}>
         <mesh rotation-x={-Math.PI / 2}>
           <ringGeometry args={[HOLE_R, HOLE_R + 0.07, 40]} />
           <meshStandardMaterial color="#9DB4D8" emissive="#DCEBFF" emissiveIntensity={0.7} metalness={0.3} roughness={0.5} />
