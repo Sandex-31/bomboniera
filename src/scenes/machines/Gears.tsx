@@ -17,7 +17,7 @@ import {
   type Spin,
   type Turn,
 } from "../../lib/gears";
-import { Approach, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
+import { Approach, Lamp, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
 
 /*
  * The gear board on the wall. A gear is taken off the rack under the board
@@ -110,11 +110,31 @@ const flat = (draw: (s: ShapePath) => void) => {
   return s;
 };
 
-/** The badge on a shaft: a curved arrow round the rim, and the hare or the snail in the middle. */
-function Badge({ dir, pace }: { dir: Turn; pace: Pace }) {
+/** How fast a badge's arrow goes round, in turns of the motor: what the hare and the snail mean. */
+const BADGE_SPIN: Record<Pace | "motore", number> = { lumaca: 0.35, motore: 1, lepre: 2.6 };
+const BADGE_GOLD = "#D9B46A";
+const BADGE_RIGHT = "#7CC46A";
+const BADGE_WRONG = "#D0503A";
+
+/**
+ * The badge on a shaft: a curved arrow round the rim, and the hare or the
+ * snail in the middle. Drawn still, nobody read it as "turn this way, this
+ * fast", so the arrow goes round as the shaft should: its way, slow on the
+ * snail, quick on the hare. The motor wears one too, with no animal, turning
+ * at the pace the others are measured against. And the badge goes green when
+ * its shaft turns as asked, red when it turns but not as asked.
+ */
+function Badge({ dir, pace, verdict, reduced }: { dir: Turn; pace: Pace | "motore"; verdict: "ok" | "wrong" | null; reduced: boolean }) {
+  const arrow = useRef<Group>(null);
+  useFrame((_, dt) => {
+    if (arrow.current && !reduced) arrow.current.rotation.z -= dir * BADGE_SPIN[pace] * MOTOR_SPEED * dt;
+  });
+  const face = verdict === "ok" ? BADGE_RIGHT : verdict === "wrong" ? BADGE_WRONG : BADGE_GOLD;
   const animal = useMemo(
     () =>
-      pace === "lepre"
+      pace === "motore"
+        ? []
+        : pace === "lepre"
         ? // a hare, sitting up: a body, a head, two long ears
           [
             flat((s) => s.absellipse(-0.004, -0.012, 0.022, 0.014, 0, Math.PI * 2, false, 0)),
@@ -140,27 +160,25 @@ function Badge({ dir, pace }: { dir: Turn; pace: Pace }) {
     <group>
       <mesh>
         <circleGeometry args={[0.062, 28]} />
-        <meshStandardMaterial
-          color="#D9B46A"
-          emissive="#D9B46A"
-          emissiveIntensity={0.25}
-          metalness={0.6}
-          roughness={0.35}
-        />
+        {/* unlit, so the lamp over the board cannot wash the green or the red out */}
+        <meshBasicMaterial color={face} />
       </mesh>
       {/* the arrow: most of a ring, and its head where the turning goes */}
+      <group ref={arrow}>
       <group scale={[dir === 1 ? -1 : 1, 1, 1]}>
         <mesh position={[0, 0, 0.002]} rotation-z={Math.PI * 0.6}>
           <torusGeometry args={[0.048, 0.005, 6, 24, Math.PI * 1.5]} />
           <meshBasicMaterial color="#2A1E14" />
         </mesh>
+        {/* at the arc's anticlockwise end, pointing on round it; mirrored, clockwise */}
         <mesh
-          position={[-0.048 * Math.cos(Math.PI * 0.1), -0.048 * Math.sin(Math.PI * 0.1) - 0.004, 0.002]}
-          rotation-z={0}
+          position={[0.048 * Math.cos(Math.PI * 0.1), 0.048 * Math.sin(Math.PI * 0.1), 0.002]}
+          rotation-z={Math.PI * 0.1}
         >
           <coneGeometry args={[0.011, 0.02, 3]} />
           <meshBasicMaterial color="#2A1E14" />
         </mesh>
+      </group>
       </group>
       {animal.map((shape, k) => (
         <mesh key={k} position={[0, 0, 0.003]}>
@@ -234,7 +252,18 @@ function PegSpot({
       )}
       {shaft && (
         <group position={[0, 0, 0.075]}>
-          <Badge dir={shaft.dir} pace={shaft.pace} />
+          <Badge
+            dir={shaft.dir}
+            pace={shaft.pace}
+            verdict={spin.shafts[shaft.id] === "ok" ? "ok" : spin.shafts[shaft.id] === "wrong" ? "wrong" : null}
+            reduced={reduced}
+          />
+        </group>
+      )}
+      {i === MOTOR.peg && (
+        <group position={[0, 0, 0.075]}>
+          {/* still until the round line drives it, as the motor itself is */}
+          <Badge dir={1} pace="motore" verdict={null} reduced={reduced || !spin.turning.get(MOTOR.peg)} />
         </group>
       )}
     </group>
@@ -279,10 +308,14 @@ export default function Gears({
   };
 
   return (
-    <FarSide a={a}>
+    <>
+    {/* the lamp outside FarSide, so it stays lit as the board goes round the back: see Boilers */}
+    <group {...onWall(a, 0.3, y - FRAME_MID)}>
+      <Lamp position={[0, 0.8, 0.55]} intensity={2.2} distance={2.2} />
+    </group>
+    <FarSide a={a} id="gears">
       {/* stood off the wall so the curve of the bricks clears its corners */}
       <group {...onWall(a, 0.3, y - FRAME_MID)} {...machine("gears")}>
-        <pointLight position={[0, 0.8, 0.55]} color="#FFC890" intensity={2.2} distance={2.2} />
         {!active && (
           <group position={[0, FRAME_MID, 0]}>
             <Approach w={(BOARD_W + 6) * U + 0.06} h={FRAME_H} onPick={onPick} />
@@ -330,6 +363,7 @@ export default function Gears({
         ))}
       </group>
     </FarSide>
+    </>
   );
 }
 

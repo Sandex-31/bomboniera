@@ -49,6 +49,8 @@ import {
   COPPER,
   FAR,
   FarSide,
+  focused,
+  burning as lampsFor,
   HALL_R,
   IRON,
   MORTAR,
@@ -100,7 +102,8 @@ const CEILING_VIEW: View = {
 };
 
 /** Standing in front of one boiler: they are worked one at a time, up close. */
-const BOILER_VIEWS = BOILER_ANGLES.map((a) => facing({ a, y: 0.62, zoom: 3.1, polar: 1.12 }));
+// high enough to take in the smoke over the chimney, which is the one hint at the damper
+const BOILER_VIEWS = BOILER_ANGLES.map((a) => facing({ a, y: 0.95, zoom: 2.9, polar: 1.12 }));
 
 /** Standing in front of each machine. */
 const VIEWS: Record<MachineId, View> = {
@@ -138,14 +141,14 @@ function outOfTheWay(a: number): [number, number, number] {
 }
 
 /** How much light the hall has with no boiler lit, and what each lit one adds. */
-const DARK = { ambient: 0.14, hemi: 0.12 };
-const PER_BOILER = { ambient: 0.12, hemi: 0.11 };
+// cold, the hall is near black: Rotom and the embers are all there is to go by
+const DARK = { ambient: 0.04, hemi: 0.03 };
+const PER_BOILER = { ambient: 0.15, hemi: 0.14 };
 
 const GEARS = [
   { a: FAR - 0.55, r: 0.36, y: 1.25, dir: 1 },
   { a: FAR + 0.55, r: 0.3, y: 1.3, dir: -1 },
 ];
-const LEVERS = [FAR - 0.62, FAR - 0.48, FAR + 0.55];
 /** How many arcs the pipes round the hall are cut into, to come and go one at a time. */
 const PIPE_ARCS = 24;
 
@@ -228,28 +231,6 @@ function Gear({
           <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
         </mesh>
       </group>
-    </group>
-  );
-}
-
-/** A lever on the wall, thrown one way or the other. Scenery until the puzzle needs it. */
-function Lever({ a, up }: { a: number; up: boolean }) {
-  return (
-    <group {...onWall(a, 0.06, 0.5)}>
-      <mesh>
-        <boxGeometry args={[0.14, 0.22, 0.05]} />
-        <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.5} />
-      </mesh>
-      <group position={[0, 0, 0.04]} rotation-x={up ? 0.5 : -0.5}>
-        <mesh position={[0, 0.1, 0.02]} rotation-x={Math.PI / 2 - 0.2}>
-          <cylinderGeometry args={[0.015, 0.015, 0.22, 8]} />
-          <meshStandardMaterial color="#9A9A9A" metalness={0.8} roughness={0.3} />
-        </mesh>
-      </group>
-      <mesh position={[0, up ? 0.13 : -0.13, 0.13]}>
-        <sphereGeometry args={[0.035, 12, 8]} />
-        <meshStandardMaterial color="#B0201A" roughness={0.5} />
-      </mesh>
     </group>
   );
 }
@@ -423,6 +404,8 @@ export default function Engine({
   /** The same, for the tap filter, which is set up once with the canvas. */
   const focusRef = useRef(focus);
   focusRef.current = focus;
+  focused.current = focus;
+  lampsFor.current = burning;
   /** Which boiler, when it is the boilers. */
   const [which, setWhich] = useState(1);
   const [zapAt, setZapAt] = useState(0);
@@ -451,7 +434,8 @@ export default function Engine({
 
   /** Walking up to a machine, and back to the whole hall. Not during a scene. */
   const pick = (id: MachineId) => {
-    if (scene) return;
+    // in the dark there is nothing to see but the boilers: the rest waits for the first fire
+    if (scene || burning === 0) return;
     setFocus(id);
     setView(VIEWS[id]);
   };
@@ -582,11 +566,11 @@ export default function Engine({
     );
   };
 
-  /** The tune pulled right: the organ plays it back by itself, then its latch springs. */
+  /** The tune pulled right: the organ plays it back by itself over its own track, then its latch springs. */
   const played = () => {
     setScene(true);
     void organVoice()
-      .play(MELODY, (k) => setPlaying(MELODY[k].note))
+      .song(MELODY, (k) => setPlaying(MELODY[k].note))
       .then(() => {
         setPlaying(null);
         setOrgan((o) => ({ ...o, played: true }));
@@ -693,12 +677,8 @@ export default function Engine({
             <Gear {...g} turning={driven && !turning.jam} reduced={reduced} />
           </FarSide>
         ))}
-        {LEVERS.map((a, k) => (
-          <FarSide key={a} a={a}>
-            <Lever a={a} up={k !== 1} />
-          </FarSide>
-        ))}
-        {burning > 0 && (
+        {/* up close they puffed big white balls over the edge of the shot */}
+        {burning > 0 && focus === null && (
           <>
             <Steam
               position={[Math.cos(FAR - 1.75) * (HALL_R - 0.12), 1.86, Math.sin(FAR - 1.75) * (HALL_R - 0.12)]}
@@ -791,7 +771,8 @@ export default function Engine({
         />
         <Carried
           at={at}
-          size={inside !== null && !held ? 0.35 : focus === "boilers" ? 0.5 : focus && focus !== "press" ? 0.6 : 1}
+          // its arms of plasma reach four times its width: at full size it hid a boiler and half the press
+          size={inside !== null && !held ? 0.35 : focus === "boilers" ? 0.4 : 0.6}
           instant={!!held || reduced}
         >
           <group {...zap} onPointerDown={(e) => (zap.onPointerDown(e), grab(e))} onPointerMove={drag}>

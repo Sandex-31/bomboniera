@@ -301,3 +301,13 @@ sparisce dal README mentre i file sono ancora nel progetto.
 
 Tutto il resto della stanza è geometria scritta a mano: nessun altro asset di
 terze parti, nessun download a runtime.
+
+## Crediti della musica
+
+Quando si risolve l'organo della sala macchine, l'organo risuona la melodia
+sopra un ritaglio di 22 secondi (da 0:38,5) di **«Genesis Retake Light»** di
+**Ridiculon**, dalla colonna sonora di *The Binding of Isaac: Repentance*
+(Nicalis / Edmund McMillen). Il ritaglio sta in
+`src/assets/organo/genesis-retake-light.mp3`, tagliato ai frame dall'mp3
+originale senza ricodificarlo; tutti i diritti restano ai loro autori.
+L'organo invece è sintetizzato con Web Audio (`src/lib/organ.ts`).

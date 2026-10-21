@@ -21,7 +21,7 @@ import {
   type PipesState,
 } from "../../lib/pipes";
 import type { Shape } from "../../lib/boilers";
-import { Approach, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
+import { Approach, Lamp, COPPER, FarSide, IRON, SPOTS, onWall, machine } from "./hall";
 
 /*
  * The panel of steam pipes on the wall. Every piece is a tap: a fitting turns
@@ -47,6 +47,8 @@ const place = (x: number, y: number): [number, number, number] => [
 
 /** Which way a side points, on the panel. */
 const AIM: Record<number, [number, number]> = { [N]: [0, 1], [E]: [1, 0], [S]: [0, -1], [WEST]: [-1, 0] };
+/** The turn that points a lever, standing up, along `aim`. */
+const leverAngle = ([ax, ay]: [number, number]) => Math.atan2(-ax, ay);
 
 /** Half a pipe, from the middle of a piece out to its side `d`. */
 function Arm({ d, material, z = 0 }: { d: number; material: MeshStandardMaterial; z?: number }) {
@@ -227,8 +229,8 @@ function Piece({
       const goal = state.valves[va] ? 0 : Math.PI * 1.5;
       wheel.current.rotation.z += (goal - wheel.current.rotation.z) * Math.min(1, dt * 6);
     }
-    if (lever.current && sw >= 0) {
-      const goal = state.switches[sw] ? 0.7 : -0.7;
+    if (lever.current && p?.kind === "switch") {
+      const goal = leverAngle(AIM[letter[state.switches[sw] ? p.a : p.b]]);
       lever.current.rotation.z += (goal - lever.current.rotation.z) * ease;
     }
   });
@@ -263,18 +265,18 @@ function Piece({
         <Arm d={S} material={material} />
         <Arm d={E} material={material} z={0.035} />
         <Arm d={WEST} material={material} z={0.035} />
-        <mesh position={[CELL / 2 - 0.01, 0, 0.018]} material={material}>
-          <cylinderGeometry args={[R, R, 0.04, 8]} />
-        </mesh>
+        {/* and where it comes back down to the neighbours' pipes, at both ends */}
+        {[-1, 1].map((sx) => (
+          <mesh key={sx} position={[sx * (CELL / 2 - 0.01), 0, 0.018]} rotation-x={Math.PI / 2} material={material}>
+            <cylinderGeometry args={[R, R, 0.04, 8]} />
+          </mesh>
+        ))}
       </>
     );
   } else if (p?.kind === "switch") {
     const live = letter[state.switches[sw] ? p.a : p.b];
     const shut = letter[state.switches[sw] ? p.b : p.a];
     const [sx, sy] = AIM[shut];
-    // the lever stands in the corner no pipe runs to
-    const free = SIDES.find((d) => !((letter[p.in] | letter[p.a] | letter[p.b]) & d)) ?? N;
-    const [fx, fy] = AIM[free];
     body = (
       <>
         <Arm d={letter[p.in]} material={material} />
@@ -288,14 +290,20 @@ function Piece({
           <cylinderGeometry args={[R * 1.4, R * 1.4, 0.012, 14]} />
           <meshStandardMaterial color="#B0201A" roughness={0.5} />
         </mesh>
-        <group position={[fx * CELL * 0.28, fy * CELL * 0.28, 0.03]}>
-          <group ref={lever} rotation-z={state.switches[sw] ? 0.7 : -0.7}>
-            <mesh position={[0, 0.03, 0]}>
-              <boxGeometry args={[0.01, 0.06, 0.01]} />
+        {/* the lever, on a round base on the face of the junction, pointing
+            the way the steam goes; the tap anywhere on the piece throws it */}
+        <group position={[0, 0, R * 1.6 + 0.004]}>
+          <mesh rotation-x={Math.PI / 2}>
+            <cylinderGeometry args={[0.03, 0.03, 0.008, 18]} />
+            <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.5} />
+          </mesh>
+          <group ref={lever} rotation-z={leverAngle(AIM[live])}>
+            <mesh position={[0, 0.03, 0.008]}>
+              <boxGeometry args={[0.012, 0.06, 0.008]} />
               <meshStandardMaterial color="#9A9A9A" metalness={0.8} roughness={0.3} />
             </mesh>
-            <mesh position={[0, 0.062, 0]}>
-              <sphereGeometry args={[0.014, 10, 8]} />
+            <mesh position={[0, 0.062, 0.01]}>
+              <sphereGeometry args={[0.016, 10, 8]} />
               <meshStandardMaterial color="#B0201A" roughness={0.5} />
             </mesh>
           </group>
@@ -388,11 +396,15 @@ export default function Pipes({
   const outletRows = Object.entries(OUTLETS) as [Outlet, number][];
 
   return (
-    <FarSide a={a}>
+    <>
+    {/* a caged lamp over the panel, lit with the first boiler;
+        outside FarSide, so it stays lit as the panel goes round the back: see Lamp */}
+    <group {...onWall(a, 0.22, y)}>
+      <Lamp position={[0, H * CELL * 0.75, 0.55]} intensity={2.2} distance={2.2} />
+    </group>
+    <FarSide a={a} id="pipes">
       {/* stood off the wall far enough that the curve of the bricks clears its corners */}
       <group {...onWall(a, 0.22, y)} {...machine("pipes")}>
-        {/* a caged lamp over the panel, so it can be worked with the boilers still cold */}
-        <pointLight position={[0, H * CELL * 0.75, 0.55]} color="#FFC890" intensity={2.2} distance={2.2} />
         {!active && (
           <group position={[0, 0, 0]}>
             <Approach w={W * CELL + 0.42} h={H * CELL + 0.24} onPick={onPick} />
@@ -428,7 +440,8 @@ export default function Pipes({
           )),
         )}
         {(Object.entries(INLETS) as [Shape, number][]).map(([line, row]) => (
-          <Flange key={line} x={0} y={row} side={WEST} shape={line} lit={false} />
+          // lit while its boiler's steam comes in, as the outlets light when it gets out
+          <Flange key={line} x={0} y={row} side={WEST} shape={line} lit={flow.carries[row * W].includes(line)} />
         ))}
         {outletRows.map(([out, row]) => (
           <group key={out}>
@@ -441,5 +454,6 @@ export default function Pipes({
         ))}
       </group>
     </FarSide>
+    </>
   );
 }

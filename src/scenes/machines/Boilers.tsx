@@ -36,8 +36,12 @@ import { COPPER, FAR, FIRE, FarSide, IRON, onWall, machine } from "./hall";
 export const BOILER_ANGLES = [FAR - 1.1, FAR, FAR + 1.1];
 /** How far in from the wall the boilers stand. */
 const INSET = 0.42;
-/** The fire door, in the boiler's own frame. */
-const DOOR: [number, number, number] = [0, 0.38, 0.3];
+/**
+ * The fire door, in the boiler's own frame: out past the curve of the body,
+ * which reaches 0.313 at that height. Any closer and its middle, stamp and
+ * all, sank into the iron.
+ */
+const DOOR: [number, number, number] = [0, 0.38, 0.34];
 
 /** Where the mouth of boiler `i` is in the hall, for Rotom to be dropped into. */
 export function doorAt(i: number): [number, number, number] {
@@ -111,7 +115,7 @@ function Chimney({ kind, reduced }: { kind: keyof typeof SMOKE_COLOR | null; red
       const u = ((state.clock.elapsedTime + k * (life / 5)) % life) / life;
       ball.visible = kind !== null && !reduced;
       if (!ball.visible || !kind) return;
-      ball.position.set(Math.sin(k * 2.3) * 0.05 * u, u * 0.55, Math.cos(k * 1.9) * 0.05 * u);
+      ball.position.set(Math.sin(k * 2.3) * 0.05 * u, u * 0.4, Math.cos(k * 1.9) * 0.05 * u);
       ball.scale.setScalar(0.05 + u * (kind === "nero" ? 0.16 : 0.11));
       const m = ball.material as MeshBasicMaterial;
       m.color.set(SMOKE_COLOR[kind]);
@@ -119,7 +123,10 @@ function Chimney({ kind, reduced }: { kind: keyof typeof SMOKE_COLOR | null; red
     });
   });
   return (
-    <group position={[0, 1.82, -0.12]}>
+    // out of a vent halfway up the chimney, in front of the lit bricks: from
+    // its top it rose over the wall into the dark, where black smoke, the one
+    // that says "more air", could not be seen at all
+    <group position={[0, 1.42, -0.04]}>
       {[0, 1, 2, 3, 4].map((k) => (
         <mesh key={k} ref={(m) => void (balls.current[k] = m)} visible={false}>
           <sphereGeometry args={[1, 10, 8]} />
@@ -161,7 +168,6 @@ function Boiler({
   const lit = state.lit[i];
   const open = state.doors[i];
   const damper = state.dampers[i];
-  const light = useRef<PointLight>(null);
   const needleRef = useRef<Group>(null);
   const fire = useRef<MeshStandardMaterial>(null);
   const door = useRef<Group>(null);
@@ -183,15 +189,9 @@ function Boiler({
     // the fire comes up with the needle while pumping, and stays once lit
     const glow = lit ? 1.4 : pumping ? 0.25 + n * 1.4 : inside ? 0.5 : 0.18;
     if (fire.current) fire.current.emissiveIntensity = glow + (reduced || !(lit || pumping) ? 0 : Math.sin(t) * 0.15);
-    if (light.current)
-      light.current.intensity = lit
-        ? 3 + (reduced ? 0 : Math.sin(t) * 0.5 + Math.sin(t * 2.7) * 0.35)
-        : pumping
-          ? n * 2.5
-          : 0;
     if (door.current) door.current.rotation.y += ((open ? -1.9 : 0) - door.current.rotation.y) * ease;
     if (drawer.current) drawer.current.position.z += ((state.drawer ? 0.46 : 0.24) - drawer.current.position.z) * ease;
-    if (lever.current) lever.current.rotation.x += ((damper - 1) * 0.6 - lever.current.rotation.x) * ease;
+    if (lever.current) lever.current.rotation.z += (-damper * (Math.PI / 2) - lever.current.rotation.z) * ease;
     if (pedal.current)
       pedal.current.rotation.x += ((pumping ? 0.25 : -0.05) - pedal.current.rotation.x) * Math.min(1, dt * 16);
   });
@@ -202,11 +202,8 @@ function Boiler({
 
   // a lit boiler is left alone: its door, damper and pedal are done with
   const latchTap = useTap(() => (active ? !lit && set({ doors: at(state.doors, !open) }) : onPick(i)));
-  const leverUp = useTap(() =>
-    active ? !lit && set({ dampers: at(state.dampers, Math.max(0, damper - 1) as Damper) }) : onPick(i),
-  );
-  const leverDown = useTap(() =>
-    active ? !lit && set({ dampers: at(state.dampers, Math.min(2, damper + 1) as Damper) }) : onPick(i),
+  const leverTap = useTap(() =>
+    active ? !lit && set({ dampers: at(state.dampers, ((damper + 1) % 3) as Damper) }) : onPick(i),
   );
   const drawerTap = useTap(() => (active ? set({ drawer: !state.drawer }) : onPick(i)));
   const pieceTap = useTap(() => active && state.drawer && set({ piece: true }));
@@ -263,8 +260,6 @@ function Boiler({
           </group>
         </group>
       </group>
-      {lit && <pointLight ref={light} position={[0, 0.45, 0.7]} color="#FF8A3A" intensity={3} distance={3.4} />}
-      {!lit && <pointLight ref={light} position={[0, 0.45, 0.7]} color="#FF8A3A" intensity={0} distance={2.4} />}
 
       {/* the gauge: no numbers, a green band to stop in and a red one past it */}
       <group position={[0, 0.78, 0.31]}>
@@ -286,35 +281,44 @@ function Boiler({
         </group>
       </group>
 
-      {/* the damper lever, on the chimney: up lets air in, down shuts it.
-          A tap on its upper half moves it up a notch, on the lower half down */}
-      <group position={[0.2, 1.38, 0.12]} rotation-y={0.4}>
-        <mesh>
-          <boxGeometry args={[0.07, 0.3, 0.03]} />
+      {/* the damper lever, on the front of the dome where it is seen: a round
+          base with three notches, up, aside and down, and the arm pivoted at
+          its middle. Up lets the most air in. A tap on the base throws it on
+          to the next notch, and from down back up. */}
+      <group position={[0, 1.22, 0.285]} rotation-x={-0.41} {...leverTap}>
+        <mesh rotation-x={Math.PI / 2}>
+          <cylinderGeometry args={[0.13, 0.13, 0.02, 24]} />
           <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.5} />
         </mesh>
-        <group ref={lever} position={[0, 0, 0.03]}>
-          <mesh position={[0, 0, 0.09]} rotation-x={Math.PI / 2}>
-            <cylinderGeometry args={[0.012, 0.012, 0.18, 8]} />
+        <mesh position={[0, 0, 0.011]}>
+          <ringGeometry args={[0.115, 0.13, 24]} />
+          <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
+        </mesh>
+        {([0, 1, 2] as const).map((d) => (
+          <mesh key={d} position={[Math.sin((d * Math.PI) / 2) * 0.095, Math.cos((d * Math.PI) / 2) * 0.095, 0.012]}>
+            <circleGeometry args={[0.012, 12]} />
+            <meshBasicMaterial color={d === damper ? "#F2E6C8" : "#5A5048"} />
+          </mesh>
+        ))}
+        <group ref={lever} position={[0, 0, 0.02]} rotation-z={-damper * (Math.PI / 2)}>
+          <mesh position={[0, 0.045, 0]}>
+            <boxGeometry args={[0.022, 0.09, 0.018]} />
             <meshStandardMaterial color="#9A9A9A" metalness={0.8} roughness={0.3} />
           </mesh>
-          <mesh position={[0, 0, 0.19]}>
-            <sphereGeometry args={[0.03, 12, 8]} />
+          <mesh position={[0, 0.095, 0.01]}>
+            <sphereGeometry args={[0.026, 12, 8]} />
             <meshStandardMaterial color="#B0201A" roughness={0.5} />
           </mesh>
+          <mesh rotation-x={Math.PI / 2}>
+            <cylinderGeometry args={[0.022, 0.022, 0.03, 12]} />
+            <meshStandardMaterial color={COPPER} metalness={0.7} roughness={0.35} />
+          </mesh>
         </group>
-        <mesh position={[0, 0.13, 0.12]} {...leverUp}>
-          <boxGeometry args={[0.3, 0.26, 0.3]} />
-          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-        </mesh>
-        <mesh position={[0, -0.13, 0.12]} {...leverDown}>
-          <boxGeometry args={[0.3, 0.26, 0.3]} />
-          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-        </mesh>
       </group>
 
       {/* the bellows on the floor beside it, and the pedal that works them */}
-      <group position={[-0.34, 0.05, 0.28]}>
+      {/* far enough out that the box clears the body and its copper hoop */}
+      <group position={[-0.42, 0.05, 0.28]}>
         <mesh position={[0, 0.06, -0.05]}>
           <boxGeometry args={[0.16, 0.1, 0.2]} />
           <meshStandardMaterial color="#5A3A24" roughness={0.9} />
@@ -403,6 +407,7 @@ export default function Boilers({
   const [pumping, setPumping] = useState<number | null>(null);
   const started = useRef(0);
   const needle = useRef(0);
+  const light = useRef<PointLight>(null);
 
   const finish = (outcome: "out" | "lit" | "spat") => {
     if (pumping === null) return;
@@ -426,7 +431,12 @@ export default function Boilers({
     };
   });
 
-  useFrame(() => {
+  useFrame((frame) => {
+    if (light.current) {
+      const t = frame.clock.elapsedTime * 8;
+      const glow = state.lit.filter(Boolean).length * 1.6 + (pumping === null ? 0 : needle.current * 2.5);
+      light.current.intensity = glow * (reduced ? 1 : 1 + Math.sin(t) * 0.15 + Math.sin(t * 2.7) * 0.1);
+    }
     if (pumping === null) return;
     needle.current = rise(state.dampers[pumping], RIGHT_DAMPERS[pumping], performance.now() - started.current);
     // into the red the valve blows at once, pedal or no pedal
@@ -435,8 +445,13 @@ export default function Boilers({
 
   return (
     <>
+      {/* One firelight for the row, not one per boiler, and outside FarSide:
+          a light that comes or goes as the camera turns makes three.js
+          recompile every material in the hall, and the hall stuttered. The
+          machines' lamps stay out of FarSide for the same reason. */}
+      <pointLight ref={light} {...onWall(FAR, 1.12, 0.45)} color="#FF8A3A" intensity={0} distance={4.2} />
       {BOILER_ANGLES.map((a, i) => (
-        <FarSide key={a} a={a}>
+        <FarSide key={a} a={a} id="boilers">
           <Boiler
             i={i}
             state={state}

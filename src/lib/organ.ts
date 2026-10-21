@@ -11,6 +11,8 @@
  * everything still works.
  */
 
+import songUrl from "../assets/organo/genesis-retake-light.mp3?url";
+
 /** The six whistles, from the tallest and lowest to the shortest and highest. */
 export const NOTES = ["C5", "D5", "Eb5", "F5", "G5", "Ab5"] as const;
 const HZ = [523.25, 587.33, 622.25, 698.46, 783.99, 830.61];
@@ -35,18 +37,54 @@ const SHORT = 0.42;
 const LONG = 1.25;
 const GAP = 0.09;
 
+/**
+ * The reward for the tune played right: the organ plays it again over the
+ * very phrase of «Genesis Retake Light» it comes from, 0:38.5 to 1:01 of
+ * the track, as in the preview Salvo chose. Salvo chose to ship the clip
+ * itself; its credit is in README.md.
+ *
+ * `cues` are when each note of the tune speaks and stops, in seconds from
+ * the start of the clip, measured off that preview: the organ in it was
+ * picked out from under the track and timed note by note.
+ */
+export const SONG = {
+  url: songUrl,
+  /** The track under the organ, in the balance of the preview: there the organ sat a third quieter. */
+  gain: 0.38,
+  length: 22.4,
+  cues: [
+    [0.54, 1.2],
+    [1.28, 1.96],
+    [2.04, 5.3],
+    [6.04, 6.7],
+    [6.78, 7.72],
+    [7.8, 10.9],
+    [11.54, 12.46],
+    [12.54, 12.96],
+    [13.04, 14.2],
+    [14.28, 15.46],
+    [15.54, 16.94],
+    [17.02, 21.0],
+  ] as readonly (readonly [number, number])[],
+};
+
 export type Voice = { stop: (at?: number) => void };
+
+type Tune = readonly { note: number; long: boolean }[];
 
 type Organ = {
   /** Sounds a whistle now, or at `at` on the context's clock, until it is stopped. */
   start: (note: number, at?: number) => Voice;
-  play: (tune: readonly { note: number; long: boolean }[], onNote?: (k: number) => void) => Promise<void>;
+  play: (tune: Tune, onNote?: (k: number) => void) => Promise<void>;
+  /** The tune over its track, timed by `SONG.cues`; the organ alone if the track cannot be had. */
+  song: (tune: Tune, onNote?: (k: number) => void) => Promise<void>;
   puff: () => void;
 };
 
 const silent: Organ = {
   start: () => ({ stop: () => {} }),
   play: () => Promise.resolve(),
+  song: () => Promise.resolve(),
   puff: () => {},
 };
 
@@ -111,8 +149,17 @@ export function organOn(ctx: BaseAudioContext): Organ {
       void ctx.resume();
   };
 
+  /** The track, fetched once, from the first pull on: it is ready long before the tune is. */
+  let clip: Promise<AudioBuffer | null> | null = null;
+  const loadClip = () =>
+    (clip ??= fetch(SONG.url)
+      .then((r) => r.arrayBuffer())
+      .then((b) => ctx.decodeAudioData(b))
+      .catch(() => null));
+
   const start = (note: number, at?: number): Voice => {
     wake();
+    void loadClip();
     const f = HZ[note];
     const t = at ?? ctx.currentTime;
     const env = ctx.createGain();
@@ -195,6 +242,30 @@ export function organOn(ctx: BaseAudioContext): Organ {
       next();
     });
 
+  const song: Organ["song"] = async (tune, onNote) => {
+    wake();
+    const track = await loadClip();
+    if (!track) return play(tune, onNote);
+    const t0 = ctx.currentTime + 0.1;
+    const src = ctx.createBufferSource();
+    src.buffer = track;
+    const level = ctx.createGain();
+    // in and out softly: the clip is cut at frames, not at a rest
+    level.gain.setValueAtTime(0, t0);
+    level.gain.linearRampToValueAtTime(SONG.gain, t0 + 0.08);
+    level.gain.setValueAtTime(SONG.gain, t0 + SONG.length - 1);
+    level.gain.linearRampToValueAtTime(0, t0 + SONG.length);
+    src.connect(level).connect(ctx.destination);
+    src.start(t0);
+    src.stop(t0 + SONG.length);
+    tune.forEach(({ note }, k) => {
+      const [on, off] = SONG.cues[k];
+      start(note, t0 + on).stop(t0 + off);
+      setTimeout(() => onNote?.(k), (t0 - ctx.currentTime + on) * 1000);
+    });
+    await new Promise((done) => setTimeout(done, (t0 - ctx.currentTime + SONG.length) * 1000));
+  };
+
   const puff = () => {
     wake();
     const t = ctx.currentTime;
@@ -213,5 +284,5 @@ export function organOn(ctx: BaseAudioContext): Organ {
     src.stop(t + 0.4);
   };
 
-  return { start, play, puff };
+  return { start, play, song, puff };
 }
