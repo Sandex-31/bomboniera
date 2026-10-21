@@ -1954,7 +1954,7 @@ try {
 
     const { STAGES } = await vite15.ssrLoadModule("/src/lib/stages.ts");
     const labels = STAGES.map((st) => st.label);
-    assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri", "tv"], "the lantern, the pillars and the tv are not after the fourth floor");
+    assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri", "tv", "corvi"], "the lantern, the pillars, the tv and the crows are not after the fourth floor");
     console.log("ok — pozzo: pilastri, 9017432 in senso orario, cifre sui puntini, telefono");
   } finally {
     await vite15.close();
@@ -2066,6 +2066,100 @@ try {
     console.log("ok — pozzo: tv, uno scambio a tempo porta il cincilla al divano, melodia di 8 note");
   } finally {
     await vite16.close();
+  }
+}
+
+/* ---------------------------------------------------------- pozzo: corvi
+ * The porcupine walks on its own; only the barrier is the visitor's. A real
+ * search over (porcupine, barrier, yellow cells seen) finds a way to all
+ * three yellows, and no way exists with the barrier left alone. The eight
+ * crows caw a fixed tune that the flute has to follow, rhythm included.
+ */
+{
+  const vite17 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const cr = await vite17.ssrLoadModule("/src/lib/well/crows.ts");
+    const { follow, DIRS } = await vite17.ssrLoadModule("/src/lib/flute.ts");
+    const { LONG_MS } = await vite17.ssrLoadModule("/src/lib/card.ts");
+    const key = (p) => `${p.x},${p.y}`;
+    const bit = (p) => cr.YELLOW.findIndex(([x, y]) => x === p.x && y === p.y);
+    const all = (1 << cr.YELLOW.length) - 1;
+    assert.equal(cr.YELLOW.length, 3);
+
+    // left alone, the barrier never lets him see all three, falling out and starting again included
+    let p = cr.PORC_START;
+    let seen = new Set([key(p)]);
+    for (let i = 0; i < 500; i++) {
+      p = cr.stepPorc(p, false);
+      if (cr.fellOut(p)) {
+        p = cr.PORC_START;
+        seen = new Set();
+      }
+      seen.add(key(p));
+      assert.ok(!cr.boxDone(seen), "the porcupine does it alone");
+    }
+
+    // BFS: before each step the barrier may be flipped or not
+    const enc = (q, up, m) => `${q.x},${q.y},${q.dir},${up},${m}`;
+    const m0 = bit(cr.PORC_START) < 0 ? 0 : 1 << bit(cr.PORC_START);
+    const queue = [{ q: cr.PORC_START, up: false, m: m0, steps: 0 }];
+    const marked = new Set([enc(cr.PORC_START, false, m0)]);
+    let win = null;
+    for (let i = 0; i < queue.length && !win; i++) {
+      const { q, up, m, steps } = queue[i];
+      for (const u of [up, !up]) {
+        const n = cr.stepPorc(q, u);
+        if (cr.fellOut(n)) continue;
+        const b = bit(n);
+        const nm = b < 0 ? m : m | (1 << b);
+        if (nm === all) {
+          win = steps + 1;
+          break;
+        }
+        const k = enc(n, u, nm);
+        if (!marked.has(k)) {
+          marked.add(k);
+          queue.push({ q: n, up: u, m: nm, steps: steps + 1 });
+        }
+      }
+    }
+    assert.ok(win, "no schedule of the barrier takes the porcupine to all three");
+    assert.ok(cr.boxDone(new Set(cr.YELLOW.map(([x, y]) => `${x},${y}`))) && !cr.boxDone(new Set()), "boxDone is wrong");
+    assert.ok(cr.stepPorc({ x: 3, y: 0, dir: -1 }, false).x === 2 && cr.stepPorc({ x: 0, y: 0, dir: -1 }, false).dir === 1, "he does not walk or turn at the edge");
+    assert.ok(cr.stepPorc({ x: 4, y: 0, dir: 1 }, true).dir === -1 && cr.stepPorc({ x: 4, y: 0, dir: 1 }, false).x === 5, "the barrier does not turn him");
+    assert.equal(cr.stepPorc({ x: 7, y: 0, dir: 1 }, false).y, 1, "he does not drop through a gap");
+
+    // the crows: eight, each its direction; the tune is fixed
+    assert.deepEqual(cr.CROWS, DIRS.map((_, i) => i));
+    assert.equal(cr.CROW_TUNE.length, 8);
+    assert.ok(new Set(cr.CROW_TUNE.map((t) => t.note)).size >= 6, "the tune has too few crows");
+    assert.ok(cr.CROW_TUNE.filter((t) => t.long).length >= 2, "the tune has under two long notes");
+    assert.ok(cr.LONG_CAW_MS >= LONG_MS && cr.SHORT_CAW_MS < LONG_MS, "a long caw is not long");
+    let n = 0;
+    for (const t of cr.CROW_TUNE) n = follow(cr.CROW_TUNE, n, t);
+    assert.equal(n, 8, "the whole crows' tune does not count through");
+    n = 0;
+    cr.CROW_TUNE.forEach((t, i) => {
+      n = follow(cr.CROW_TUNE, n, i === 3 ? { ...t, long: !t.long } : t);
+    });
+    assert.notEqual(n, 8, "the right order with a wrong length counts");
+
+    // the caws in time: each one in turn, then over
+    assert.equal(cr.cawAt(cr.CROW_TUNE, 0), 0);
+    assert.equal(cr.cawAt(cr.CROW_TUNE, cr.SHORT_CAW_MS + 1), -1, "no gap between caws");
+    assert.equal(cr.cawAt(cr.CROW_TUNE, 1e6), 8);
+
+    assert.deepEqual(cr.loadCrows("x"), cr.START);
+    assert.deepEqual(cr.loadCrows(null), cr.START);
+    assert.deepEqual(cr.loadCrows(JSON.stringify({ box: true })), cr.START, "a half state loads");
+    assert.deepEqual(cr.loadCrows(JSON.stringify(cr.solvedCrows())), cr.solvedCrows(), "the solved state does not load");
+
+    const { STAGES } = await vite17.ssrLoadModule("/src/lib/stages.ts");
+    const stop = STAGES.find((st) => st.label === "corvi");
+    assert.ok(stop && stop.solved().flame, "the crows stop has no flame");
+    console.log(`ok — pozzo: corvi, la barriera a tempo porta il porcospino ai tre gialli in ${win} passi, 8 corvi con il ritmo`);
+  } finally {
+    await vite17.close();
   }
 }
 

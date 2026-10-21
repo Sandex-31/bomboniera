@@ -55,6 +55,7 @@ import { solvedOrgan } from "./card";
 import { solvedPress } from "./press";
 import { solvedPillars, solvedUv } from "./well/pillars";
 import { solvedTv } from "./well/tv";
+import { solvedCrows } from "./well/crows";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
 function levers(): boolean[] {
@@ -115,6 +116,7 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "luce uv", key: WELL_PILLARS_KEY, solved: solvedUv },
   { label: "pilastri", key: WELL_PILLARS_KEY, solved: solvedPillars },
   { label: "tv", key: WELL_TV_KEY, solved: solvedTv },
+  { label: "corvi", key: WELL_CROWS_KEY, solved: solvedCrows },
 ];
 
 /**
@@ -125,7 +127,6 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
 export const WIPED = [
   CHAT_KEY,
   DEPTH_KEY,
-  WELL_CROWS_KEY,
   WELL_BUDS_KEY,
   WELL_MURAL_KEY,
   WELL_INSIDE_KEY,

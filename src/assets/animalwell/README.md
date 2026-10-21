@@ -50,8 +50,9 @@ gioco. I nomi sono quelli di `src/lib/well/sprites.ts`: se una misura cambia, va
 - `switch.wav`: un interruttore premuto;
 - `chest.wav`: il baule che si apre;
 - `firecracker.wav`: il petardo;
-- `crow.wav`: il verso del corvo;
 - `phone-busy.wav`: il tono di occupato;
 - `phone-ring.wav`: il telefono che squilla;
 - `flame.wav`: la fiamma presa;
 - `mural.wav`: un pezzo del murale messo al suo posto.
+- `crow.wav` (o `.ogg`, `.mp3`): un solo verso del corvo, breve; i versi lunghi sono lo stesso
+  rallentato.
