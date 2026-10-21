@@ -1799,6 +1799,57 @@ try {
   }
 }
 
+/* ---------------------------------------------------------- pozzo: schermo
+ * The walls of the well are game screens: a tap lands on a pixel, Rotom runs
+ * to it without ever overshooting, and every sprite has a size and a file in
+ * the one folder the originals are dropped into.
+ */
+{
+  const vite14 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const px = await vite14.ssrLoadModule("/src/lib/well/pixels.ts");
+    assert.equal(px.W, 320);
+    assert.equal(px.H, 180);
+    assert.deepEqual(px.toPixel({ x: 0, y: 1 }), [0, 0], "uv's top left is the canvas's top left");
+    assert.deepEqual(px.toPixel({ x: 1, y: 0 }), [319, 179], "uv's bottom right is the last pixel");
+
+    for (const [from, to, dt] of [[[0, 0], [300, 170], 1 / 60], [[10, 5], [10, 5], 0.1], [[319, 0], [0, 179], 0.5]]) {
+      let at = from;
+      let steps = 0;
+      const d0 = Math.hypot(to[0] - from[0], to[1] - from[1]);
+      while ((at[0] !== to[0] || at[1] !== to[1]) && steps < 10000) {
+        const next = px.chase(at, to, dt);
+        const step = Math.hypot(next[0] - at[0], next[1] - at[1]);
+        assert.ok(step <= 140 * dt + 1e-9, "Rotom runs faster than his speed");
+        assert.ok(Math.hypot(to[0] - next[0], to[1] - next[1]) <= Math.hypot(to[0] - at[0], to[1] - at[1]), "Rotom runs away");
+        // never past the target: still on the segment from where he started
+        assert.ok(Math.hypot(next[0] - from[0], next[1] - from[1]) <= d0 + 1e-9, "Rotom overshoots");
+        at = next;
+        steps++;
+      }
+      assert.deepEqual(at, to, "Rotom never gets there");
+    }
+    assert.deepEqual(px.chase([0, 0], [5, 0], 1, 100), [5, 0], "a faster Rotom stops on the target");
+
+    assert.ok(px.inCircle([10, 0], [0, 0], 10), "the rim is inside the circle");
+    assert.ok(!px.inCircle([10, 1], [0, 0], 10));
+    const r = { x: 4, y: 6, w: 10, h: 5 };
+    assert.ok(px.hit([4, 6], r) && px.hit([13, 10], r), "a rect takes its first and last pixel");
+    assert.ok(!px.hit([14, 6], r) && !px.hit([4, 11], r) && !px.hit([3, 6], r) && !px.hit([4, 5], r));
+
+    const { SPRITES } = await vite14.ssrLoadModule("/src/lib/well/sprites.ts");
+    const ids = ["rotomFrost", "chinchilla", "chest", "porcupine", "crow", "turtle", "bud", "ghost", "candle", "phone", "tv", "face", "flame", "blockPink", "blockBlue", "switchYellow", "switchGreen", "switchPink", "tile"];
+    for (const id of ids) assert.ok(SPRITES[id], `no sprite ${id}`);
+    for (const [id, s] of Object.entries(SPRITES)) {
+      assert.ok(s.w > 0 && s.h > 0 && s.frames > 0, `${id} has no size`);
+      assert.match(s.file, /^src\/assets\/animalwell\/[\w-]+\.png$/, `${id} is not in the originals' folder`);
+    }
+    console.log(`ok — pozzo: schermo, ${px.W}x${px.H} pixels, ${Object.keys(SPRITES).length} sprites`);
+  } finally {
+    await vite14.close();
+  }
+}
+
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,
  * movement and sound only. No text between their tags, no text element, no

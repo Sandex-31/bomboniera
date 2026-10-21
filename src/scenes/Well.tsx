@@ -9,9 +9,12 @@ import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
-import { wellLine } from "../data/puzzle";
+import { wallLine, wellLine } from "../data/puzzle";
 import { Approach, Carried, FarSide, WALL_H, facing, onlySeen, onWall } from "./machines/hall";
-import { WALL_ANGLES, type WallId } from "./well/wall";
+import { SCREEN_Y, WALL_ANGLES, WELL_R, type WallId } from "./well/wall";
+import Screen, { INSET, PANEL, type Painter } from "./well/Screen";
+import { H, W } from "../lib/well/pixels";
+import { SPRITES, drawSprite, type SpriteId } from "../lib/well/sprites";
 
 /*
  * The fourth floor: the well, in the rock under the machine room. A round
@@ -21,9 +24,6 @@ import { WALL_ANGLES, type WallId } from "./well/wall";
  * each to be walked up to with a tap. It is the base the screens of the
  * walls are hung on.
  */
-
-/** How wide the hall is: wider than the machine room's, which is 2.4. Its wall is as high. */
-export const HALL_R = 3.4;
 
 /** The hole above, straight over the middle: where the press broke the floor. */
 const HOLE_Y = 2.55;
@@ -56,14 +56,14 @@ const CEILING_VIEW: View = {
 };
 
 /** Where the camera stands to work a wall, and how high on it the screen is. */
-const WALL_SPOT = { y: 0.95, zoom: 2.2, polar: 1.3 };
+const WALL_SPOT = { y: SCREEN_Y, zoom: 5.5, polar: 1.45 };
 
 /** Standing in front of each wall, and the altar. */
 const VIEWS: Record<Focus, View> = {
-  tv: facing({ a: WALL_ANGLES.tv, ...WALL_SPOT }, HALL_R),
-  corvi: facing({ a: WALL_ANGLES.corvi, ...WALL_SPOT }, HALL_R),
-  boccioli: facing({ a: WALL_ANGLES.boccioli, ...WALL_SPOT }, HALL_R),
-  pilastri: facing({ a: WALL_ANGLES.pilastri, ...WALL_SPOT }, HALL_R),
+  tv: facing({ a: WALL_ANGLES.tv, ...WALL_SPOT }, WELL_R),
+  corvi: facing({ a: WALL_ANGLES.corvi, ...WALL_SPOT }, WELL_R),
+  boccioli: facing({ a: WALL_ANGLES.boccioli, ...WALL_SPOT }, WELL_R),
+  pilastri: facing({ a: WALL_ANGLES.pilastri, ...WALL_SPOT }, WELL_R),
   altar: {
     target: [0, 0.5, 0],
     azimuth: Math.PI / 4,
@@ -73,10 +73,37 @@ const VIEWS: Record<Focus, View> = {
   },
 };
 
-/** Where Rotom keeps while a wall at angle `a` is worked: off to one side along it, out of the shot. */
-function outOfTheWay(a: number): [number, number, number] {
-  return [-Math.sin(a) * 3.1, -0.2, Math.cos(a) * 3.1];
+/** Where 3D Rotom goes when he enters the wall at angle `a`: into the middle of its screen, shrinking to nothing. */
+function intoTheWall(a: number): [number, number, number] {
+  return onWall(a, INSET + 0.05, SCREEN_Y, WELL_R).position;
 }
+
+/**
+ * Until the walls have rooms of their own: a floor of tiles, a few sprites
+ * standing on it, and a mark that only the UV light shows.
+ */
+function testWall(cast: SpriteId[]): Painter {
+  return (ctx, t, uvAt) => {
+    const tile = SPRITES.tile;
+    for (let x = 0; x < W; x += tile.w)
+      for (let y = H - tile.h * 3; y < H; y += tile.h) drawSprite(ctx, "tile", x, y, (x / tile.w + y / tile.h) % tile.frames);
+    cast.forEach((id, i) => {
+      const s = SPRITES[id];
+      drawSprite(ctx, id, ((i + 1) * W) / (cast.length + 1) - s.w / 2, H - tile.h * 3 - s.h, Math.floor(t * 2));
+    });
+    ctx.fillStyle = "#FF4FD8";
+    for (let x = 140; x < 180; x++)
+      for (let y = 40; y < 80; y++) if ((x + y) % 6 === 0 && uvAt([x, y])) ctx.fillRect(x, y, 1, 1);
+  };
+}
+
+/** What each wall shows until its task gives it its room, and whether it is dark or under the lantern. */
+const TEST: Record<WallId, { paint: Painter; dark?: boolean; uv?: boolean }> = {
+  tv: { paint: testWall(["chinchilla", "chest", "tv", "blockPink", "blockBlue", "switchGreen"]), uv: true },
+  corvi: { paint: testWall(["porcupine", "switchYellow", "crow", "crow", "flame"]) },
+  boccioli: { paint: testWall(["turtle", "bud", "bud", "switchPink"]) },
+  pilastri: { paint: testWall(["ghost", "candle", "phone", "face"]), dark: true },
+};
 
 const WALLS = Object.keys(WALL_ANGLES) as WallId[];
 
@@ -117,6 +144,10 @@ export default function Well({
   const [scene, setScene] = useState(arriving);
   /** Rotom is saying its line on landing. */
   const [saying, setSaying] = useState(false);
+  /** Rotom has gone into the walls, and is pixel art on whichever is worked. */
+  const [inside, setInside] = useState(false);
+  /** Rotom is saying its line on going into the first wall. */
+  const [telling, setTelling] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   useEffect(() => {
@@ -146,6 +177,16 @@ export default function Well({
     if (scene) return;
     setFocus(id);
     setView(VIEWS[id]);
+    // the first wall: Rotom flies into it while the camera walks up, then has its say
+    if (id !== "altar" && !inside) {
+      setScene(true);
+      timers.current.push(setTimeout(() => setTelling(true), reduced ? 0 : FLIGHT * 1000));
+    }
+  };
+  const told = () => {
+    setTelling(false);
+    setInside(true);
+    setScene(false);
   };
   const back = () => {
     if (scene || focus === null || tappedJustNow()) return;
@@ -174,8 +215,8 @@ export default function Well({
     if (focus !== "altar") pick("altar");
   });
 
-  const at: [number, number, number] =
-    focus && focus !== "altar" ? outOfTheWay(WALL_ANGLES[focus]) : ASIDE;
+  const wall = focus !== null && focus !== "altar" ? focus : null;
+  const at: [number, number, number] = wall ? intoTheWall(WALL_ANGLES[wall]) : ASIDE;
 
   return (
     <Canvas
@@ -194,31 +235,43 @@ export default function Well({
 
       {/* the floor: dark stone */}
       <mesh rotation-x={-Math.PI / 2}>
-        <circleGeometry args={[HALL_R, 64]} />
+        <circleGeometry args={[WELL_R, 64]} />
         <meshStandardMaterial color="#14181F" roughness={0.9} />
       </mesh>
       {/* the wall, from the inside only */}
       <mesh position={[0, WALL_H / 2, 0]}>
-        <cylinderGeometry args={[HALL_R, HALL_R, WALL_H, 64, 1, true]} />
+        <cylinderGeometry args={[WELL_R, WELL_R, WALL_H, 64, 1, true]} />
         <meshStandardMaterial color="#232A36" side={BackSide} roughness={0.95} />
       </mesh>
       <mesh position={[0, WALL_H, 0]} rotation-x={-Math.PI / 2} visible={focus === null}>
-        <ringGeometry args={[HALL_R, HALL_R + 0.12, 64]} />
+        <ringGeometry args={[WELL_R, WELL_R + 0.12, 64]} />
         <meshStandardMaterial color="#2E3440" roughness={0.8} />
       </mesh>
 
-      {/* the four walls: a dark slab where each screen will hang, walked up to with a tap */}
+      {/* the four walls, each a screen, walked up to with a tap */}
       {WALLS.map((id) => (
         <FarSide key={id} a={WALL_ANGLES[id]}>
-          <group {...onWall(WALL_ANGLES[id], 0.05, WALL_SPOT.y, HALL_R)}>
-            <mesh>
-              <planeGeometry args={[1.6, 1.1]} />
-              <meshStandardMaterial color="#0C0F14" roughness={0.7} />
-            </mesh>
-            {focus !== id && <Approach w={1.6} h={1.1} onPick={() => pick(id)} />}
-          </group>
+          <Screen
+            a={WALL_ANGLES[id]}
+            paint={TEST[id].paint}
+            onTap={() => {}}
+            active={focus === id && !scene}
+            dark={TEST[id].dark}
+            uv={TEST[id].uv}
+            reduced={reduced}
+          />
+          {focus !== id && (
+            <group {...onWall(WALL_ANGLES[id], INSET, SCREEN_Y, WELL_R)}>
+              <Approach w={PANEL.w} h={PANEL.h} onPick={() => pick(id)} />
+            </group>
+          )}
         </FarSide>
       ))}
+      {telling && wall && (
+        <Html position={onWall(WALL_ANGLES[wall], 0.9, SCREEN_Y + 0.3, WELL_R).position} center zIndexRange={[6, 0]}>
+          <Keeper line={wallLine} last reduced={reduced} onNext={told} />
+        </Html>
+      )}
 
       {/* the altar, in the middle, under the light */}
       <mesh position={[0, 0.25, 0]} {...altar}>
@@ -246,8 +299,9 @@ export default function Well({
         <meshBasicMaterial color="#DCEBFF" transparent opacity={0.07} depthWrite={false} />
       </mesh>
 
-      <Carried at={at} size={focus === null || focus === "altar" ? 0.6 : 0.5} instant={reduced}>
-        <group {...zap}>
+      <Carried at={at} size={wall ? 0.02 : 0.6} instant={reduced}>
+        {/* once inside the walls, he is the one on the screen */}
+        <group {...zap} visible={!(wall && inside && !scene)}>
           <Suspense fallback={null}>
             <Rotom form="frost" from="heat" move={move} reduced={reduced} zapAt={zapAt} awake />
           </Suspense>

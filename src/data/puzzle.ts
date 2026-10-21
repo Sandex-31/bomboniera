@@ -245,7 +245,7 @@ export const wellLine = 'Rotom: TODO — la battuta dell’arrivo nel pozzo.';
  *
  * TODO: da scrivere — questa riga è segnaposto.
  */
-export const wallLine = 'Rotom: TODO — la battuta della prima parete.';
+export const wallLine = 'Rotom: così ti controllo meglio';
 
 /**
  * And what it says once the flame of the well is lit.

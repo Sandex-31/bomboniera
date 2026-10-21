@@ -19,3 +19,9 @@ export const WALL_ANGLES: Record<WallId, number> = {
   boccioli: FAR - Math.PI / 2,
   pilastri: FAR + Math.PI,
 };
+
+/** How wide the hall is: wider than the machine room's, which is 2.4. */
+export const WELL_R = 3.4;
+
+/** How high on its wall each screen hangs, and where the camera looks to work it. */
+export const SCREEN_Y = 0.95;
