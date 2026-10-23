@@ -102,12 +102,12 @@ export const LOCK_KEY = 'bomboniera.puzzle.lucchetto';
 
 /**
  * Which floor of the tower the visitor is on: 0 the island, 1 Babel, 2 the
- * machine room, 3 the well. Missing means they have never been down.
+ * machine room, 3 the well, 4 the hall. Missing means they have never been down.
  */
 export const FLOOR_KEY = 'bomboniera.puzzle.piano';
 
 /** How many floors are built so far, the island included. */
-export const FLOORS = 4;
+export const FLOORS = 5;
 
 /** The stored floor, read back: anything that is not a floor is the island. */
 export function floorFrom(stored: string | null): number {
@@ -171,6 +171,9 @@ export const insideFrom = (stored: string | null) => stored === '1';
 
 /** The mural of the well, and how much of it has been uncovered. */
 export const WELL_MURAL_KEY = 'bomboniera.puzzle.pozzo.murale';
+
+/** The lecture hall of the fifth floor: its exams, and how far each has got. */
+export const AULA_KEY = 'bomboniera.puzzle.aula';
 
 /** The read phrases, read back: anything that is not a list of distinct phrases is none. */
 export function langFrom(stored: string | null): number[] {
@@ -266,6 +269,27 @@ export const flameLine = 'Rotom: TODO — la battuta della fiamma.';
  * TODO: da scrivere — questa riga è segnaposto.
  */
 export const muralLine = 'Rotom: TODO — la battuta del murale.';
+
+/**
+ * What it says on landing in the lecture hall, back from Frost Rotom.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const aulaLine = 'Rotom: TODO — la battuta dell’arrivo in aula.';
+
+/**
+ * And what it says when the laptop is tapped before the libretto is full.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const laptopShutLine = 'Rotom: TODO — la battuta del portatile ancora chiuso.';
+
+/**
+ * And what it says as it goes into the laptop.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const laptopLine = 'Rotom: TODO — la battuta dell’ingresso nel portatile.';
 
 /** What it says to anyone who names a silhouette right: right, and useless. */
 export const bravoLine = 'Rotom: Bravo! giusto ma non ti servirá a un bel niente hahahahah';

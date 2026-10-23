@@ -69,6 +69,15 @@ const CEILING_VIEW: View = {
   spread: { azimuth: 0.1, polar: 0.05 },
 };
 
+/** Up from the hall below: the camera waits over the open well, where Rotom is about to rise. */
+const PIT_VIEW: View = {
+  target: [0, 0.3, 0],
+  azimuth: Math.PI / 4,
+  polar: 0.8,
+  zoom: 2.2,
+  spread: { azimuth: 0.1, polar: 0.05 },
+};
+
 /** Square in front of the mural over the altar, close enough for its pieces to be a finger wide on a phone. */
 const PANEL_VIEW: View = {
   target: [0, PANEL_Y, 0],
@@ -78,7 +87,7 @@ const PANEL_VIEW: View = {
   spread: { azimuth: 0.05, polar: 0.03 },
 };
 
-/** Rotom's dive into the well once it opens: over it, down to the rim, and back up, as there is no floor below yet. */
+/** Rotom's dive into the well once it opens: over it, down to the rim, and back up. Going down for good waits for a tap on the well. */
 const DIVE: [number, number, number][] = [
   [0, 0.7, 0],
   [0, -0.15, 0],
@@ -129,6 +138,9 @@ export default function Well({
   reduced,
   onScene,
   onUp,
+  onDown,
+  deep,
+  fromBelow,
   arrivedAt,
   first,
 }: {
@@ -137,6 +149,12 @@ export default function Well({
   onScene: (on: boolean) => void;
   /** The hole in the ceiling was tapped: back up to the machine room. */
   onUp: () => void;
+  /** Rotom has dived into the open well: on to the hall below. */
+  onDown: (first: boolean) => void;
+  /** Whether the visitor has been down to the hall before. */
+  deep: boolean;
+  /** Whether they came up from the hall, not down from the machine room. */
+  fromBelow: boolean;
   /** When the visitor came down, or -Infinity if they were already here. */
   arrivedAt: number;
   /** Whether that was the first time down, which is the long way. */
@@ -153,13 +171,14 @@ export default function Well({
    * Coming in: the camera waits under the hole, Rotom drops out of it as it
    * was in the machine room and flashes into Frost Rotom, says its line (the
    * first time only), and the camera stands back to take in the hall. A reload just finds it all
-   * there.
+   * there. Coming up from the hall below it rises out of the well instead,
+   * as it was down there until the flash.
    */
   const arriving = Number.isFinite(arrivedAt) && !reduced;
   const [move, setMove] = useState<Move | undefined>(() =>
-    arriving ? { at: arrivedAt, kind: "in", dir: "down", fast: !first } : undefined,
+    arriving ? { at: arrivedAt, kind: "in", dir: fromBelow ? "up" : "down", fast: !first } : undefined,
   );
-  const [view, setView] = useState<View>(arriving ? CEILING_VIEW : HALL_VIEW);
+  const [view, setView] = useState<View>(arriving ? (fromBelow ? PIT_VIEW : CEILING_VIEW) : HALL_VIEW);
   const [scene, setScene] = useState(arriving);
   /** Rotom is saying its line on landing. */
   const [saying, setSaying] = useState(false);
@@ -244,6 +263,28 @@ export default function Well({
     stopMusic(reduced ? 300 : moveMs(true) * 0.8);
     setMove({ at: performance.now(), kind: "out", dir: "up", fast: true });
     timers.current.push(setTimeout(onUp, reduced ? 0 : moveMs(true) * 0.8));
+  });
+  /*
+   * Down into the open well: Rotom comes over it, hangs there a moment, then
+   * spirals in, and the hall below takes over. The long way the first time,
+   * the short way after.
+   */
+  const [descending, setDescending] = useState(false);
+  const down = useTap(() => {
+    if (scene || !open) return;
+    const long = !deep;
+    setScene(true);
+    setDescending(true);
+    stopMusic(reduced ? 300 : 900 + moveMs(!long) * 0.8);
+    timers.current.push(
+      setTimeout(
+        () => {
+          setMove({ at: performance.now(), kind: "out", dir: "down", fast: !long });
+          timers.current.push(setTimeout(() => onDown(long), reduced ? 0 : moveMs(!long) * 0.8));
+        },
+        reduced ? 0 : 900,
+      ),
+    );
   });
   const zap = useTap(() => {
     if (!scene) setZapAt(performance.now());
@@ -396,7 +437,13 @@ export default function Well({
       flute.current = () => {};
     };
   });
-  const at: [number, number, number] = wall ? intoTheWall(WALL_ANGLES[wall]) : (dive ?? ASIDE);
+  const at: [number, number, number] = descending
+    ? DIVE[0]
+    : arriving && fromBelow && scene
+      ? [0, 0, 0]
+      : wall
+        ? intoTheWall(WALL_ANGLES[wall])
+        : (dive ?? ASIDE);
 
   return (
     <>
@@ -475,6 +522,11 @@ export default function Well({
         onPick={() => focus !== "altar" && pick("altar")}
         panel={focus === "altar" && lit(flames()) && (!mural.done || finale === "landing") ? <Mural state={mural} onPlace={placed} /> : null}
       />
+      {/* the open well, once the mural is whole: tapping it goes down */}
+      <mesh position={[0, 0.02, 0]} rotation-x={-Math.PI / 2} visible={open && focus === null} {...down}>
+        <circleGeometry args={[PIT_R + 0.1, 32]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
       {finale === "saying" && (
         <Html position={[0, 1.5, 0]} center zIndexRange={[6, 0]}>
           <Keeper line={muralLine} last reduced={reduced} onNext={muralSaid} />
@@ -501,7 +553,7 @@ export default function Well({
         {/* once inside the walls, he is the one on the screen */}
         <group {...zap} visible={!(wall && inside && !scene)}>
           <Suspense fallback={null}>
-            <Rotom form="frost" from="heat" move={move} reduced={reduced} zapAt={zapAt} awake />
+            <Rotom form="frost" from={fromBelow ? "fan" : "heat"} move={move} reduced={reduced} zapAt={zapAt} awake />
           </Suspense>
         </group>
         {saying && (

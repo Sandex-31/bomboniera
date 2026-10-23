@@ -9,6 +9,7 @@
  * on load, so a wrong answer here shows up as an unsolved screen.
  */
 import {
+  AULA_KEY,
   BEAM_KEY,
   BOILERS_KEY,
   FLOOR_KEY,
@@ -121,17 +122,20 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "corvi", key: WELL_CROWS_KEY, solved: solvedCrows },
   { label: "boccioli", key: WELL_BUDS_KEY, solved: solvedBuds },
   { label: "murale", key: WELL_MURAL_KEY, solved: solvedMural },
+  { label: "quinto piano", key: FLOOR_KEY, solved: () => "4" },
 ];
 
 /**
  * What the puzzle keeps that is not a stop of its own: which chats have been
  * opened, and how deep the visitor has been. Wiped with the rest. The
- * remaining keys of the well wait here until the task of each moves it onto a stop.
+ * remaining keys of the well wait here until the task of each moves it onto a
+ * stop, and so does the hall's until its exams have stops of their own.
  */
 export const WIPED = [
   CHAT_KEY,
   DEPTH_KEY,
   WELL_INSIDE_KEY,
+  AULA_KEY,
 ];
 
 /**

@@ -1008,7 +1008,9 @@ try {
     // the well comes right after the press, and the last stop leaves the visitor in it
     const labels = STAGES.map((st) => st.label);
     assert.equal(labels[labels.indexOf("pressa") + 1], "quarto piano", "the well is not the stop after the press");
-    assert.equal(puzzle.floorFrom(store.get(puzzle.FLOOR_KEY)), 3, "the last stop leaves the visitor in the well");
+    // and the hall comes right after the mural, and the last stop leaves the visitor in it
+    assert.equal(labels[labels.indexOf("murale") + 1], "quinto piano", "the hall is not the stop after the mural");
+    assert.equal(puzzle.floorFrom(store.get(puzzle.FLOOR_KEY)), 4, "the last stop leaves the visitor in the hall");
     // and the way back down from Babel is open, not a sarcophagus still to fill
     const { titlesDone } = await vite5.ssrLoadModule("/src/data/babel.ts");
     assert.ok(titlesDone(read(puzzle.TITLES_KEY)), "the jump leaves the sarcophagus shut");
@@ -1035,7 +1037,8 @@ try {
     assert.equal(puzzle.floorFrom("1"), 1);
     assert.equal(puzzle.floorFrom("2"), 2);
     assert.equal(puzzle.floorFrom("3"), 3, "the well is a floor");
-    assert.equal(puzzle.floorFrom("4"), 0, "there is nothing below the well");
+    assert.equal(puzzle.floorFrom("4"), 4, "the hall is a floor");
+    assert.equal(puzzle.floorFrom("5"), 0, "there is nothing below the hall");
     assert.equal(puzzle.floorFrom("0"), 0, "been down and back up is the island");
     for (const bad of ["", "x", "-1", "1.5", String(puzzle.FLOORS), "99"]) {
       assert.equal(puzzle.floorFrom(bad), 0, `"${bad}" must fall back to the island`);
@@ -1044,7 +1047,8 @@ try {
     assert.equal(puzzle.depthFrom(null), 0, "never been down");
     assert.equal(puzzle.depthFrom("2"), 2);
     assert.equal(puzzle.depthFrom("3"), 3, "the well is a depth");
-    for (const bad of ["", "x", "-1", "1.5", "4", "99"]) {
+    assert.equal(puzzle.depthFrom("4"), 4, "the hall is a depth");
+    for (const bad of ["", "x", "-1", "1.5", "5", "99"]) {
       assert.equal(puzzle.depthFrom(bad), 0, `"${bad}" is no depth`);
     }
 
@@ -1177,7 +1181,7 @@ try {
       down: [6, 4, 2, -4],
     });
 
-    for (const name of ["rotom", "rotom_wash", "rotom_heat"]) {
+    for (const name of ["rotom", "rotom_wash", "rotom_heat", "rotom_frost", "rotom_fan"]) {
       const file = new URL(`../src/assets/rotom/cobblemon/${name}.geo.json`, import.meta.url);
       const geo = JSON.parse(readFileSync(file, "utf8"))["minecraft:geometry"][0];
       const model = buildGeo(geo, new MeshBasicMaterial());
@@ -1963,7 +1967,7 @@ try {
 
     const { STAGES } = await vite15.ssrLoadModule("/src/lib/stages.ts");
     const labels = STAGES.map((st) => st.label);
-    assert.deepEqual(labels.slice(labels.indexOf("quarto piano")), ["quarto piano", "luce uv", "pilastri", "tv", "corvi", "boccioli", "murale"], "the lantern, the pillars, the tv, the crows, the buds and the mural are not after the fourth floor");
+    assert.deepEqual(labels.slice(labels.indexOf("quarto piano"), labels.indexOf("murale") + 1), ["quarto piano", "luce uv", "pilastri", "tv", "corvi", "boccioli", "murale"], "the lantern, the pillars, the tv, the crows, the buds and the mural are not after the fourth floor");
     console.log("ok — pozzo: pilastri, 9017432 in senso orario, cifre sui puntini, telefono");
   } finally {
     await vite15.close();

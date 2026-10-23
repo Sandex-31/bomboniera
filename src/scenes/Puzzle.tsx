@@ -33,6 +33,7 @@ import Rotom from "./Rotom";
 import Babel from "./Babel";
 import Engine from "./Engine";
 import Well from "./Well";
+import Aula from "./Aula";
 import Keeper from "./Keeper";
 import Maze from "../components/Maze";
 import Mirrors from "../components/Mirrors";
@@ -1564,6 +1565,8 @@ function Desk({
   const toEngine = useCallback((first: boolean) => goTo(2, first), [goTo]);
   const upToEngine = useCallback(() => goTo(2, false), [goTo]);
   const toWell = useCallback((first: boolean) => goTo(3, first), [goTo]);
+  const upToWell = useCallback(() => goTo(3, false), [goTo]);
+  const toAula = useCallback((first: boolean) => goTo(4, first), [goTo]);
   /** Whether the lock is open, which is what the tower hangs on. */
   const [opened, setOpened] = useState(() => unlocked(loadLock()));
   /** When it opened in this visit; -Infinity is before it, or long since. */
@@ -1720,11 +1723,22 @@ function Desk({
           arrivedAt={arrival.at}
           first={arrival.first}
         />
-      ) : (
+      ) : floor === 3 ? (
         <Well
           reduced={reduced}
           onScene={setScene}
           onUp={upToEngine}
+          onDown={toAula}
+          deep={depth >= 4}
+          fromBelow={arrival.from === 4}
+          arrivedAt={arrival.at}
+          first={arrival.first}
+        />
+      ) : (
+        <Aula
+          reduced={reduced}
+          onScene={setScene}
+          onUp={upToWell}
           arrivedAt={arrival.at}
           first={arrival.first}
         />

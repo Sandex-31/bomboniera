@@ -291,8 +291,8 @@ in alto fluttua l'etichetta, `ring` = il cerchio dorato a terra).
 
 ## Crediti dei modelli
 
-Il guardiano della stanza nascosta, Rotom, e le sue forme (per ora Rotom
-Lavaggio) sono i modelli e le texture del mod **Cobblemon**
+Il guardiano della stanza nascosta, Rotom, e le sue forme (Rotom Lavaggio,
+Calore, Gelo e Vortice) sono i modelli e le texture del mod **Cobblemon**
 (<https://gitlab.com/cable-mc/cobblemon>), usati sotto licenza **MPL-2.0**.
 I file, non modificati, stanno in `src/assets/rotom/cobblemon/` con un
 `SOURCE.txt` che dice da quale commit vengono; `src/lib/bedrock.ts` li legge
