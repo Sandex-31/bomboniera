@@ -2895,8 +2895,12 @@ try {
     const SHEET = { analisi: ["Analisi", "area"], arch: ["Arch", "risultato"], logica: ["Logica", "tavola"], lft: ["Lft", "lettere"], fisica: ["Fisica", "mA"], so: ["So", "unità"], asd: ["Asd", "cattedra"], bd: ["Bd", "matricola"], ium: ["Ium", "commit"] };
     for (const x of cs) {
       const [file, word] = SHEET[x.uses];
-      const sheet = readFileSync(new URL(`../src/scenes/aula/${file}.tsx`, import.meta.url), "utf8");
+      // the sheet without its comments, so the word is one it shows, not one its code mentions
+      const sheet = readFileSync(new URL(`../src/scenes/aula/${file}.tsx`, import.meta.url), "utf8")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .replace(/\/\/.*$/gm, "");
       assert.ok(x.text.includes(word), `«${x.text}» does not say «${word}»`);
+      if (x.uses === "asd") assert.ok(x.chip.includes(word) && !/strada|via |catena|percorso/.test(x.text), `«${x.chip}» names what the ASD sheet does not show`);
       assert.ok(sheet.includes(word), `${file}.tsx never shows «${word}»`);
     }
     assert.ok(readFileSync(new URL("../src/scenes/aula/So.tsx", import.meta.url), "utf8").includes("finiscono"));

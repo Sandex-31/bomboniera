@@ -79,9 +79,9 @@ export function constraints(r: Omit<Results, "si">): Constraint[] {
       holds: (a) => a[0] === second,
     },
     {
-      text: "Le caselle 4, 6 e 9 sommano l'ultimo banco prima della cattedra, sulla strada di Algoritmi dalla porta.",
+      text: "Le caselle 4, 6 e 9 sommano il banco che, ad Algoritmi, viene subito prima della cattedra.",
       uses: "asd",
-      chip: "strada di Algoritmi",
+      chip: "cattedra di Algoritmi",
       cells: [3, 5, 8],
       holds: (a) => a[3] + a[5] + a[8] === r.asd[r.asd.length - 2],
     },
