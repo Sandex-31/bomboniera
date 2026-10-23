@@ -224,7 +224,10 @@ export default function Aula({
     setView(id !== "desk" ? SPOTS[id].view : aula.laptop === "on" ? SCREEN_VIEW : canOpen(aula) ? KEYS_VIEW : SPOTS.desk.view);
   };
   const back = () => {
-    if (scene || focus === null || tappedJustNow()) return;
+    if (!tappedJustNow()) leave();
+  };
+  const leave = () => {
+    if (scene || focus === null) return;
     setFocus(null);
     setView(HALL_VIEW);
     setShut(false);
@@ -232,9 +235,14 @@ export default function Aula({
     setFinale(null);
   };
 
-  /** The laptop tapped: walked up to, and still shut until the libretto is full. */
+  /**
+   * The laptop tapped: walked up to, and still shut until the libretto is full.
+   * Open, up close it fills a phone's screen and leaves nothing else to tap,
+   * so a tap on the case, off its keys and its video, walks back to the hall.
+   */
   const tapLaptop = () => {
     if (scene) return;
+    if (focus === "desk" && canOpen(aula)) return leave();
     if (focus !== "desk") pick("desk");
     if (!canOpen(aula)) setShut(true);
   };

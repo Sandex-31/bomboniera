@@ -1,3 +1,4 @@
+import { Box3, type Object3D } from "three";
 import { ORDER, passed, type AulaState } from "./chain";
 import { SI_ANSWER } from "./si";
 
@@ -22,4 +23,16 @@ export function typed(buffer: string, key: string): { buffer: string; result: "m
   const next = buffer + key;
   if (next.length < SI_ANSWER.length) return { buffer: next, result: "more" };
   return next === SI_ANSWER ? { buffer: next, result: "ok" } : { buffer: "", result: "jam" };
+}
+
+/**
+ * The box of `part` in the frame `model` stands in. A cached model taken off
+ * the desk when the hall unmounts keeps the desk's place in its world matrix,
+ * so the next visit would lay the keys out a desk's height too high: the
+ * model's matrices are brought up to date first, wherever it hangs now.
+ */
+export function partBox(model: Object3D, part: Object3D): Box3 {
+  model.updateWorldMatrix(false, true);
+  const box = new Box3().setFromObject(part);
+  return model.parent ? box.applyMatrix4(model.parent.matrixWorld.clone().invert()) : box;
 }

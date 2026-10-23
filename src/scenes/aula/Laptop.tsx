@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html, useGLTF } from "@react-three/drei";
-import { Box3, Color, Vector3, type Mesh, type MeshStandardMaterial, type Object3D } from "three";
+import { Color, Vector3, type Mesh, type MeshStandardMaterial, type Object3D } from "three";
 import { useTap } from "../Hotspot";
 import type { View } from "../focus";
-import { canOpen, typed } from "../../lib/aula/laptop";
+import { canOpen, partBox, typed } from "../../lib/aula/laptop";
 import type { AulaState } from "../../lib/aula/chain";
 import { SPOTS, SPOT_MARK, TAP_W } from "./spots";
 
@@ -166,7 +166,7 @@ export default function Laptop({
     // matte, so off it stays dark glass and does not shine back the lamp over the desk
     screen.roughness = 0.6;
     // the ten keys over the keyboard, in the model's own frame, which is the laptop's
-    const box = new Box3().setFromObject(get("keys"));
+    const box = partBox(scene, get("keys"));
     const size = box.getSize(new Vector3());
     const cell = new Vector3(size.x / 5, size.y, size.z / 2);
     const keys = DIGITS.map((d, i) => ({
@@ -219,7 +219,7 @@ export default function Laptop({
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
       )}
-      {/* at the desk the case answers a tap itself: still shut it says so, and a tap on it never walks away */}
+      {/* at the desk the case answers a tap itself: still shut it says so, open it walks back to the hall */}
       <primitive object={scene} {...(focused ? tap : {})} />
       {typing &&
         parts.keys.map(({ d, at }) => (

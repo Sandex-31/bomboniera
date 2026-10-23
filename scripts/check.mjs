@@ -2954,6 +2954,24 @@ try {
     assert.ok(lp.canOpen(done), "the laptop's stop leaves an exam unpassed");
     assert.equal(c.loadAula(JSON.stringify(STAGES[fin - 1].solved())).laptop, "closed", "the last exam's stop already has the laptop on");
 
+    // the keys are laid over the model's own `keys`, in the model's frame: the same box the first time
+    // down and after coming back, when the cached model still carries the desk's place from the last visit
+    const { Box3, BoxGeometry, Group, Mesh } = await import("three");
+    const model = new Group();
+    const keys = new Mesh(new BoxGeometry(0.2, 0.02, 0.1));
+    keys.position.set(0, 0.05, 0.03);
+    model.add(keys);
+    const fresh = lp.partBox(model, keys);
+    const same = (b) => b.min.distanceTo(fresh.min) < 1e-9 && b.max.distanceTo(fresh.max) < 1e-9;
+    assert.ok(fresh.equals(new Box3().setFromObject(keys)), "the keys' box is not the model's own");
+    const desk = new Group();
+    desk.position.set(0.4, 1.1, -2.6);
+    desk.add(model);
+    desk.updateMatrixWorld(true);
+    assert.ok(same(lp.partBox(model, keys)), "the keys move with the desk the model stands on");
+    desk.remove(model);
+    assert.ok(same(lp.partBox(model, keys)), "the keys keep the desk's place from the last visit");
+
     // the model: a GLB, its JSON chunk first, with the parts the scene moves
     const { readFileSync, statSync } = await import("node:fs");
     const url = new URL("../public/models/portatile.glb", import.meta.url);
