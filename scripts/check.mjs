@@ -2890,6 +2890,18 @@ try {
     }
     for (const x of cs) assert.ok(x.text.length > 10 && x.chip.length > 3 && x.cells.every((i) => i >= 0 && i < 9));
 
+    // each constraint names its result in the words the exam's own sheet shows it with
+    const { readFileSync } = await import("node:fs");
+    const SHEET = { analisi: ["Analisi", "area"], arch: ["Arch", "risultato"], logica: ["Logica", "tavola"], lft: ["Lft", "lettere"], fisica: ["Fisica", "mA"], so: ["So", "unità"], asd: ["Asd", "cattedra"], bd: ["Bd", "matricola"], ium: ["Ium", "commit"] };
+    for (const x of cs) {
+      const [file, word] = SHEET[x.uses];
+      const sheet = readFileSync(new URL(`../src/scenes/aula/${file}.tsx`, import.meta.url), "utf8");
+      assert.ok(x.text.includes(word), `«${x.text}» does not say «${word}»`);
+      assert.ok(sheet.includes(word), `${file}.tsx never shows «${word}»`);
+    }
+    assert.ok(readFileSync(new URL("../src/scenes/aula/So.tsx", import.meta.url), "utf8").includes("finiscono"));
+    assert.ok(cs.find((x) => x.uses === "so").text.includes("finisce"));
+
     assert.ok(si.checkSi(sols[0]));
     assert.ok(!si.checkSi(sols[0].slice(1)));
     assert.ok(!si.checkSi(sols[0].map((d, i) => (i === 4 ? (d + 1) % 10 : d))));
