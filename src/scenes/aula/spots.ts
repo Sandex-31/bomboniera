@@ -52,6 +52,23 @@ export const LAB = { x: 3.25, z: -2.15, w: 0.7, d: 1.3, h: 0.62 };
 /** Where the hole in the ceiling is: over the landing at the entrance. */
 export const HOLE: [number, number, number] = [2.7, HALL_H, 3.05];
 
+/** Width the camera fits from the whole-hall view: the hall seen corner to corner. */
+export const FIT_W = 11;
+
+/**
+ * How wide a spot's hit area has to be, in world units, for a finger: 44 CSS
+ * px from the whole-hall view on a phone 390 px wide. Spots on the desk stand
+ * that far apart, so theirs only touch.
+ */
+export const TAP_W = (44 / 390) * FIT_W;
+
+/**
+ * Marks a spot's group. Wherever a tap lands on a marked mesh and on the hole
+ * in the ceiling too, the spot has it: every puzzle spreads this on its own
+ * group, or the hole steals the taps meant for it from across the hall.
+ */
+export const SPOT_MARK = { userData: { spot: true } };
+
 /** A spot of the hall: one of the ten exams, or the desk with the laptop. */
 export type Spot = ExamId | "desk";
 
@@ -92,9 +109,9 @@ export const SPOTS: Record<Spot, { position: [number, number, number]; view: Vie
     view: look([LAB.x, LAB.h, LAB.z], -Math.PI / 2, 1, 4.6),
   },
   // on the desk: the registers to the left of the laptop, the libretto to its right
-  bd: { position: desk(-0.9), view: look(desk(-0.9), FRONT, 0.9, 6) },
+  bd: { position: desk(-TAP_W), view: look(desk(-TAP_W), FRONT, 0.9, 6) },
   desk: { position: desk(0), view: look(desk(0), FRONT, 0.9, 6) },
-  si: { position: desk(0.9), view: look(desk(0.9), FRONT, 0.9, 6) },
+  si: { position: desk(TAP_W), view: look(desk(TAP_W), FRONT, 0.9, 6) },
   // two rows of benches
   logica: { position: row(1, -1.8), view: look(row(1, -1.8), FRONT, 0.95, 5) },
   so: { position: row(2, 1), view: look(row(2, 1), FRONT, 0.95, 4.4) },

@@ -1010,6 +1010,16 @@ try {
     assert.equal(labels[labels.indexOf("pressa") + 1], "quarto piano", "the well is not the stop after the press");
     // and the hall comes right after the mural, and the last stop leaves the visitor in it
     assert.equal(labels[labels.indexOf("murale") + 1], "quinto piano", "the hall is not the stop after the mural");
+    // every spot of the hall is a finger wide on a phone, and no two hit areas swallow each other
+    const aula = await vite5.ssrLoadModule("/src/scenes/aula/spots.ts");
+    assert.ok(aula.TAP_W * (390 / aula.FIT_W) >= 44, "a spot of the hall is under 44 px on a phone");
+    const spots = Object.entries(aula.SPOTS);
+    assert.equal(spots.length, 11, "the hall has ten exams and the desk");
+    for (const [a, { position: p }] of spots) {
+      for (const [b, { position: q }] of spots) {
+        if (a < b) assert.ok(Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) >= aula.TAP_W - 1e-9, `${a} and ${b} stand too close to tap apart`);
+      }
+    }
     assert.equal(puzzle.floorFrom(store.get(puzzle.FLOOR_KEY)), 4, "the last stop leaves the visitor in the hall");
     // and the way back down from Babel is open, not a sarcophagus still to fill
     const { titlesDone } = await vite5.ssrLoadModule("/src/data/babel.ts");

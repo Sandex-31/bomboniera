@@ -15,6 +15,7 @@ import {
   BOARD,
   DESK,
   DESK_TOP,
+  FIT_W,
   HALF_D,
   HALF_W,
   HALL_H,
@@ -27,7 +28,9 @@ import {
   SCREEN,
   SIDE_BOARD,
   SPOTS,
+  SPOT_MARK,
   TIER_D,
+  TAP_W,
   tier,
   type Spot,
 } from "./aula/spots";
@@ -44,9 +47,6 @@ import {
 
 /** How wide the hole the well's floor gave way through is. */
 const HOLE_R = 0.45;
-
-/** Width the camera fits: the hall seen corner to corner. */
-const FIT_W = 11;
 
 /** Where Rotom sits: a seat in the back row, by the aisle. */
 const SEAT: [number, number, number] = [2.4, tier(ROWS - 1).y + ROW_SEAT.h, tier(ROWS - 1).z + ROW_SEAT.dz];
@@ -72,9 +72,8 @@ const CEILING_VIEW: View = {
 
 const SPOT_IDS = Object.keys(SPOTS) as Spot[];
 
-/** Marks the way up and every spot, so a tap that lands on both can be kept off the hole. */
+/** Marks the way up, so a tap that lands on it and on a spot (`SPOT_MARK`) can be kept off the hole. */
 const UP = { userData: { hole: true } };
-const SPOT_MARK = { userData: { spot: true } };
 const marked = (o: Object3D | null, key: string): boolean => !!o && (o.userData[key] === true || marked(o.parent, key));
 
 /**
@@ -92,12 +91,22 @@ const WOOD_DARK = "#4A3324";
 const PLASTER = "#C9C2B4";
 const SLATE = "#1F3A2E";
 
-/** A spot of the hall still waiting for its puzzle: a labelled box, tapped to walk up to it. */
-function Placeholder({ id, onPick }: { id: Spot; onPick: () => void }) {
+/**
+ * A spot of the hall still waiting for its puzzle: a labelled box, tapped to
+ * walk up to it. The box is small; round it, while it is not the spot being
+ * worked, an unseen one a finger wide on a phone takes the tap.
+ */
+function Placeholder({ id, focused, onPick }: { id: Spot; focused: boolean; onPick: () => void }) {
   const tap = useTap(onPick);
   return (
     <group position={SPOTS[id].position} {...SPOT_MARK}>
-      <mesh {...tap}>
+      {!focused && (
+        <mesh {...tap}>
+          <boxGeometry args={[TAP_W, TAP_W, TAP_W]} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        </mesh>
+      )}
+      <mesh>
         <boxGeometry args={[0.32, 0.32, 0.32]} />
         <meshStandardMaterial color="#E8D9A8" emissive="#E8D9A8" emissiveIntensity={0.25} roughness={0.6} />
       </mesh>
@@ -358,7 +367,7 @@ export default function Aula({
 
       {/* the ten exams and the desk, each still a box with its name */}
       {SPOT_IDS.map((id) => (
-        <Placeholder key={id} id={id} onPick={() => focus !== id && pick(id)} />
+        <Placeholder key={id} id={id} focused={focus === id} onPick={() => pick(id)} />
       ))}
 
       {/* the way up: the hole in the ceiling over the entrance, a rim and the light behind it. Tapping it goes back up. */}
