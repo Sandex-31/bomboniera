@@ -2475,6 +2475,88 @@ try {
   }
 }
 
+/* ---------------------------------------------------------- aula: analisi, fisica
+ * The area under the curve on the big blackboard, an integer, turned down
+ * the first time it is right and passed the second; then that area in volts
+ * across a circuit of colour-banded resistors, where only one filling of its
+ * slots lifts the iron weight and the trembling needle cannot tell which.
+ */
+{
+  const vite22 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const an = await vite22.ssrLoadModule("/src/lib/aula/analisi.ts");
+    const fi = await vite22.ssrLoadModule("/src/lib/aula/fisica.ts");
+    const c = await vite22.ssrLoadModule("/src/lib/aula/chain.ts");
+
+    // the area, against a Simpson's rule of its own
+    assert.ok(Number.isInteger(an.ANALISI_ANSWER), "the area is not an integer");
+    const n = 20_000;
+    const h = (an.B - an.A) / n;
+    let sum = an.f(an.A) + an.f(an.B);
+    for (let i = 1; i < n; i++) sum += (i % 2 ? 4 : 2) * an.f(an.A + i * h);
+    assert.ok(Math.abs((sum * h) / 3 - an.ANALISI_ANSWER) < 1e-6, "the area is not the integral of f");
+    for (let x = an.A; x <= an.B; x += 0.01) assert.ok(an.f(x) > 0, `the curve dips under the axis at ${x}`);
+    assert.ok(an.REASONS.length > 0);
+
+    // the second shot: stamped first, passed once stamped, wrong is wrong either way
+    const stamped = c.fail(c.INITIAL, "analisi", 1_000, true);
+    assert.equal(an.judgeAnalisi(c.INITIAL, an.ANALISI_ANSWER), "stamp");
+    assert.equal(an.judgeAnalisi(stamped, an.ANALISI_ANSWER), "pass");
+    assert.equal(an.judgeAnalisi(c.INITIAL, an.ANALISI_ANSWER + 1), "fail");
+    assert.equal(an.judgeAnalisi(stamped, an.ANALISI_ANSWER - 1), "fail");
+    assert.ok(stamped.analisiStamped && stamped.failedAt.analisi === 1_000, "the stamp is not a failure on the register");
+    assert.equal(c.fail(c.INITIAL, "analisi", 1_000).analisiStamped, false, "a wrong answer stamps");
+    assert.equal(c.fail(stamped, "analisi", 2_000).analisiStamped, true, "a wrong answer wipes the stamp");
+    assert.ok(c.passed(c.pass(stamped, "analisi"), "analisi"));
+
+    // the bands, by the real 4-band code
+    const code = ["black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "grey", "white"];
+    for (const r of fi.RESISTORS) {
+      assert.equal(r.bands.length, 4, `${r.id} has not four bands`);
+      const [d1, d2, m] = r.bands.map((b) => code.indexOf(b));
+      assert.ok(d1 > 0 && d2 >= 0 && m >= 0, `${r.id} has a band out of the code`);
+      assert.equal(r.bands[3], "gold", `${r.id} has no tolerance band`);
+      assert.equal((d1 * 10 + d2) * 10 ** m, r.ohms, `${r.id} does not read ${r.ohms} Ω`);
+    }
+    assert.equal(new Set(fi.RESISTORS.map((r) => r.id)).size, fi.RESISTORS.length);
+
+    // every filling of the slots, each resistor used once at most
+    const ids = [null, ...fi.RESISTORS.map((r) => r.id)];
+    const k = fi.EMPTY.slots.length;
+    const all = [];
+    const fill = (slots) => {
+      if (slots.length === k) return all.push({ slots });
+      for (const id of ids) if (id === null || !slots.includes(id)) fill([...slots, id]);
+    };
+    fill([]);
+    const V = an.ANALISI_ANSWER;
+    const lifts = all.filter((cc) => fi.judgeFisica(cc, V) === "lift");
+    assert.equal(lifts.length, 1, `${lifts.length} fillings lift the weight`);
+    assert.ok(all.some((cc) => fi.judgeFisica(cc, V) === "smoke"), "nothing smokes");
+    assert.ok(all.every((cc) => fi.current(cc, V) >= 0));
+    const I = fi.current(lifts[0], V);
+    assert.deepEqual(lifts[0], fi.FISICA_FILLING);
+    assert.equal(fi.FISICA_ANSWER, Math.round(I));
+    assert.ok(Number.isInteger(fi.FISICA_ANSWER));
+    // the two nearest that do not lift sit inside the needle's tremble
+    const near = all
+      .filter((cc) => cc !== lifts[0] && fi.current(cc, V) > 0)
+      .map((cc) => fi.current(cc, V))
+      .sort((p, q) => Math.abs(p - I) - Math.abs(q - I))
+      .slice(0, 2);
+    for (const x of near) assert.ok(Math.abs(x - I) <= 0.15 * I, `${x.toFixed(2)} mA is out of the needle's tremble`);
+    for (let t = 0; t < 60; t += 0.013) assert.ok(Math.abs(fi.jitter(I, t) - I) <= 0.15 * I + 1e-9, "the needle trembles too far");
+    assert.equal(fi.judgeFisica(fi.EMPTY, V), "weak");
+
+    const r = c.results();
+    assert.equal(r.analisi, an.ANALISI_ANSWER);
+    assert.equal(r.fisica, fi.FISICA_ANSWER);
+    console.log(`ok — aula: analisi ${an.ANALISI_ANSWER}, fisica ${fi.FISICA_ANSWER} mA su ${all.length} montaggi`);
+  } finally {
+    await vite22.close();
+  }
+}
+
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,
  * movement and sound only. No text between their tags, no text element, no

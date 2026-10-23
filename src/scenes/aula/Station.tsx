@@ -1,7 +1,7 @@
 import type { ReactNode, SyntheticEvent } from "react";
 import { Html } from "@react-three/drei";
 import { useTap } from "../Hotspot";
-import { lockedFor, open, passed, type AulaState, type ExamId } from "../../lib/aula/chain";
+import { lockedFor, open, passed, type AulaState, type ExamId, type Verdict } from "../../lib/aula/chain";
 import { FIT_W, SPOTS, SPOT_MARK, TAP_W } from "./spots";
 
 /*
@@ -39,11 +39,11 @@ export default function Station({
   state: AulaState;
   now: number;
   /** An answer was given: the hall passes or fails the exam. */
-  onTry: (ok: boolean) => void;
+  onTry: (v: Verdict) => void;
   focused: boolean;
   onPick: () => void;
   /** The puzzle, told whether it is passed so it can draw its result, and how to answer. */
-  children: (p: { passed: boolean; onTry: (ok: boolean) => void }) => ReactNode;
+  children: (p: { passed: boolean; onTry: (v: Verdict) => void }) => ReactNode;
 }) {
   const tap = useTap(onPick);
   const { position, view } = SPOTS[id];
@@ -95,7 +95,7 @@ export default function Station({
                   )}
                   {/* a fieldset disabled disables every control of the puzzle in it at once */}
                   <fieldset disabled={left > 0} className="aula-sheet__body">
-                    {children({ passed: done, onTry: (ok) => left === 0 && !done && onTry(ok) })}
+                    {children({ passed: done, onTry: (v) => left === 0 && !done && onTry(v) })}
                   </fieldset>
                 </>
               )}

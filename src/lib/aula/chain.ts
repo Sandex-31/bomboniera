@@ -1,6 +1,8 @@
 import { exams } from "../../data/exams";
 import { ARCH_ANSWER } from "./arch";
 import { ASD_ANSWER } from "./asd";
+import { ANALISI_ANSWER } from "./analisi";
+import { FISICA_ANSWER } from "./fisica";
 
 /*
  * The ten exams of the lecture hall on the fifth floor, one puzzle each, and
@@ -119,15 +121,20 @@ export function lockedFor(failedAt: number | undefined, now: number): number {
   return Math.min(APPELLO_MS, Math.max(0, failedAt + APPELLO_MS - now));
 }
 
-export function fail(s: AulaState, id: ExamId, now: number): AulaState {
-  return { ...s, failedAt: { ...s.failedAt, [id]: now } };
+/** What an answer comes to: passed, failed, or Analisi's first right one, failed and stamped on the register. */
+export type Verdict = boolean | "stamp";
+
+/** Starts the appello. A `stamp` also writes Analisi's right answer on the register, so the next appello takes it. */
+export function fail(s: AulaState, id: ExamId, now: number, stamp = false): AulaState {
+  return { ...s, failedAt: { ...s.failedAt, [id]: now }, analisiStamped: s.analisiStamped || stamp };
 }
 
-/** Records the exam passed; Sistemi Operativi draws its grade the first time, 18 to 30. */
+/** Records the exam passed; Sistemi Operativi draws its grade the first time, 18 to 30. Analisi passed has been stamped, however it got there. */
 export function pass(s: AulaState, id: ExamId, rng: () => number = Math.random): AulaState {
   return {
     ...s,
     passed: s.passed.includes(id) ? s.passed : [...s.passed, id],
+    analisiStamped: s.analisiStamped || id === "analisi",
     soGrade: id === "so" && s.soGrade === null ? 18 + Math.floor(rng() * 13) : s.soGrade,
   };
 }
@@ -147,8 +154,8 @@ export function aulaUpTo(n: number): AulaState {
 }
 
 /** What each puzzle gives the ones after it. Each puzzle adds its own as it is built. */
-export type Results = { arch: number; asd: number[] };
+export type Results = { arch: number; asd: number[]; analisi: number; fisica: number };
 
 export function results(): Results {
-  return { arch: ARCH_ANSWER, asd: ASD_ANSWER };
+  return { arch: ARCH_ANSWER, asd: ASD_ANSWER, analisi: ANALISI_ANSWER, fisica: FISICA_ANSWER };
 }

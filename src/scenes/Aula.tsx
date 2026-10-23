@@ -10,10 +10,12 @@ import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
 import { AULA_KEY, aulaLine } from "../data/puzzle";
-import { INITIAL, ORDER, fail, loadAula, lockedFor, pass, results, settle, type AulaState, type ExamId } from "../lib/aula/chain";
+import { INITIAL, ORDER, fail, loadAula, lockedFor, pass, results, settle, type AulaState, type ExamId, type Verdict } from "../lib/aula/chain";
 import Station from "./aula/Station";
 import Arch from "./aula/Arch";
 import Asd from "./aula/Asd";
+import Analisi from "./aula/Analisi";
+import Fisica from "./aula/Fisica";
 import Libretto, { Booklet } from "./aula/Libretto";
 import { Carried, onlySeen } from "./machines/hall";
 import {
@@ -193,10 +195,10 @@ export default function Aula({
     }, 250);
     return () => clearInterval(t);
   }, [counting]);
-  const answer = (id: ExamId, ok: boolean) => {
+  const answer = (id: ExamId, v: Verdict) => {
     const t = Date.now();
     setNow(t);
-    setAula((s) => (ok ? pass(s, id) : fail(s, id, t)));
+    setAula((s) => (v === true ? pass(s, id) : fail(s, id, t, v === "stamp")));
   };
   const [booklet, setBooklet] = useState(false);
 
@@ -428,8 +430,20 @@ export default function Aula({
 
       {/* the ten exams, each at its own spot, and the desk with the libretto on it */}
       {ORDER.map((id) => (
-        <Station key={id} id={id} state={aula} now={now} onTry={(ok) => answer(id, ok)} focused={focus === id} onPick={() => pick(id)}>
-          {(p) => (id === "arch" ? <Arch {...p} /> : id === "asd" ? <Asd {...p} byte={results().arch} /> : <Stub {...p} />)}
+        <Station key={id} id={id} state={aula} now={now} onTry={(v) => answer(id, v)} focused={focus === id} onPick={() => pick(id)}>
+          {(p) =>
+            id === "arch" ? (
+              <Arch {...p} />
+            ) : id === "asd" ? (
+              <Asd {...p} byte={results().arch} />
+            ) : id === "analisi" ? (
+              <Analisi {...p} state={aula} />
+            ) : id === "fisica" ? (
+              <Fisica {...p} volts={results().analisi} firstTry={aula.failedAt.fisica === undefined} />
+            ) : (
+              <Stub {...p} />
+            )
+          }
         </Station>
       ))}
       <Placeholder id="desk" focused={focus === "desk"} onPick={() => pick("desk")} />
