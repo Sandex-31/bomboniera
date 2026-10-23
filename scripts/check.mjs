@@ -2944,6 +2944,16 @@ try {
     assert.deepEqual(lp.typed("12", "Enter"), { buffer: "12", result: "more" });
     assert.equal(type([...SI_ANSWER].join(" x")).result, "ok");
 
+    // the debug stop for the finale: right after the last exam, every exam passed and the laptop on, as a save reads it back
+    const { STAGES } = await vite27.ssrLoadModule("/src/lib/stages.ts");
+    const labels = STAGES.map((st) => st.label);
+    const fin = labels.indexOf("aula: portatile");
+    assert.equal(labels[fin - 1], `aula: ${c.examName("si")}`, "the laptop's stop is not right after Sistemi Intelligenti");
+    const done = c.loadAula(JSON.stringify(STAGES[fin].solved()));
+    assert.equal(done.laptop, "on", "the laptop's stop does not land on the video");
+    assert.ok(lp.canOpen(done), "the laptop's stop leaves an exam unpassed");
+    assert.equal(c.loadAula(JSON.stringify(STAGES[fin - 1].solved())).laptop, "closed", "the last exam's stop already has the laptop on");
+
     // the model: a GLB, its JSON chunk first, with the parts the scene moves
     const { readFileSync, statSync } = await import("node:fs");
     const url = new URL("../public/models/portatile.glb", import.meta.url);

@@ -127,6 +127,8 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "quinto piano", key: FLOOR_KEY, solved: () => "4" },
   // the hall: one exam more at each stop, in an order that never skips what one needs
   ...ORDER.map((id, i) => ({ label: `aula: ${examName(id)}`, key: AULA_KEY, solved: () => aulaUpTo(i + 1) })),
+  // and the finale done: the code in, Rotom gone into the laptop, the video on its screen
+  { label: "aula: portatile", key: AULA_KEY, solved: () => ({ ...aulaUpTo(ORDER.length), laptop: "on" }) },
 ];
 
 /**
