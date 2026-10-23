@@ -10,8 +10,10 @@ import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
 import { AULA_KEY, aulaLine } from "../data/puzzle";
-import { INITIAL, ORDER, fail, loadAula, lockedFor, pass, settle, type AulaState, type ExamId } from "../lib/aula/chain";
+import { INITIAL, ORDER, fail, loadAula, lockedFor, pass, results, settle, type AulaState, type ExamId } from "../lib/aula/chain";
 import Station from "./aula/Station";
+import Arch from "./aula/Arch";
+import Asd from "./aula/Asd";
 import Libretto, { Booklet } from "./aula/Libretto";
 import { Carried, onlySeen } from "./machines/hall";
 import {
@@ -427,7 +429,7 @@ export default function Aula({
       {/* the ten exams, each at its own spot, and the desk with the libretto on it */}
       {ORDER.map((id) => (
         <Station key={id} id={id} state={aula} now={now} onTry={(ok) => answer(id, ok)} focused={focus === id} onPick={() => pick(id)}>
-          {(p) => <Stub {...p} />}
+          {(p) => (id === "arch" ? <Arch {...p} /> : id === "asd" ? <Asd {...p} byte={results().arch} /> : <Stub {...p} />)}
         </Station>
       ))}
       <Placeholder id="desk" focused={focus === "desk"} onPick={() => pick("desk")} />

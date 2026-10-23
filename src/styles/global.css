@@ -1754,6 +1754,32 @@ button.card-pieces__piece { cursor: pointer; }
   min-width: 44px; min-height: 44px; padding: 0 16px; border-radius: 6px;
   border: 1px solid #1A1410; background: #fff; color: #1A1410; font: inherit; cursor: pointer;
 }
+/* Architettura: a corner of the slate, chalk on it, and the levers under it, two rows of a nibble each */
+.aula-arch { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.aula-arch__board {
+  display: flex; gap: 8px; align-items: flex-end; width: 100%; box-sizing: border-box;
+  padding: 10px; border-radius: 4px; background: #1F3A2E; color: #E9EEE6;
+}
+.aula-arch__board > div { flex: 1; min-width: 0; }
+.aula-arch__head { display: flex; align-items: center; gap: 6px; font: 12px/1.2 var(--font-mono); }
+.aula-sheet .aula-arch__head { margin: 0 0 6px; }
+.aula-arch__phone { width: 132px; height: 22px; flex: none; }
+.aula-arch__code { margin: 0 0 6px; padding-left: 2.4em; font: 13px/1.45 var(--font-mono); white-space: pre; }
+.aula-arch__code li::marker { color: #9FB3A6; }
+.aula-arch__pile { width: 40px; height: 168px; flex: none; color: #E9EEE6; }
+.aula-arch__levers { display: grid; grid-template-columns: repeat(4, 56px); gap: 8px; }
+.aula-lever {
+  min-width: 44px; min-height: 52px; border-radius: 6px; border: 1px solid #1A1410;
+  background: linear-gradient(#fff 50%, #D8D2C4 50%); color: #1A1410; font: 700 16px/1 var(--font-mono); cursor: pointer;
+}
+.aula-lever[aria-pressed="true"] { background: linear-gradient(#D8D2C4 50%, #C9A64A 50%); }
+.aula-arch__byte, .aula-asd__done { font: 700 16px/1.2 var(--font-mono); letter-spacing: 0.08em; }
+.aula-sheet .aula-arch__byte { margin: 0; }
+/* ASD: the plan of the floor */
+.aula-asd svg { display: block; width: 100%; height: auto; }
+.aula-asd__bench { cursor: pointer; }
+.aula-sheet .aula-asd__key { margin: 6px 0 4px; font-size: 12px; }
+.aula-sheet .aula-asd__done { margin: 0; letter-spacing: 0; }
 .libretto-btn {
   position: fixed; z-index: 20; right: max(14px, env(safe-area-inset-right)); top: max(14px, var(--safe-t));
   min-height: 44px; padding: 0 16px; border-radius: 999px;

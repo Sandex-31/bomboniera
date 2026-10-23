@@ -1,4 +1,6 @@
 import { exams } from "../../data/exams";
+import { ARCH_ANSWER } from "./arch";
+import { ASD_ANSWER } from "./asd";
 
 /*
  * The ten exams of the lecture hall on the fifth floor, one puzzle each, and
@@ -145,8 +147,8 @@ export function aulaUpTo(n: number): AulaState {
 }
 
 /** What each puzzle gives the ones after it. Each puzzle adds its own as it is built. */
-export type Results = Record<never, never>;
+export type Results = { arch: number; asd: number[] };
 
 export function results(): Results {
-  return {};
+  return { arch: ARCH_ANSWER, asd: ASD_ANSWER };
 }

@@ -2374,6 +2374,107 @@ try {
   }
 }
 
+/* ---------------------------------------------------------- aula: architettura, asd
+ * The program on the blackboard, run on a digit of the well's telephone,
+ * gives a byte; the byte makes the corridors between the benches slow or
+ * fast, and the one quickest way from the door to the desk is the answer.
+ * Leaving the byte out, or counting hops, gives a different way.
+ */
+{
+  const vite21 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const ar = await vite21.ssrLoadModule("/src/lib/aula/arch.ts");
+    const as = await vite21.ssrLoadModule("/src/lib/aula/asd.ts");
+    const c = await vite21.ssrLoadModule("/src/lib/aula/chain.ts");
+    const { NUMBER } = await vite21.ssrLoadModule("/src/lib/well/pillars.ts");
+    const { buildMaze, passable } = await vite21.ssrLoadModule("/src/lib/maze.ts");
+
+    // a tiny loop: r1 = 3 + 3 + 3 + 3, counted down in r2, and 8 bits wide
+    const tiny = [
+      { op: "MOV", a: "r1", b: 0 },
+      { op: "MOV", a: "r2", b: 4 },
+      { op: "ADD", a: "r1", b: "r0" },
+      { op: "DEC", a: "r2" },
+      { op: "JNZ", a: "r2", b: 2 },
+      { op: "MOV", a: "r0", b: "r1" },
+    ];
+    assert.equal(ar.run(tiny, 3), 12, "the tiny loop does not run four times");
+    assert.equal(ar.run(tiny, 100), 400 & 0xff, "the registers are not 8 bits");
+    assert.equal(ar.run([{ op: "SHL", a: "r0", b: 1 }, { op: "SHR", a: "r0", b: 2 }, { op: "XOR", a: "r0", b: 1 }, { op: "OR", a: "r0", b: 8 }, { op: "AND", a: "r0", b: 12 }, { op: "SUB", a: "r0", b: 1 }], 6), 7);
+    assert.throws(() => ar.run([{ op: "JNZ", a: "r0", b: 0 }], 1), "a program that never ends is run forever");
+
+    // the program on the board loops at least four times, and its answer has both kinds of bit
+    let loops = 0;
+    ar.run(ar.PROGRAM, NUMBER[ar.PHONE_DIGIT_INDEX], () => loops++);
+    assert.ok(loops >= 4, `the program jumps back only ${loops} times`);
+    assert.ok(Number.isInteger(ar.PHONE_DIGIT_INDEX) && ar.PHONE_DIGIT_INDEX >= 0 && ar.PHONE_DIGIT_INDEX < NUMBER.length);
+    assert.equal(ar.ARCH_ANSWER, ar.run(ar.PROGRAM, NUMBER[ar.PHONE_DIGIT_INDEX]));
+    assert.ok(ar.ARCH_ANSWER >= 1 && ar.ARCH_ANSWER <= 254, `ARCH_ANSWER ${ar.ARCH_ANSWER} is all one bit`);
+    // every other digit of the telephone gives another byte: the right one has to be read off the drawing
+    NUMBER.forEach((d, i) => {
+      if (d !== NUMBER[ar.PHONE_DIGIT_INDEX]) assert.notEqual(ar.run(ar.PROGRAM, d), ar.ARCH_ANSWER, `digit ${i} gives the answer too`);
+    });
+    const levers = [...ar.ARCH_ANSWER.toString(2).padStart(8, "0")].map((b) => b === "1");
+    assert.ok(ar.checkArch(levers), "the right levers are turned down");
+    assert.ok(!ar.checkArch([...levers].reverse()), "the levers are read LSB first");
+    for (let k = 0; k < 8; k++) assert.ok(!ar.checkArch(levers.map((v, j) => (j === k ? !v : v))), `lever ${k} is ignored`);
+    assert.ok(!ar.checkArch(levers.slice(1)), "seven levers pass");
+
+    // the benches lie on the maze of the first floor, a finger apart on the sheet
+    const maze = buildMaze();
+    for (const { id, cell: [r, col] } of as.NODES) {
+      const ways = [[r - 1, col], [r + 1, col], [r, col - 1], [r, col + 1]].filter((n) => passable(maze, [r, col], n));
+      assert.ok(ways.length > 0, `bench ${id} is on a cell of the maze no way leads into`);
+    }
+    as.NODES.forEach((n, i) => assert.equal(n.id, i, "NODES are not numbered in order"));
+    for (const a of as.NODES)
+      for (const b of as.NODES)
+        if (a.id < b.id) assert.ok(Math.hypot(a.cell[0] - b.cell[0], a.cell[1] - b.cell[1]) * as.CELL_PX >= 44, `benches ${a.id} and ${b.id} are under 44 px apart`);
+    assert.ok(as.EDGES.every((e) => e.bit >= 0 && e.bit < 8 && e.a !== e.b), "an edge has no bit of the byte, or is a loop");
+    assert.deepEqual([...new Set(as.EDGES.map((e) => e.bit))].sort(), [0, 1, 2, 3, 4, 5, 6, 7], "some bit of the byte is not used");
+
+    // every simple way from the door to the desk, by brute force
+    const all = [];
+    const walk = (at, seen, way) => {
+      if (at === as.DESK) return all.push([...way]);
+      for (const e of as.EDGES) {
+        const to = e.a === at ? e.b : e.b === at ? e.a : -1;
+        if (to < 0 || seen.has(to)) continue;
+        seen.add(to);
+        way.push(to);
+        walk(to, seen, way);
+        way.pop();
+        seen.delete(to);
+      }
+    };
+    walk(as.DOOR, new Set([as.DOOR]), [as.DOOR]);
+    const w = as.weights(ar.ARCH_ANSWER);
+    assert.equal(w.length, as.EDGES.length);
+    as.EDGES.forEach((e, k) => assert.equal(w[k], (ar.ARCH_ANSWER >> e.bit) & 1 ? as.FAST : as.SLOW));
+    const cost = (way) =>
+      way.slice(1).reduce((s, n, i) => s + w[as.EDGES.findIndex((e) => (e.a === way[i] && e.b === n) || (e.b === way[i] && e.a === n))], 0);
+    const best = Math.min(...all.map(cost));
+    const winners = all.filter((way) => cost(way) === best);
+    assert.equal(winners.length, 1, `${winners.length} ways tie at ${best}`);
+    assert.deepEqual(as.ASD_ANSWER, winners[0], "Dijkstra does not find the one quickest way");
+    assert.deepEqual(as.shortest(ar.ARCH_ANSWER), as.ASD_ANSWER);
+    // the byte matters: counting hops, or every corridor alike, goes another way
+    const fewest = Math.min(...all.map((way) => way.length));
+    assert.ok(all.filter((way) => way.length === fewest).every((way) => JSON.stringify(way) !== JSON.stringify(as.ASD_ANSWER)), "the quickest way is also the shortest");
+    assert.notDeepEqual(as.shortest(0), as.ASD_ANSWER, "the byte does not matter");
+    assert.ok(as.checkAsd(as.ASD_ANSWER));
+    assert.ok(!as.checkAsd(as.shortest(0)));
+    assert.ok(!as.checkAsd(as.ASD_ANSWER.slice(0, -1)), "a way short of the desk passes");
+
+    const r = c.results();
+    assert.equal(r.arch, ar.ARCH_ANSWER);
+    assert.deepEqual(r.asd, as.ASD_ANSWER);
+    console.log(`ok — aula: architettura ${ar.ARCH_ANSWER} (${loops} giri), asd ${as.ASD_ANSWER.join("-")} su ${all.length} vie`);
+  } finally {
+    await vite21.close();
+  }
+}
+
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,
  * movement and sound only. No text between their tags, no text element, no
