@@ -2915,6 +2915,55 @@ try {
   }
 }
 
+/* ---------------------------------------------------------- aula: portatile
+ * The laptop on the desk: it opens once the libretto is full, and takes Sistemi
+ * Intelligenti's code digit by digit, judging it only once all of it is in.
+ * Its model is one GLB of at most 3 MB with the parts the scene moves.
+ */
+{
+  const vite27 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const lp = await vite27.ssrLoadModule("/src/lib/aula/laptop.ts");
+    const { SI_ANSWER } = await vite27.ssrLoadModule("/src/lib/aula/si.ts");
+    const c = await vite27.ssrLoadModule("/src/lib/aula/chain.ts");
+
+    assert.equal(lp.canOpen(c.INITIAL), false);
+    assert.equal(lp.canOpen(c.aulaUpTo(c.ORDER.length - 1)), false, "opens with an exam missing");
+    assert.equal(lp.canOpen(c.aulaUpTo(c.ORDER.length)), true);
+
+    const type = (keys) => [...keys].reduce((s, k) => lp.typed(s.buffer, k), { buffer: "", result: "more" });
+    let s = { buffer: "", result: "more" };
+    for (const [i, k] of [...SI_ANSWER].entries()) {
+      s = lp.typed(s.buffer, k);
+      assert.equal(s.result, i === SI_ANSWER.length - 1 ? "ok" : "more", `digit ${i + 1}`);
+    }
+    const wrong = SI_ANSWER.slice(0, -1) + String((+SI_ANSWER.at(-1) + 1) % 10);
+    assert.deepEqual(type(wrong), { buffer: "", result: "jam" });
+    // only digits go in: letters, spaces and keys like Enter change nothing
+    assert.deepEqual(lp.typed("12", "a"), { buffer: "12", result: "more" });
+    assert.deepEqual(lp.typed("12", "Enter"), { buffer: "12", result: "more" });
+    assert.equal(type([...SI_ANSWER].join(" x")).result, "ok");
+
+    // the model: a GLB, its JSON chunk first, with the parts the scene moves
+    const { readFileSync, statSync } = await import("node:fs");
+    const url = new URL("../public/models/portatile.glb", import.meta.url);
+    assert.ok(existsSync(url), "public/models/portatile.glb is missing");
+    const size = statSync(url).size;
+    assert.ok(size <= 3 * 1024 * 1024, `portatile.glb is ${(size / 1048576).toFixed(2)} MB`);
+    const glb = readFileSync(url);
+    assert.equal(glb.toString("ascii", 0, 4), "glTF");
+    assert.equal(glb.readUInt32LE(8), size, "the GLB header gives another length");
+    assert.equal(glb.readUInt32LE(16), 0x4e4f534a, "the first chunk is not JSON");
+    const gltf = JSON.parse(glb.toString("utf8", 20, 20 + glb.readUInt32LE(12)));
+    const names = gltf.nodes.map((n) => n.name);
+    for (const n of ["base", "lid", "keys", "heart"]) assert.ok(names.includes(n), `no node «${n}» in ${names.join(", ")}`);
+    assert.ok(names.some((n) => /^gear/.test(n)), "no gear* node");
+    console.log(`ok — aula: portatile, codice di ${SI_ANSWER.length} cifre, modello ${(size / 1048576).toFixed(2)} MB (${names.join(", ")})`);
+  } finally {
+    await vite27.close();
+  }
+}
+
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,
  * movement and sound only. No text between their tags, no text element, no

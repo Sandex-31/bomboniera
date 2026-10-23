@@ -9,7 +9,7 @@ import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
-import { AULA_KEY, aulaLine } from "../data/puzzle";
+import { AULA_KEY, aulaLine, laptopLine, laptopShutLine } from "../data/puzzle";
 import { INITIAL, ORDER, fail, loadAula, lockedFor, pass, results, settle, type AulaState, type ExamId, type Verdict } from "../lib/aula/chain";
 import Station from "./aula/Station";
 import Arch from "./aula/Arch";
@@ -24,6 +24,8 @@ import So from "./aula/So";
 import Si from "./aula/Si";
 import { moodRng } from "../lib/aula/so";
 import Libretto, { Booklet } from "./aula/Libretto";
+import Laptop, { KEYS_VIEW, SCREEN_AT, SCREEN_VIEW } from "./aula/Laptop";
+import { canOpen } from "../lib/aula/laptop";
 import { Carried, onlySeen } from "./machines/hall";
 import {
   BOARD,
@@ -42,9 +44,7 @@ import {
   SCREEN,
   SIDE_BOARD,
   SPOTS,
-  SPOT_MARK,
   TIER_D,
-  TAP_W,
   tier,
   type Spot,
 } from "./aula/spots";
@@ -103,33 +103,11 @@ const WOOD_DARK = "#4A3324";
 const PLASTER = "#C9C2B4";
 const SLATE = "#1F3A2E";
 
-/**
- * The desk, still waiting for its laptop: a labelled box, tapped to walk up
- * to it. The box is small; round it, while it is not the spot being
- * worked, an unseen one a finger wide on a phone takes the tap.
- */
-function Placeholder({ id, focused, onPick }: { id: Spot; focused: boolean; onPick: () => void }) {
-  const tap = useTap(onPick);
-  return (
-    <group position={SPOTS[id].position} {...SPOT_MARK}>
-      {!focused && (
-        <mesh {...tap}>
-          <boxGeometry args={[TAP_W, TAP_W, TAP_W]} />
-          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-        </mesh>
-      )}
-      <mesh>
-        <boxGeometry args={[0.32, 0.32, 0.32]} />
-        <meshStandardMaterial color="#E8D9A8" emissive="#E8D9A8" emissiveIntensity={0.25} roughness={0.6} />
-      </mesh>
-      <Html position={[0, 0.3, 0]} center zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}>
-        <span className="aula-tag">
-          {id}
-        </span>
-      </Html>
-    </group>
-  );
-}
+/** Rotom on his way into the laptop: in front of it, over the desk, saying his line. */
+const BY_LAPTOP: [number, number, number] = [SCREEN_AT[0] + 0.12, SCREEN_AT[1] + 0.05, SCREEN_AT[2] + 0.45];
+
+/** The finale, once the code is in: the gears turn, Rotom comes to say his line, flies into the screen, and is in. */
+type Finale = "spin" | "say" | "fly" | "in";
 
 export default function Aula({
   reduced,
@@ -188,6 +166,11 @@ export default function Aula({
     setAula((s) => (v === true ? pass(s, id, id === "so" ? moodRng(t) : undefined) : fail(s, id, t, v === "stamp")));
   };
   const [booklet, setBooklet] = useState(false);
+  /** The laptop was tapped too early and Rotom says it is shut. */
+  const [shut, setShut] = useState(false);
+  const [finale, setFinale] = useState<Finale | null>(null);
+  /** The screen holds the video: from the moment Rotom is in, and straight away on a later visit. */
+  const lit = aula.laptop === "on" && (finale === null || finale === "in");
 
   /*
    * Coming in: the camera waits under the hole, Rotom drops out of it as
@@ -237,12 +220,48 @@ export default function Aula({
   const pick = (id: Spot) => {
     if (scene) return;
     setFocus(id);
-    setView(SPOTS[id].view);
+    // the laptop is seen up close for what it is ready for: the video, the keyboard, or shut on the desk
+    setView(id !== "desk" ? SPOTS[id].view : aula.laptop === "on" ? SCREEN_VIEW : canOpen(aula) ? KEYS_VIEW : SPOTS.desk.view);
   };
   const back = () => {
     if (scene || focus === null || tappedJustNow()) return;
     setFocus(null);
     setView(HALL_VIEW);
+    setShut(false);
+    // Rotom comes back out of the laptop to his seat
+    setFinale(null);
+  };
+
+  /** The laptop tapped: walked up to, and still shut until the libretto is full. */
+  const tapLaptop = () => {
+    if (scene) return;
+    if (focus !== "desk") pick("desk");
+    if (!canOpen(aula)) setShut(true);
+  };
+  /*
+   * The right code: saved at once, so a reload opens on the video. The camera
+   * stands back to see the gears turn and the heart light up, Rotom comes over
+   * and says his line, flies into the screen, and the screen lights up.
+   */
+  const laptopOn = () => {
+    setAula((s) => ({ ...s, laptop: "on" }));
+    setScene(true);
+    setFinale("spin");
+    setView(SPOTS.desk.view);
+    timers.current.push(setTimeout(() => setFinale("say"), reduced ? 0 : 1800));
+  };
+  const intoLaptop = () => {
+    setFinale("fly");
+    timers.current.push(
+      setTimeout(
+        () => {
+          setFinale("in");
+          setView(SCREEN_VIEW);
+          timers.current.push(setTimeout(() => setScene(false), reduced ? 0 : FLIGHT * 1000));
+        },
+        reduced ? 0 : 1100,
+      ),
+    );
   };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -443,7 +462,14 @@ export default function Aula({
           }
         </Station>
       ))}
-      <Placeholder id="desk" focused={focus === "desk"} onPick={() => pick("desk")} />
+      <Suspense fallback={null}>
+        <Laptop state={aula} focused={focus === "desk"} lit={lit} reduced={reduced} onOpen={tapLaptop} onOn={laptopOn} />
+      </Suspense>
+      {shut && (
+        <Html position={[SPOTS.desk.position[0], SPOTS.desk.position[1] + 0.45, SPOTS.desk.position[2]]} center zIndexRange={[6, 0]}>
+          <Keeper line={laptopShutLine} last reduced={reduced} onNext={() => setShut(false)} />
+        </Html>
+      )}
       <Booklet onOpen={() => setBooklet(true)} />
 
       {/* the way up: the hole in the ceiling over the entrance, a rim and the light behind it. Tapping it goes back up. */}
@@ -462,9 +488,13 @@ export default function Aula({
         <meshBasicMaterial color="#DCEBFF" transparent opacity={0.07} depthWrite={false} />
       </mesh>
 
-      <Carried at={landed ? LANDING : SEAT} size={0.5} instant={reduced}>
-        {/* up close he would sit in front of whatever is on the front wall: he waits in the hall */}
-        <group {...zap} visible={focus === null}>
+      <Carried
+        at={finale === "say" ? BY_LAPTOP : finale === "fly" || finale === "in" ? SCREEN_AT : landed ? LANDING : SEAT}
+        size={finale === "fly" || finale === "in" ? 0.02 : finale === "say" ? 0.3 : 0.5}
+        instant={reduced}
+      >
+        {/* up close he would sit in front of whatever is on the front wall: he waits in the hall, but for the laptop */}
+        <group {...zap} visible={focus === null ? finale !== "in" : finale === "say" || finale === "fly"}>
           <Suspense fallback={null}>
             <Rotom form="fan" from="frost" move={move} reduced={reduced} zapAt={zapAt} awake />
           </Suspense>
@@ -472,6 +502,11 @@ export default function Aula({
         {saying && (
           <Html position={[0, 2.1, 0]} center zIndexRange={[6, 0]}>
             <Keeper line={aulaLine} last reduced={reduced} onNext={said} />
+          </Html>
+        )}
+        {finale === "say" && (
+          <Html position={[0, 2.1, 0]} center zIndexRange={[6, 0]}>
+            <Keeper line={laptopLine} last reduced={reduced} onNext={intoLaptop} />
           </Html>
         )}
       </Carried>
