@@ -16,6 +16,8 @@ import Arch from "./aula/Arch";
 import Asd from "./aula/Asd";
 import Analisi from "./aula/Analisi";
 import Fisica from "./aula/Fisica";
+import Logica from "./aula/Logica";
+import Lft from "./aula/Lft";
 import Libretto, { Booklet } from "./aula/Libretto";
 import { Carried, onlySeen } from "./machines/hall";
 import {
@@ -440,6 +442,10 @@ export default function Aula({
               <Analisi {...p} state={aula} />
             ) : id === "fisica" ? (
               <Fisica {...p} volts={results().analisi} firstTry={aula.failedAt.fisica === undefined} />
+            ) : id === "logica" ? (
+              <Logica {...p} />
+            ) : id === "lft" ? (
+              <Lft {...p} />
             ) : (
               <Stub {...p} />
             )

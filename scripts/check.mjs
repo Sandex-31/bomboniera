@@ -2557,6 +2557,115 @@ try {
   }
 }
 
+/* ---------------------------------------------------------- aula: logica, lft
+ * The formula in the abandoned notebook, read by a parser of the test's own
+ * so the notebook and `evaluate` cannot drift apart; its eight rows, which
+ * are no constant and no single letter; then the half-drawn automaton, whose
+ * eight faint arrows are the rows. Its shortest accepted word is the only
+ * one of its length, and changes when any one row is wrong.
+ */
+{
+  const vite23 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const lo = await vite23.ssrLoadModule("/src/lib/aula/logica.ts");
+    const lf = await vite23.ssrLoadModule("/src/lib/aula/lft.ts");
+    const c = await vite23.ssrLoadModule("/src/lib/aula/chain.ts");
+
+    // ¬ binds tightest, then ∧, ∨, and → last, to the right
+    const parse = (src, env) => {
+      const s = src.replace(/\s+/g, "");
+      let i = 0;
+      const imp = () => {
+        const a = or();
+        if (s[i] !== "→") return a;
+        i++;
+        const b = imp();
+        return !a || b;
+      };
+      const bin = (op, next) => () => {
+        let a = next();
+        while (s[i] === op) {
+          i++;
+          const b = next();
+          a = op === "∧" ? a && b : a || b;
+        }
+        return a;
+      };
+      const atom = () => {
+        const ch = s[i++];
+        if (ch === "¬") return !atom();
+        if (ch === "(") {
+          const v = imp();
+          assert.equal(s[i++], ")", `unclosed bracket in ${src}`);
+          return v;
+        }
+        assert.ok(ch in env, `${ch} is not p, q or r`);
+        return env[ch];
+      };
+      const and = bin("∧", atom);
+      const or = bin("∨", and);
+      const v = imp();
+      assert.equal(i, s.length, `${src} does not parse to the end`);
+      return v;
+    };
+    assert.ok(lo.FORMULA.includes("→") && lo.FORMULA.includes("¬"), "the formula has no → or no ¬");
+    const row = (k) => ({ p: !!(k & 4), q: !!(k & 2), r: !!(k & 1) });
+    const bitsOf = (f) => Array.from({ length: 8 }, (_, k) => f(row(k))).reduce((n, b, k) => n | (b ? 1 << k : 0), 0);
+    assert.equal(bitsOf((e) => parse(lo.FORMULA, e)), lo.LOGICA_ANSWER, "the notebook's formula is not the table");
+    assert.equal(bitsOf((e) => lo.evaluate(e.p, e.q, e.r)), lo.LOGICA_ANSWER, "evaluate is not the table");
+    const plain = [0, 255];
+    for (const v of ["p", "q", "r"]) plain.push(bitsOf((e) => e[v]), bitsOf((e) => !e[v]));
+    assert.ok(!plain.includes(lo.LOGICA_ANSWER), "the table is a constant or a single letter");
+    const table = Array.from({ length: 8 }, (_, k) => !!((lo.LOGICA_ANSWER >> k) & 1));
+    assert.ok(lo.checkLogica(table));
+    for (let k = 0; k < 8; k++) assert.ok(!lo.checkLogica(table.map((b, j) => (j === k ? !b : b))), `row ${k + 1} wrong still passes`);
+    assert.ok(!lo.checkLogica(table.slice(0, 7)));
+
+    // the automaton: deterministic whatever the table, and over its own letters
+    assert.ok(lf.ALPHABET.length >= 3 && lf.ALPHABET.length <= 4);
+    assert.equal(lf.OPTIONAL.length, 8);
+    const every = [...lf.FIXED, ...lf.OPTIONAL];
+    assert.equal(new Set(every.map((t) => `${t.from}${t.letter}`)).size, every.length, "two arrows leave a state on one letter");
+    for (const t of every) {
+      assert.ok(lf.ALPHABET.includes(t.letter) && lf.STATES.includes(t.from) && lf.STATES.includes(t.to), `${JSON.stringify(t)} is off the automaton`);
+    }
+    assert.notEqual(lf.START, lf.ACCEPT);
+    assert.equal(lf.automaton(0).length, lf.FIXED.length);
+    assert.equal(lf.automaton(255).length, every.length);
+
+    const accepts = (bits, w) => {
+      const tr = lf.automaton(bits);
+      let s = lf.START;
+      for (const a of w) {
+        const t = tr.find((x) => x.from === s && x.letter === a);
+        if (!t) return false;
+        s = t.to;
+      }
+      return s === lf.ACCEPT;
+    };
+    const wordsOf = (n) => (n === 0 ? [""] : wordsOf(n - 1).flatMap((w) => [...lf.ALPHABET].map((a) => w + a)));
+    const W = lf.LFT_ANSWER;
+    assert.equal(W, lf.shortestAccepted(lo.LOGICA_ANSWER));
+    assert.ok(W.length >= 5, `${W} is shorter than 5`);
+    for (let n = 0; n < W.length; n++) assert.ok(!wordsOf(n).some((w) => accepts(lo.LOGICA_ANSWER, w)), `a word of ${n} letters is accepted`);
+    const same = wordsOf(W.length).filter((w) => accepts(lo.LOGICA_ANSWER, w));
+    assert.deepEqual(same, [W], `accepted at length ${W.length}: ${same.join(" ")}`);
+    // the table matters, all of it: every arrow, none, or any one row wrong is another answer
+    assert.notEqual(lf.shortestAccepted(0), W);
+    assert.notEqual(lf.shortestAccepted(255), W);
+    for (let k = 0; k < 8; k++) assert.notEqual(lf.shortestAccepted(lo.LOGICA_ANSWER ^ (1 << k)), W, `row ${k + 1} wrong gives the same word`);
+    assert.ok(lf.checkLft(W));
+    assert.ok(!lf.checkLft(W.slice(1)) && !lf.checkLft(""));
+
+    const r = c.results();
+    assert.equal(r.logica, lo.LOGICA_ANSWER);
+    assert.equal(r.lft, W);
+    console.log(`ok — aula: logica ${table.map(Number).join("")}, lft «${W}» su ${lf.ALPHABET.length ** W.length} parole`);
+  } finally {
+    await vite23.close();
+  }
+}
+
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,
  * movement and sound only. No text between their tags, no text element, no

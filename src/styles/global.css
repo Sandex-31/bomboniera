@@ -1811,6 +1811,33 @@ button.card-pieces__piece { cursor: pointer; }
 .aula-fisica__res svg { display: block; width: 100%; height: 22px; }
 .aula-sheet .aula-fisica__note { margin: 0; font-size: 13px; }
 .aula-fisica__thanks { font-weight: 400; font-style: italic; letter-spacing: 0; }
+/* Logica: the notebook's page, and beside the switches and the bulb the table they fill */
+.aula-logica { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.aula-sheet .aula-logica__note {
+  width: 100%; box-sizing: border-box; margin: 0; padding: 4px 10px; border-left: 3px solid #C8261E;
+  background: repeating-linear-gradient(#FFFDF6 0 21px, #BFD0E4 21px 22px) 0 4px; font: 15px/22px var(--font-mono); text-align: center;
+}
+.aula-logica__bench { display: flex; gap: 14px; align-items: flex-start; }
+.aula-logica__switches { display: grid; grid-template-columns: 56px; gap: 8px; }
+.aula-logica__bulb { min-width: 44px; min-height: 56px; padding: 4px; border-radius: 6px; border: 1px solid #1A1410; background: #2A2620; cursor: pointer; }
+.aula-logica__bulb svg { display: block; width: 30px; height: 40px; margin: 0 auto; }
+.aula-logica__table { border-collapse: collapse; font: 14px/1 var(--font-mono); }
+.aula-logica__table th, .aula-logica__table td { padding: 4px 8px; text-align: center; }
+.aula-logica__table thead th { border-bottom: 1px solid #1A1410; }
+.aula-logica__table tbody th { color: #8A7A5A; font-weight: 400; }
+.aula-logica__table td:last-child { border-left: 1px solid #1A1410; font-weight: 700; }
+.aula-logica__table tr[aria-current="true"] { background: #F3D392; }
+/* LFT: the side board in chalk, the word composed so far, and the tiles */
+.aula-lft { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.aula-lft__board { position: relative; width: 100%; box-sizing: border-box; padding: 6px; border-radius: 4px; background: #1F3A2E; }
+.aula-lft__board svg { display: block; width: 100%; height: auto; }
+.aula-sheet .aula-lft__prof {
+  position: absolute; right: 8px; top: 8px; margin: 0; padding: 6px 10px; border-radius: 12px;
+  background: #F4EFE2; color: #1A1410; font: 700 16px/1.2 var(--font-sans); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.aula-sheet .aula-lft__word { min-width: 8ch; margin: 0; padding: 4px 8px; border-bottom: 2px solid #1A1410; font: 700 20px/1.2 var(--font-mono); letter-spacing: 0.15em; text-align: center; }
+.aula-lft__tiles { display: flex; gap: 8px; }
+.aula-lft__tile { min-width: 48px; min-height: 48px; border-radius: 6px; border: 1px solid #1A1410; background: #fff; color: #1A1410; font: 700 20px/1 var(--font-mono); cursor: pointer; }
 .libretto-btn {
   position: fixed; z-index: 20; right: max(14px, env(safe-area-inset-right)); top: max(14px, var(--safe-t));
   min-height: 44px; padding: 0 16px; border-radius: 999px;
