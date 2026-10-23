@@ -5,6 +5,8 @@ import { ANALISI_ANSWER } from "./analisi";
 import { FISICA_ANSWER } from "./fisica";
 import { LOGICA_ANSWER } from "./logica";
 import { LFT_ANSWER } from "./lft";
+import { BD_ANSWER } from "./bd";
+import { IUM_ANSWER } from "./ium";
 
 /*
  * The ten exams of the lecture hall on the fifth floor, one puzzle each, and
@@ -156,8 +158,8 @@ export function aulaUpTo(n: number): AulaState {
 }
 
 /** What each puzzle gives the ones after it. Each puzzle adds its own as it is built. */
-export type Results = { arch: number; asd: number[]; analisi: number; fisica: number; logica: number; lft: string };
+export type Results = { arch: number; asd: number[]; analisi: number; fisica: number; logica: number; lft: string; bd: number; ium: string };
 
 export function results(): Results {
-  return { arch: ARCH_ANSWER, asd: ASD_ANSWER, analisi: ANALISI_ANSWER, fisica: FISICA_ANSWER, logica: LOGICA_ANSWER, lft: LFT_ANSWER };
+  return { arch: ARCH_ANSWER, asd: ASD_ANSWER, analisi: ANALISI_ANSWER, fisica: FISICA_ANSWER, logica: LOGICA_ANSWER, lft: LFT_ANSWER, bd: BD_ANSWER, ium: IUM_ANSWER };
 }

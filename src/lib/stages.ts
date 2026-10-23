@@ -30,6 +30,7 @@ import {
   PLAN_KEY,
   PUZZLE_KEY,
   SAGOME_KEY,
+  SENIA_KEY,
   SKI_KEY,
   TITLES_KEY,
   TOMBINO_KEY,
@@ -130,13 +131,15 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
 
 /**
  * What the puzzle keeps that is not a stop of its own: which chats have been
- * opened, and how deep the visitor has been. Wiped with the rest. The
- * remaining key of the well waits here until its task moves it onto a stop.
+ * opened, how deep the visitor has been, whether Senia has called. Wiped
+ * with the rest. The remaining key of the well waits here until its task
+ * moves it onto a stop.
  */
 export const WIPED = [
   CHAT_KEY,
   DEPTH_KEY,
   WELL_INSIDE_KEY,
+  SENIA_KEY,
 ];
 
 /**

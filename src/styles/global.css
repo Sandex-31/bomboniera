@@ -1838,6 +1838,46 @@ button.card-pieces__piece { cursor: pointer; }
 .aula-sheet .aula-lft__word { min-width: 8ch; margin: 0; padding: 4px 8px; border-bottom: 2px solid #1A1410; font: 700 20px/1.2 var(--font-mono); letter-spacing: 0.15em; text-align: center; }
 .aula-lft__tiles { display: flex; gap: 8px; }
 .aula-lft__tile { min-width: 48px; min-height: 48px; border-radius: 6px; border: 1px solid #1A1410; background: #fff; color: #1A1410; font: 700 20px/1 var(--font-mono); cursor: pointer; }
+/* Basi di Dati: the registers, scrolled in their own box, the board question over them, the query in cards under them */
+.aula-bd { display: flex; flex-direction: column; gap: 8px; max-height: 540px; overflow: auto; overscroll-behavior: contain; }
+.aula-sheet .aula-bd__target { margin: 0; padding: 6px 8px; border-radius: 4px; background: #1F3A2E; color: #E9EEE6; font-size: 14px; }
+.aula-bd__registers { display: flex; gap: 4px; flex: none; scrollbar-width: thin; align-items: flex-start; max-height: 200px; overflow: auto; overscroll-behavior: contain; border: 1px solid #C9BFA6; background: #FBF8F0; }
+.aula-bd__registers table { border-collapse: collapse; font: 9.5px/1.35 var(--font-mono); }
+.aula-bd__registers caption { font: 600 11px/1.6 var(--font-sans); text-align: left; padding-left: 4px; }
+.aula-bd__registers th, .aula-bd__registers td { padding: 0 2px; text-align: left; white-space: nowrap; }
+.aula-bd__registers thead th { position: sticky; top: 0; background: #FBF8F0; border-bottom: 1px solid #1A1410; }
+.aula-bd__registers tr[aria-current="true"] { background: #F3D392; font-weight: 700; }
+.aula-bd__query { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.aula-bd__line { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font: 12px/1 var(--font-mono); }
+.aula-bd__line > b { min-width: 44px; }
+.aula-bd__card {
+  min-width: 44px; min-height: 44px; padding: 0 5px; border-radius: 4px; border: 1px solid #1A1410;
+  background: #fff; color: #1A1410; font: 11px/1 var(--font-mono); cursor: pointer;
+}
+.aula-bd__card[aria-pressed="true"] { background: #F3D392; }
+.aula-bd__cards { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px; border-radius: 4px; background: #E8D9A8; }
+.aula-bd__rows { display: flex; flex-direction: column; font: 12px/1.4 var(--font-mono); }
+.aula-bd__tutor { display: flex; gap: 8px; align-items: center; }
+.aula-sheet .aula-bd__tutor p { margin: 0; font-size: 13px; font-style: italic; }
+/* IUM-TWEB: the page as drawn, the file in conflict under it, its halves the buttons, then the commit */
+.aula-ium { position: relative; display: flex; flex-direction: column; gap: 8px; }
+.aula-ium__call { position: absolute; z-index: 1; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: rgba(20, 16, 12, 0.88); color: #F4EFE2; border-radius: 4px; }
+.aula-ium__call .keeper { width: 100%; box-sizing: border-box; }
+.aula-ium__preview { min-height: 90px; max-height: 150px; overflow: auto; border: 6px solid #3A3A40; border-radius: 4px; background: #fff; font-size: 13px; }
+.aula-ium__preview p { margin: 0 0 4px; }
+.aula-ium__file { max-height: 260px; overflow: auto; overscroll-behavior: contain; padding: 4px; border-radius: 4px; background: #1E1E24; color: #D8D8DE; }
+.aula-ium__file pre, .aula-ium__half { margin: 0; font: 10.5px/1.35 var(--font-mono); font-variant-ligatures: none; white-space: pre-wrap; word-break: break-all; }
+.aula-ium__hunk > pre { color: #E8A04A; }
+.aula-ium__half {
+  display: block; width: 100%; min-height: 44px; padding: 2px 4px; text-align: left; cursor: pointer;
+  border: 1px dashed #6A6A74; border-radius: 3px; background: transparent; color: inherit;
+}
+.aula-ium__half[aria-pressed="true"] { border-style: solid; border-color: #7FD18B; background: rgba(127, 209, 139, 0.14); }
+.aula-ium__half[data-dropped="true"] { opacity: 0.4; text-decoration: line-through; }
+.aula-ium__commit { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 12px/1 var(--font-mono); }
+.aula-ium__commit input { width: 9ch; min-height: 44px; padding: 0 6px; border: 1px solid #1A1410; border-radius: 4px; background: #fff; color: #1A1410; font: 16px/1 var(--font-mono); }
+.aula-sheet .aula-ium__log { margin: 0; padding: 6px 8px; border-radius: 4px; background: #1E1E24; color: #D8D8DE; font: 700 15px/1.2 var(--font-mono); }
+.aula-ium__log span { color: #E8C14A; }
 .libretto-btn {
   position: fixed; z-index: 20; right: max(14px, env(safe-area-inset-right)); top: max(14px, var(--safe-t));
   min-height: 44px; padding: 0 16px; border-radius: 999px;

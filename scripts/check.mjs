@@ -2666,6 +2666,105 @@ try {
   }
 }
 
+/* ---------------------------------------------------------- aula: basi di dati, ium
+ * The two registers on the desk and the query the cards can make. No query
+ * over one register alone comes to the one row the board asks for, whatever
+ * the cards; the join of the two does, and every query that does says what
+ * the board says. Then the file on the projector: of all the ways to settle
+ * its conflicts, one, with the word of LFT as its message.
+ */
+{
+  const vite24 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const bd = await vite24.ssrLoadModule("/src/lib/aula/bd.ts");
+    const ium = await vite24.ssrLoadModule("/src/lib/aula/ium.ts");
+    const lf = await vite24.ssrLoadModule("/src/lib/aula/lft.ts");
+    const sg = await vite24.ssrLoadModule("/src/lib/sagome.ts");
+    const c = await vite24.ssrLoadModule("/src/lib/aula/chain.ts");
+
+    const names = bd.STUDENTS.map((s) => s.name);
+    for (const ch of sg.CHARACTERS) assert.ok(names.includes(ch.id), `${ch.id} is not in the register`);
+    assert.ok(names.includes("rotom"));
+    assert.equal(new Set(names).size, names.length, "a name is in the register twice");
+    const mats = bd.STUDENTS.map((s) => s.matricola);
+    assert.equal(new Set(mats).size, mats.length, "two students share a matricola");
+    for (const m of [...mats, ...bd.ESITI.map((e) => e.matricola)]) assert.ok(m >= 100000 && m <= 999999, `${m} has not 6 digits`);
+    assert.ok(mats.includes(bd.BD_ANSWER));
+    assert.ok(typeof bd.BD_TARGET === "string" && bd.BD_TARGET.length > 10);
+    assert.ok(bd.TUTOR.length >= 3);
+
+    const intended = {
+      select: "studenti.matricola",
+      join: true,
+      on: ["studenti.matricola", "esiti.matricola"],
+      where: [["esiti.esame", "=", "fisica"], ["esiti.esito", "=", "bocciato"], ["studenti.nome", "!=", "rotom"]],
+    };
+    assert.deepEqual(bd.runQuery(intended), [[String(bd.BD_ANSWER)]]);
+    assert.ok(bd.checkBd(bd.runQuery(intended)));
+    assert.ok(!bd.checkBd(bd.runQuery({ ...intended, where: intended.where.slice(0, 2) })), "Rotom does not have to be left out");
+    assert.ok(!bd.checkBd(bd.runQuery({ ...intended, select: "studenti.nome" })));
+    assert.ok(!bd.checkBd([]) && !bd.checkBd([[String(bd.BD_ANSWER)], [String(bd.BD_ANSWER)]]));
+
+    // every query the cards can make, up to MAX_WHERE conditions
+    const conds = bd.FIELDS.flatMap((f) => ["=", "!="].flatMap((op) => bd.VALUES.map((v) => [f, op, v])));
+    const wheres = [[]];
+    for (let n = 0; n < bd.MAX_WHERE; n++) {
+      for (const w of wheres.filter((w) => w.length === n)) {
+        const from = w.length ? conds.indexOf(w[w.length - 1]) + 1 : 0;
+        for (let k = from; k < conds.length; k++) wheres.push([...w, conds[k]]);
+      }
+    }
+    let single = 0;
+    for (const select of bd.FIELDS) {
+      for (const where of wheres) {
+        single++;
+        assert.ok(!bd.checkBd(bd.runQuery({ select, join: false, on: null, where })), `one register is enough: ${select} ${JSON.stringify(where)}`);
+      }
+    }
+    const keyed = (w, f, op, v) => w.some((x) => x[0] === f && x[1] === op && x[2] === v);
+    let joined = 0;
+    for (const on of [["studenti.matricola", "esiti.matricola"], ["esiti.matricola", "studenti.matricola"], null]) {
+      for (const select of bd.FIELDS) {
+        for (const where of wheres) {
+          if (!bd.checkBd(bd.runQuery({ select, join: true, on, where }))) continue;
+          joined++;
+          assert.ok(on, `a join without ON is enough: ${JSON.stringify(where)}`);
+          const says =
+            keyed(where, "esiti.esame", "=", "fisica") &&
+            (keyed(where, "esiti.esito", "=", "bocciato") || keyed(where, "esiti.esito", "!=", "superato")) &&
+            keyed(where, "studenti.nome", "!=", "rotom");
+          assert.ok(says, `${JSON.stringify(where)} finds the matricola without saying what the board says`);
+        }
+      }
+    }
+    assert.ok(joined > 0);
+
+    // the file on the projector
+    assert.ok(ium.HUNKS.length >= 4);
+    for (const h of ium.HUNKS) assert.notDeepEqual(h.ours, h.theirs);
+    const right = ium.HUNKS.map((h) => h.right);
+    assert.ok(right.includes("ours") && right.includes("theirs"), "every hunk is the same side");
+    assert.ok(ium.resolve(right).includes(String(bd.BD_ANSWER)), "the file has not the matricola");
+    const vectors = Array.from({ length: 2 ** ium.HUNKS.length }, (_, k) => ium.HUNKS.map((_, i) => ((k >> i) & 1 ? "theirs" : "ours")));
+    const ok = vectors.filter((v) => ium.checkIum(v, lf.LFT_ANSWER));
+    assert.deepEqual(ok, [right], `${ok.length} ways through the conflicts`);
+    assert.equal(new Set(vectors.map((v) => ium.hash(ium.resolve(v) + "\n" + lf.LFT_ANSWER))).size, vectors.length, "two files give one hash");
+    assert.ok(!ium.checkIum(right, "") && !ium.checkIum(right, lf.LFT_ANSWER.slice(1)) && !ium.checkIum(right, "fix"));
+    assert.ok(!ium.checkIum(right.slice(1), lf.LFT_ANSWER));
+    // FNV-1a 32-bit: "a" is e40c292c
+    assert.equal(ium.hash("a"), "e40c");
+    assert.match(ium.IUM_ANSWER, /^[0-9a-f]{4}$/);
+    assert.equal(ium.IUM_ANSWER, ium.hash(ium.resolve(right) + "\n" + lf.LFT_ANSWER));
+
+    const r = c.results();
+    assert.equal(r.bd, bd.BD_ANSWER);
+    assert.equal(r.ium, ium.IUM_ANSWER);
+    console.log(`ok — aula: basi di dati ${bd.BD_ANSWER} (${single} query su un registro, ${joined} col JOIN), ium ${ium.IUM_ANSWER} su ${vectors.length} risoluzioni`);
+  } finally {
+    await vite24.close();
+  }
+}
+
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,
  * movement and sound only. No text between their tags, no text element, no

@@ -18,6 +18,8 @@ import Analisi from "./aula/Analisi";
 import Fisica from "./aula/Fisica";
 import Logica from "./aula/Logica";
 import Lft from "./aula/Lft";
+import Bd from "./aula/Bd";
+import Ium from "./aula/Ium";
 import Libretto, { Booklet } from "./aula/Libretto";
 import { Carried, onlySeen } from "./machines/hall";
 import {
@@ -446,6 +448,10 @@ export default function Aula({
               <Logica {...p} />
             ) : id === "lft" ? (
               <Lft {...p} />
+            ) : id === "bd" ? (
+              <Bd {...p} />
+            ) : id === "ium" ? (
+              <Ium {...p} onScene={setScene} reduced={reduced} firstTry={aula.failedAt.ium === undefined} />
             ) : (
               <Stub {...p} />
             )

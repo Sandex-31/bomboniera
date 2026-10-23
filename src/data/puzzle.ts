@@ -175,6 +175,9 @@ export const WELL_MURAL_KEY = 'bomboniera.puzzle.pozzo.murale';
 /** The lecture hall of the fifth floor: its exams, and how far each has got. */
 export const AULA_KEY = 'bomboniera.puzzle.aula';
 
+/** Whether Senia has already called about the git, the first time IUM-TWEB was opened. */
+export const SENIA_KEY = 'bomboniera.puzzle.aula.telefonata';
+
 /** The read phrases, read back: anything that is not a list of distinct phrases is none. */
 export function langFrom(stored: string | null): number[] {
   try {
@@ -276,6 +279,13 @@ export const muralLine = 'Rotom: TODO — la battuta del murale.';
  * TODO: da scrivere — questa riga è segnaposto.
  */
 export const aulaLine = 'Rotom: TODO — la battuta dell’arrivo in aula.';
+
+/**
+ * Senia on the phone, the first time the file in conflict is opened.
+ *
+ * TODO: da scrivere — questa riga è segnaposto.
+ */
+export const seniaLine = 'Senia: TODO — è esploso tutto il git.';
 
 /**
  * And what it says when the laptop is tapped before the libretto is full.
