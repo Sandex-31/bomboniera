@@ -69,7 +69,7 @@ export default function Analisi({ passed, onTry, state }: { passed: boolean; onT
         </svg>
       </div>
       {state.analisiStamped && !passed && (
-        <p className="aula-analisi__register" role="status">
+        <p className="aula-analisi__register aula-sheet__keep" role="status">
           registro: <span className="aula-analisi__ring">{ANALISI_ANSWER}</span> respinto — {reason}
         </p>
       )}

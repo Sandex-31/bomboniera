@@ -8,7 +8,7 @@ import { COIL_OHMS, EMPTY, FISICA_ANSWER, FISICA_FILLING, LIFT, RESISTORS, SMOKE
  * ammeter) beside a branch with one slot of its own. Under it the box of
  * resistors: tap one, then tap a slot to put it there; tap a filled slot to
  * take it out. Closing the switch sends the current: the weight comes up,
- * stays down, or the wire smokes.
+ * stays down, or the wire smokes; only the first passes.
  */
 
 const HEX: Record<Colour, string> = {
@@ -92,8 +92,8 @@ export default function Fisica({
   const close = () => {
     const v = judgeFisica(circuit, volts);
     setShot(v);
-    if (v === "lift") onTry(true);
-    if (v === "smoke") onTry(false);
+    // the weight left on the bench is failed as surely as the smoke: no filling can be tried for free
+    onTry(v === "lift");
   };
   const lifted = passed || shot === "lift";
 

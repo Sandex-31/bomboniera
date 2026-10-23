@@ -1749,7 +1749,8 @@ button.card-pieces__piece { cursor: pointer; }
 .aula-sheet__appello { color: #9B1C1C; font-size: 13px; }
 .aula-sheet__appello b { display: block; font: 700 28px/1.1 var(--font-mono); }
 .aula-sheet__body { border: 0; margin: 0; padding: 0; min-width: 0; }
-.aula-sheet__body:disabled { opacity: 0.45; }
+/* dimmed child by child, so a part of the puzzle the visitor must still read (Analisi's register) can stay out of it */
+.aula-sheet__body:disabled > * > :not(.aula-sheet__keep) { opacity: 0.45; }
 .aula-stub {
   min-width: 44px; min-height: 44px; padding: 0 16px; border-radius: 6px;
   border: 1px solid #1A1410; background: #fff; color: #1A1410; font: inherit; cursor: pointer;

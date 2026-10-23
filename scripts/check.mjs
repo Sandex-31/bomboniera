@@ -2506,7 +2506,7 @@ try {
     assert.equal(an.judgeAnalisi(stamped, an.ANALISI_ANSWER - 1), "fail");
     assert.ok(stamped.analisiStamped && stamped.failedAt.analisi === 1_000, "the stamp is not a failure on the register");
     assert.equal(c.fail(c.INITIAL, "analisi", 1_000).analisiStamped, false, "a wrong answer stamps");
-    assert.equal(c.fail(stamped, "analisi", 2_000).analisiStamped, true, "a wrong answer wipes the stamp");
+    assert.equal(c.fail(stamped, "analisi", 2_000).analisiStamped, true, "a wrong answer after the stamp loses it");
     assert.ok(c.passed(c.pass(stamped, "analisi"), "analisi"));
 
     // the bands, by the real 4-band code
