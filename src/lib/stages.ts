@@ -59,6 +59,7 @@ import { solvedTv } from "./well/tv";
 import { solvedCrows } from "./well/crows";
 import { solvedBuds } from "./well/buds";
 import { solvedMural } from "./well/mural";
+import { ORDER, aulaUpTo, examName } from "./aula/chain";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
 export function levers(): boolean[] {
@@ -123,19 +124,19 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "boccioli", key: WELL_BUDS_KEY, solved: solvedBuds },
   { label: "murale", key: WELL_MURAL_KEY, solved: solvedMural },
   { label: "quinto piano", key: FLOOR_KEY, solved: () => "4" },
+  // the hall: one exam more at each stop, in an order that never skips what one needs
+  ...ORDER.map((id, i) => ({ label: `aula: ${examName(id)}`, key: AULA_KEY, solved: () => aulaUpTo(i + 1) })),
 ];
 
 /**
  * What the puzzle keeps that is not a stop of its own: which chats have been
  * opened, and how deep the visitor has been. Wiped with the rest. The
- * remaining keys of the well wait here until the task of each moves it onto a
- * stop, and so does the hall's until its exams have stops of their own.
+ * remaining key of the well waits here until its task moves it onto a stop.
  */
 export const WIPED = [
   CHAT_KEY,
   DEPTH_KEY,
   WELL_INSIDE_KEY,
-  AULA_KEY,
 ];
 
 /**

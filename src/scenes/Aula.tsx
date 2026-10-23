@@ -9,7 +9,10 @@ import Rotom from "./Rotom";
 import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
-import { aulaLine } from "../data/puzzle";
+import { AULA_KEY, aulaLine } from "../data/puzzle";
+import { INITIAL, ORDER, fail, loadAula, lockedFor, pass, type AulaState, type ExamId } from "../lib/aula/chain";
+import Station from "./aula/Station";
+import Libretto, { Booklet } from "./aula/Libretto";
 import { Carried, onlySeen } from "./machines/hall";
 import {
   BOARD,
@@ -70,8 +73,6 @@ const CEILING_VIEW: View = {
   spread: { azimuth: 0.1, polar: 0.05 },
 };
 
-const SPOT_IDS = Object.keys(SPOTS) as Spot[];
-
 /** Marks the way up, so a tap that lands on it and on a spot (`SPOT_MARK`) can be kept off the hole. */
 const UP = { userData: { hole: true } };
 const marked = (o: Object3D | null, key: string): boolean => !!o && (o.userData[key] === true || marked(o.parent, key));
@@ -92,10 +93,30 @@ const PLASTER = "#C9C2B4";
 const SLATE = "#1F3A2E";
 
 /**
- * A spot of the hall still waiting for its puzzle: a labelled box, tapped to
- * walk up to it. The box is small; round it, while it is not the spot being
+ * The desk, still waiting for its laptop: a labelled box, tapped to walk up
+ * to it. The box is small; round it, while it is not the spot being
  * worked, an unseen one a finger wide on a phone takes the tap.
  */
+/**
+ * An exam still waiting for its puzzle: one right answer and one wrong, to
+ * try the lock, the appello and the libretto with. Each puzzle's own task
+ * puts the real one in its place.
+ */
+function Stub({ passed, onTry }: { passed: boolean; onTry: (ok: boolean) => void }) {
+  return passed ? (
+    <p>superato</p>
+  ) : (
+    <div style={{ display: "flex", gap: 12 }}>
+      <button type="button" className="aula-stub" onClick={() => onTry(true)}>
+        giusta
+      </button>
+      <button type="button" className="aula-stub" onClick={() => onTry(false)}>
+        sbagliata
+      </button>
+    </div>
+  );
+}
+
 function Placeholder({ id, focused, onPick }: { id: Spot; focused: boolean; onPick: () => void }) {
   const tap = useTap(onPick);
   return (
@@ -111,7 +132,7 @@ function Placeholder({ id, focused, onPick }: { id: Spot; focused: boolean; onPi
         <meshStandardMaterial color="#E8D9A8" emissive="#E8D9A8" emissiveIntensity={0.25} roughness={0.6} />
       </mesh>
       <Html position={[0, 0.3, 0]} center zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}>
-        <span style={{ font: "600 12px/1 system-ui, sans-serif", color: "#1A1410", background: "#E8D9A8", padding: "3px 6px", borderRadius: 4, whiteSpace: "nowrap" }}>
+        <span className="aula-tag">
           {id}
         </span>
       </Html>
@@ -141,6 +162,36 @@ export default function Aula({
   const [zapAt, setZapAt] = useState(0);
   /** The spot the camera stands in front of, if any. */
   const [focus, setFocus] = useState<Spot | null>(null);
+
+  /** The exams: what is passed, and when each was last failed. Saved on every change. */
+  const [aula, setAula] = useState<AulaState>(() => {
+    try {
+      return loadAula(localStorage.getItem(AULA_KEY));
+    } catch {
+      return INITIAL;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(AULA_KEY, JSON.stringify(aula));
+    } catch {
+      // private mode: it will not be there next time
+    }
+  }, [aula]);
+  /** The clock the appelli count down by: it only ticks while one of them does. */
+  const [now, setNow] = useState(Date.now);
+  const counting = ORDER.some((id) => lockedFor(aula.failedAt[id], now) > 0);
+  useEffect(() => {
+    if (!counting) return;
+    const t = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(t);
+  }, [counting]);
+  const answer = (id: ExamId, ok: boolean) => {
+    const t = Date.now();
+    setNow(t);
+    setAula((s) => (ok ? pass(s, id) : fail(s, id, t)));
+  };
+  const [booklet, setBooklet] = useState(false);
 
   /*
    * Coming in: the camera waits under the hole, Rotom drops out of it as
@@ -199,7 +250,9 @@ export default function Aula({
   };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") back();
+      if (e.key !== "Escape") return;
+      if (booklet) setBooklet(false);
+      else back();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -228,6 +281,7 @@ export default function Aula({
   });
 
   return (
+    <>
     <Canvas
       orthographic
       dpr={[1, 1.75]}
@@ -365,10 +419,14 @@ export default function Aula({
         <meshStandardMaterial color="#20262B" roughness={0.4} />
       </mesh>
 
-      {/* the ten exams and the desk, each still a box with its name */}
-      {SPOT_IDS.map((id) => (
-        <Placeholder key={id} id={id} focused={focus === id} onPick={() => pick(id)} />
+      {/* the ten exams, each at its own spot, and the desk with the libretto on it */}
+      {ORDER.map((id) => (
+        <Station key={id} id={id} state={aula} now={now} onTry={(ok) => answer(id, ok)} focused={focus === id} onPick={() => pick(id)}>
+          {(p) => <Stub {...p} />}
+        </Station>
       ))}
+      <Placeholder id="desk" focused={focus === "desk"} onPick={() => pick("desk")} />
+      <Booklet onOpen={() => setBooklet(true)} />
 
       {/* the way up: the hole in the ceiling over the entrance, a rim and the light behind it. Tapping it goes back up. */}
       <group position={HOLE} visible={focus === null} {...UP} {...up}>
@@ -414,5 +472,7 @@ export default function Aula({
         maxAzimuthAngle={view.azimuth + view.spread.azimuth}
       />
     </Canvas>
+    <Libretto state={aula} open={booklet} hidden={scene} onToggle={setBooklet} />
+    </>
   );
 }

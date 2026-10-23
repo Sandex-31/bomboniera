@@ -1730,3 +1730,51 @@ button { font: inherit; color: inherit; }
 }
 button.card-pieces__piece { cursor: pointer; }
 .card-pieces__piece.is-held { transform: translateY(4px) scale(1.12); background: rgba(255, 210, 122, 0.35); }
+
+/* ---------------------------------------------------------- l'aula
+ * The sheets the exams are sat on, the tags over them from the hall, and the
+ * libretto, which opens over everything from its button in the corner.
+ */
+.aula-tag {
+  font: 600 12px/1 var(--font-sans); color: #1A1410; background: #E8D9A8;
+  padding: 3px 6px; border-radius: 4px; white-space: nowrap;
+}
+.aula-sheet {
+  box-sizing: border-box; padding: 16px; border-radius: 6px;
+  background: #F4EFE2; color: #1A1410; font: 15px/1.4 var(--font-sans);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+.aula-sheet p { margin: 0 0 10px; }
+.aula-sheet__lock { font-weight: 600; text-align: center; }
+.aula-sheet__appello { color: #9B1C1C; font-size: 13px; }
+.aula-sheet__appello b { display: block; font: 700 28px/1.1 var(--font-mono); }
+.aula-sheet__body { border: 0; margin: 0; padding: 0; min-width: 0; }
+.aula-sheet__body:disabled { opacity: 0.45; }
+.aula-stub {
+  min-width: 44px; min-height: 44px; padding: 0 16px; border-radius: 6px;
+  border: 1px solid #1A1410; background: #fff; color: #1A1410; font: inherit; cursor: pointer;
+}
+.libretto-btn {
+  position: fixed; z-index: 20; right: max(14px, env(safe-area-inset-right)); top: max(14px, var(--safe-t));
+  min-height: 44px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid #C9A64A; background: rgba(10, 14, 22, 0.72); color: #F3D392;
+  font: 600 13px/1 var(--font-mono); cursor: pointer; touch-action: manipulation;
+}
+.libretto {
+  position: fixed; z-index: 30; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(360px, calc(100vw - 32px)); max-height: calc(100vh - 120px); overflow: auto;
+  box-sizing: border-box; padding: 16px 18px; border-radius: 8px;
+  background: #7A1F2B; color: #F7EEDC; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+.libretto header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.libretto h2 { margin: 0; font: 600 18px/1.2 var(--font-display); color: #F3D392; }
+.libretto__close {
+  width: 44px; height: 44px; border: 0; background: transparent; color: inherit; font-size: 26px; cursor: pointer;
+}
+.libretto ol { margin: 10px 0 0; padding: 0; list-style: none; }
+.libretto li {
+  display: flex; justify-content: space-between; gap: 12px; padding: 7px 0;
+  border-bottom: 1px dashed rgba(247, 238, 220, 0.25); font-size: 14px;
+}
+.libretto li[data-passed="false"] { opacity: 0.55; }
+.libretto li b { font-family: var(--font-mono); white-space: nowrap; }

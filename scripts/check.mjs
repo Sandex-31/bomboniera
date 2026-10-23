@@ -2289,6 +2289,84 @@ try {
   }
 }
 
+/* ---------------------------------------------------------- aula: catena
+ * The ten exams of the hall and what they need: a prerequisite passed only
+ * counts when its own are, a wrong answer locks for an appello that a clock
+ * moved back cannot stretch, and the debug stops land one exam at a time.
+ */
+{
+  const vite20 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const c = await vite20.ssrLoadModule("/src/lib/aula/chain.ts");
+    const { STAGES, WIPED } = await vite20.ssrLoadModule("/src/lib/stages.ts");
+    const { AULA_KEY } = await vite20.ssrLoadModule("/src/data/puzzle.ts");
+    const { exams } = await vite20.ssrLoadModule("/src/data/exams.ts");
+    const ids = Object.keys(c.PREREQ);
+    assert.equal(ids.length, 10, "the hall has ten exams");
+    assert.deepEqual([...c.ORDER].sort(), [...ids].sort(), "ORDER is not the ten exams");
+    // ORDER puts every exam after what it needs, which also proves the graph has no cycle
+    c.ORDER.forEach((id, i) =>
+      c.PREREQ[id].forEach((p) => assert.ok(c.ORDER.indexOf(p) < i, `${id} comes before ${p}`)),
+    );
+    assert.deepEqual([...c.PREREQ.si].sort(), ids.filter((id) => id !== "si").sort(), "si needs all nine others");
+    for (const id of ids) assert.ok(exams.some((e) => e.id === c.EXAM_OF[id]), `${id} has no exam in exams.ts`);
+
+    // a tampered or broken save is the untouched floor
+    assert.deepEqual(c.loadAula("{"), c.INITIAL);
+    assert.deepEqual(c.loadAula(null), c.INITIAL);
+    assert.deepEqual(c.loadAula('{"passed":["zzz"]}'), c.INITIAL, "an unknown exam is kept");
+    assert.deepEqual(c.loadAula("[1]"), c.INITIAL);
+    assert.deepEqual(c.loadAula('{"failedAt":{"arch":"x","zzz":1},"soGrade":99,"laptop":"boom"}'), c.INITIAL);
+    const s = c.loadAula(JSON.stringify({ ...c.INITIAL, passed: ["so", "fisica", "analisi"] }));
+    assert.equal(c.passed(s, "so"), false, "so counts as passed without asd");
+    assert.equal(c.passed(s, "fisica"), true);
+    assert.equal(c.open(s, "so"), false);
+
+    // the appello: full from the failure, over after it, never longer if the clock went back
+    const t = 1_000_000;
+    assert.equal(c.lockedFor(t, t), c.APPELLO_MS);
+    assert.equal(c.lockedFor(t, t + c.APPELLO_MS), 0);
+    assert.equal(c.lockedFor(undefined, t), 0);
+    assert.ok(c.lockedFor(t + 600_000, t) <= c.APPELLO_MS, "a clock moved back locks for longer than an appello");
+    assert.ok(c.APPELLO_MS <= 60_000);
+    assert.equal(c.lockedFor(c.fail(c.INITIAL, "arch", t).failedAt.arch, t + 1), c.APPELLO_MS - 1);
+
+    // the mood of the prof of Sistemi Operativi, 18 to 30, drawn once
+    assert.equal(c.pass(c.INITIAL, "so", () => 0).soGrade, 18);
+    assert.equal(c.pass(c.INITIAL, "so", () => 0.9999).soGrade, 30);
+    assert.equal(c.pass(c.pass(c.INITIAL, "so", () => 0), "so", () => 0.9999).soGrade, 18, "the grade is drawn again");
+
+    // each debug stop: exactly the first i passed, the next open, and saved as it loads
+    for (let i = 0; i <= c.ORDER.length; i++) {
+      const up = c.aulaUpTo(i);
+      c.ORDER.forEach((id, k) => assert.equal(c.passed(up, id), k < i, `aulaUpTo(${i}) gets ${id} wrong`));
+      if (i < c.ORDER.length) assert.ok(c.open(up, c.ORDER[i]), `aulaUpTo(${i}) leaves ${c.ORDER[i]} shut`);
+      assert.deepEqual(c.loadAula(JSON.stringify(up)), up, `aulaUpTo(${i}) does not survive a reload`);
+    }
+    const book = c.libretto(c.aulaUpTo(10));
+    assert.deepEqual(book.map((e) => e.id), [...c.ORDER]);
+    for (const e of book) {
+      if (e.id === "so") assert.match(e.grade, /^(1[89]|2\d|30)$/, "so has no grade");
+      else assert.equal(e.grade, "superato", `${e.id} is not superato`);
+    }
+    assert.ok(c.libretto(c.INITIAL).every((e) => e.grade === null && e.name), "an empty libretto has grades or no names");
+
+    // the stops: one per exam, in ORDER, right after the hall itself
+    assert.ok(!WIPED.includes(AULA_KEY), "the hall is still wiped rather than a stop");
+    const labels = STAGES.map((st) => st.label);
+    const at = labels.indexOf("quinto piano");
+    c.ORDER.forEach((id, i) => {
+      const stop = STAGES[at + 1 + i];
+      assert.equal(stop.label, `aula: ${book[i].name}`, `stop ${at + 1 + i} is not ${id}`);
+      assert.equal(stop.key, AULA_KEY);
+      assert.deepEqual(stop.solved(), c.aulaUpTo(i + 1));
+    });
+    console.log(`ok — aula: catena, ${ids.length} esami, appello ${c.APPELLO_MS / 1000} s, ${c.ORDER.length} fermate`);
+  } finally {
+    await vite20.close();
+  }
+}
+
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,
  * movement and sound only. No text between their tags, no text element, no
