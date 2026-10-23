@@ -280,7 +280,7 @@ Deciso con Salvo: il puzzle di Fisica riguarda l'**elettrodinamica**.
   superati.
   - Ogni esame mostra «superato», come deciso con Salvo.
   - Fa eccezione Sistemi Operativi, il cui voto lo dà l'umore del prof.
-- **Rotom** torna normale, non più Gelo, appena atterra nell'aula, e si siede in un banco. Le battute
+- **Rotom** diventa **Rotom Vortice**, una forma mai usata nei piani prima, appena atterra nell'aula, e si siede in un banco. Le battute
   le scrive Salvo; nel frattempo si usa il segnaposto `«Rotom: TODO — …»` come negli altri piani.
 - **Lo stato si salva** come sugli altri piani: le chiavi in `src/data/puzzle.ts` e le fermate in
   `src/lib/stages.ts`, almeno una per puzzle più una per il portatile.

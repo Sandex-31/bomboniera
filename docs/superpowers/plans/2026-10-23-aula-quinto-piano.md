@@ -66,7 +66,7 @@
   - Every passed exam reads «superato».
   - The one exception is Sistemi Operativi: a mood grade from 18 to 30, drawn once when the exam is passed, and saved.
 - **Rotom.**
-  - He lands as Frost and flashes back to `"base"` on arrival (`from="frost"`, `form="base"`), then sits in a bench.
+  - He lands as Frost and flashes into **Rotom Vortice** (`from="frost"`, `form="fan"`), a form not used on any other floor, then sits in a bench.
   - Going back up, he turns to Frost again.
   - New placeholder lines in `src/data/puzzle.ts`, in the `starLine` style `'Rotom: TODO — …'`:
     - `aulaLine`, on arrival;
