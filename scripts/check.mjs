@@ -2328,6 +2328,13 @@ try {
     assert.equal(c.lockedFor(t, t + c.APPELLO_MS), 0);
     assert.equal(c.lockedFor(undefined, t), 0);
     assert.ok(c.lockedFor(t + 600_000, t) <= c.APPELLO_MS, "a clock moved back locks for longer than an appello");
+    // and it runs out one appello of real time later, whether found on load or while counting down
+    const ahead = c.fail(c.INITIAL, "arch", t + 600_000);
+    const loaded = c.loadAula(JSON.stringify(ahead), t);
+    assert.equal(c.lockedFor(loaded.failedAt.arch, t + c.APPELLO_MS), 0, "a failure stamped in the future outlasts its appello after a reload");
+    assert.equal(c.lockedFor(c.settle(ahead, t).failedAt.arch, t + c.APPELLO_MS), 0, "a failure stamped in the future outlasts its appello");
+    const behind = c.fail(c.INITIAL, "arch", t);
+    assert.equal(c.settle(behind, t + 5), behind, "settle touches a failure that is not ahead");
     assert.ok(c.APPELLO_MS <= 60_000);
     assert.equal(c.lockedFor(c.fail(c.INITIAL, "arch", t).failedAt.arch, t + 1), c.APPELLO_MS - 1);
 

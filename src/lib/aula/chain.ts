@@ -60,8 +60,12 @@ export const INITIAL: AulaState = { passed: [], failedAt: {}, analisiStamped: fa
 const isExam = (v: unknown): v is ExamId => typeof v === "string" && v in PREREQ;
 const isGrade = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 18 && (v as number) <= 30;
 
-/** The saved hall, or the untouched one when the save is missing or broken. Whatever it does not know is dropped. */
-export function loadAula(raw: string | null): AulaState {
+/**
+ * The saved hall, or the untouched one when the save is missing or broken.
+ * Whatever it does not know is dropped, and a failure stamped after `now` is
+ * settled to `now`.
+ */
+export function loadAula(raw: string | null, now: number = Date.now()): AulaState {
   let v: unknown;
   try {
     v = JSON.parse(raw ?? "");
@@ -71,7 +75,7 @@ export function loadAula(raw: string | null): AulaState {
   if (!v || typeof v !== "object" || Array.isArray(v)) return INITIAL;
   const o = v as Record<string, unknown>;
   const failed = o.failedAt && typeof o.failedAt === "object" ? (o.failedAt as Record<string, unknown>) : {};
-  return {
+  return settle({
     passed: Array.isArray(o.passed) ? [...new Set(o.passed.filter(isExam))] : [],
     failedAt: Object.fromEntries(
       Object.entries(failed).filter(([id, t]) => isExam(id) && typeof t === "number" && Number.isFinite(t)),
@@ -79,7 +83,19 @@ export function loadAula(raw: string | null): AulaState {
     analisiStamped: o.analisiStamped === true,
     soGrade: isGrade(o.soGrade) ? o.soGrade : null,
     laptop: o.laptop === "on" ? "on" : "closed",
-  };
+  }, now);
+}
+
+/**
+ * Brings every failure stamped in the future, after the clock was moved back,
+ * down to `now`. Its appello then runs out after one `APPELLO_MS` of real
+ * time, and not only once the clock catches up with the stamp. Returns `s`
+ * itself when nothing changes.
+ */
+export function settle(s: AulaState, now: number): AulaState {
+  const ahead = Object.entries(s.failedAt).filter(([, t]) => t! > now);
+  if (!ahead.length) return s;
+  return { ...s, failedAt: { ...s.failedAt, ...Object.fromEntries(ahead.map(([id]) => [id, now])) } };
 }
 
 /** Passed, and only as long as everything it needs is too: a save that skips a prerequisite counts for nothing downstream. */

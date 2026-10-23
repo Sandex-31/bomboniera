@@ -10,7 +10,7 @@ import Keeper from "./Keeper";
 import { FLIGHT, type View } from "./focus";
 import { moveMs, type Move } from "../lib/descent";
 import { AULA_KEY, aulaLine } from "../data/puzzle";
-import { INITIAL, ORDER, fail, loadAula, lockedFor, pass, type AulaState, type ExamId } from "../lib/aula/chain";
+import { INITIAL, ORDER, fail, loadAula, lockedFor, pass, settle, type AulaState, type ExamId } from "../lib/aula/chain";
 import Station from "./aula/Station";
 import Libretto, { Booklet } from "./aula/Libretto";
 import { Carried, onlySeen } from "./machines/hall";
@@ -183,7 +183,12 @@ export default function Aula({
   const counting = ORDER.some((id) => lockedFor(aula.failedAt[id], now) > 0);
   useEffect(() => {
     if (!counting) return;
-    const t = setInterval(() => setNow(Date.now()), 250);
+    const t = setInterval(() => {
+      const at = Date.now();
+      setNow(at);
+      // a clock moved back mid-appello: the stamp comes down with it, so the countdown still runs
+      setAula((s) => settle(s, at));
+    }, 250);
     return () => clearInterval(t);
   }, [counting]);
   const answer = (id: ExamId, ok: boolean) => {
