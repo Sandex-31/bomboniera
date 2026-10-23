@@ -21,6 +21,7 @@ import Lft from "./aula/Lft";
 import Bd from "./aula/Bd";
 import Ium from "./aula/Ium";
 import So from "./aula/So";
+import Si from "./aula/Si";
 import { moodRng } from "../lib/aula/so";
 import Libretto, { Booklet } from "./aula/Libretto";
 import { Carried, onlySeen } from "./machines/hall";
@@ -107,26 +108,6 @@ const SLATE = "#1F3A2E";
  * to it. The box is small; round it, while it is not the spot being
  * worked, an unseen one a finger wide on a phone takes the tap.
  */
-/**
- * An exam still waiting for its puzzle: one right answer and one wrong, to
- * try the lock, the appello and the libretto with. Each puzzle's own task
- * puts the real one in its place.
- */
-function Stub({ passed, onTry }: { passed: boolean; onTry: (ok: boolean) => void }) {
-  return passed ? (
-    <p>superato</p>
-  ) : (
-    <div style={{ display: "flex", gap: 12 }}>
-      <button type="button" className="aula-stub" onClick={() => onTry(true)}>
-        giusta
-      </button>
-      <button type="button" className="aula-stub" onClick={() => onTry(false)}>
-        sbagliata
-      </button>
-    </div>
-  );
-}
-
 function Placeholder({ id, focused, onPick }: { id: Spot; focused: boolean; onPick: () => void }) {
   const tap = useTap(onPick);
   return (
@@ -457,7 +438,7 @@ export default function Aula({
             ) : id === "so" ? (
               <So {...p} grade={aula.soGrade} />
             ) : (
-              <Stub {...p} />
+              <Si {...p} />
             )
           }
         </Station>

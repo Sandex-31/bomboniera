@@ -8,6 +8,7 @@ import { LFT_ANSWER } from "./lft";
 import { BD_ANSWER } from "./bd";
 import { IUM_ANSWER } from "./ium";
 import { SO_ANSWER } from "./so";
+import { SI_ANSWER } from "./si";
 
 /*
  * The ten exams of the lecture hall on the fifth floor, one puzzle each, and
@@ -158,9 +159,9 @@ export function aulaUpTo(n: number): AulaState {
   return ORDER.slice(0, n).reduce((s, id) => pass(s, id, () => 0.5), INITIAL);
 }
 
-/** What each puzzle gives the ones after it. Each puzzle adds its own as it is built. */
-export type Results = { arch: number; asd: number[]; analisi: number; fisica: number; logica: number; lft: string; bd: number; ium: string; so: number[] };
+/** What each puzzle gives the ones after it; Sistemi Intelligenti's goes to the laptop. */
+export type Results = { arch: number; asd: number[]; analisi: number; fisica: number; logica: number; lft: string; bd: number; ium: string; so: number[]; si: string };
 
 export function results(): Results {
-  return { arch: ARCH_ANSWER, asd: ASD_ANSWER, analisi: ANALISI_ANSWER, fisica: FISICA_ANSWER, logica: LOGICA_ANSWER, lft: LFT_ANSWER, bd: BD_ANSWER, ium: IUM_ANSWER, so: SO_ANSWER };
+  return { arch: ARCH_ANSWER, asd: ASD_ANSWER, analisi: ANALISI_ANSWER, fisica: FISICA_ANSWER, logica: LOGICA_ANSWER, lft: LFT_ANSWER, bd: BD_ANSWER, ium: IUM_ANSWER, so: SO_ANSWER, si: SI_ANSWER };
 }

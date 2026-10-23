@@ -2852,6 +2852,53 @@ try {
   }
 }
 
+/* ---------------------------------------------------------- aula: sistemi intelligenti
+ * The last exam: nine boxes and a page of constraints, each on the result of
+ * another exam. One way only to fill the boxes, every constraint needed for
+ * it, and every one of the nine results in some constraint: change any of
+ * them and the answer no longer holds.
+ */
+{
+  const vite26 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const si = await vite26.ssrLoadModule("/src/lib/aula/si.ts");
+    const c = await vite26.ssrLoadModule("/src/lib/aula/chain.ts");
+
+    const { si: code, ...given } = c.results();
+    const cs = si.constraints(given);
+    const sols = si.solveAll(cs);
+    assert.equal(sols.length, 1, `${sols.length} ways to fill the boxes`);
+    assert.equal(sols[0].length, 9);
+    assert.equal(si.SI_ANSWER, sols[0].join(""));
+    assert.equal(code, si.SI_ANSWER);
+    assert.match(si.SI_ANSWER, /^\d{9}$/);
+
+    // none redundant: without any one, more than one way
+    for (const k of cs.keys()) assert.ok(si.solveAll(cs.filter((_, j) => j !== k), 2).length > 1, `«${cs[k].text}» is redundant`);
+
+    // every result used, and used for real: each constraint names one, and
+    // moved a little, the result its constraint names no longer lets the answer through
+    const keys = Object.keys(given);
+    assert.equal(keys.length, 9);
+    assert.deepEqual([...new Set(cs.map((x) => x.uses))].sort(), [...keys].sort(), "not every result is used");
+    // a number one up, a list the other way round, LFT's word backwards, IUM's hash one digit on
+    const nudge = { lft: [...given.lft].reverse().join(""), ium: given.ium.replace(/\d/,(d) => String((+d + 1) % 10)) };
+    for (const k of keys) {
+      const v = given[k];
+      const moved = si.constraints({ ...given, [k]: nudge[k] ?? (typeof v === "number" ? v + 1 : [...v].reverse()) });
+      assert.ok(moved.some((x) => !x.holds(sols[0])), `the answer holds whatever ${k} is`);
+    }
+    for (const x of cs) assert.ok(x.text.length > 10 && x.chip.length > 3 && x.cells.every((i) => i >= 0 && i < 9));
+
+    assert.ok(si.checkSi(sols[0]));
+    assert.ok(!si.checkSi(sols[0].slice(1)));
+    assert.ok(!si.checkSi(sols[0].map((d, i) => (i === 4 ? (d + 1) % 10 : d))));
+    console.log(`ok — aula: sistemi intelligenti ${si.SI_ANSWER}, ${cs.length} vincoli, nessuno di troppo`);
+  } finally {
+    await vite26.close();
+  }
+}
+
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,
  * movement and sound only. No text between their tags, no text element, no

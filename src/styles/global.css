@@ -1896,6 +1896,21 @@ button.card-pieces__piece { cursor: pointer; }
 .aula-sheet .aula-so__label { margin: 0; font-size: 13px; }
 .aula-so__gantt { display: block; width: 100%; height: auto; }
 .aula-sheet .aula-so__done { margin: 0; font: 700 14px/1.2 var(--font-mono); }
+/* Sistemi Intelligenti: the nine boxes, the page of constraints scrolled in its own box, each with its chip, and the keypad */
+.aula-si { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.aula-si__boxes { display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.aula-si__boxes li { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.aula-si__boxes b { display: flex; align-items: center; justify-content: center; width: 28px; height: 36px; box-sizing: border-box; border: 1px solid #1A1410; border-radius: 4px; background: #fff; font: 700 20px/1 var(--font-mono); }
+.aula-si__boxes li[aria-current="true"] b { border-width: 2px; background: #F3D392; }
+.aula-si__boxes span { font: 10px/1 var(--font-mono); color: #8A7A5A; }
+.aula-si__page {
+  max-height: 260px; overflow: auto; overscroll-behavior: contain; margin: 0; padding: 6px 10px; list-style: none;
+  border-left: 3px solid #C8261E; background: #FFFDF6; font-size: 13px; line-height: 1.35;
+}
+.aula-si__page li + li { margin-top: 6px; }
+.aula-si__chip { display: inline-block; padding: 1px 6px; border-radius: 9px; background: #1F3A2E; color: #E9EEE6; font: 600 11px/1.4 var(--font-sans); white-space: nowrap; }
+.aula-si__keys { display: grid; grid-template-columns: repeat(6, 44px); gap: 4px; }
+.aula-si__keys .aula-lft__tile { min-width: 44px; min-height: 44px; }
 .libretto-btn {
   position: fixed; z-index: 20; right: max(14px, env(safe-area-inset-right)); top: max(14px, var(--safe-t));
   min-height: 44px; padding: 0 16px; border-radius: 999px;
