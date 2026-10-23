@@ -15,13 +15,14 @@ export function toPixel(uv: { x: number; y: number }): [number, number] {
   return [clamp(uv.x * W, W), clamp((1 - uv.y) * H, H)];
 }
 
-/** One step of running from `at` towards `to`: at most `speed * dt` pixels, and never past it. */
-export function chase(at: [number, number], to: [number, number], dt: number, speed = 140): [number, number] {
+/** One step of running from `at` towards `to`: at most `speed * dt` pixels, and never closer than `keep`. */
+export function chase(at: [number, number], to: [number, number], dt: number, speed = 140, keep = 0): [number, number] {
   const dx = to[0] - at[0];
   const dy = to[1] - at[1];
   const d = Math.hypot(dx, dy);
-  const step = speed * dt;
-  if (d <= step) return [to[0], to[1]];
+  if (d <= keep) return at;
+  const step = Math.min(speed * dt, d - keep);
+  if (keep === 0 && step === d) return [to[0], to[1]];
   return [at[0] + (dx / d) * step, at[1] + (dy / d) * step];
 }
 

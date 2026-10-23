@@ -1830,6 +1830,8 @@ try {
       assert.deepEqual(at, to, "Rotom never gets there");
     }
     assert.deepEqual(px.chase([0, 0], [5, 0], 1, 100), [5, 0], "a faster Rotom stops on the target");
+    assert.deepEqual(px.chase([0, 0], [30, 0], 1, 100, 20), [10, 0], "Rotom keeps his distance from the tap");
+    assert.deepEqual(px.chase([25, 0], [30, 0], 1, 100, 20), [25, 0], "Rotom already close stays put");
 
     assert.ok(px.inCircle([10, 0], [0, 0], 10), "the rim is inside the circle");
     assert.ok(!px.inCircle([10, 1], [0, 0], 10));
@@ -1843,6 +1845,13 @@ try {
     for (const [id, s] of Object.entries(SPRITES)) {
       assert.ok(s.w > 0 && s.h > 0 && s.frames > 0, `${id} has no size`);
       assert.match(s.file, /^src\/assets\/animalwell\/[\w-]+\.png$/, `${id} is not in the originals' folder`);
+      // a sheet that is there is exactly its frames side by side
+      if (existsSync(s.file)) {
+        const { decode } = await import("./png.mjs");
+        const { readFileSync } = await import("node:fs");
+        const sheet = decode(readFileSync(s.file));
+        assert.deepEqual([sheet.width, sheet.height], [s.w * s.frames, s.h], `${s.file} does not match ${id}'s size in sprites.ts`);
+      }
     }
     const { insideFrom } = await vite14.ssrLoadModule("/src/data/puzzle.ts");
     assert.ok(insideFrom("1"), "Rotom forgets he went into the walls");

@@ -1,5 +1,5 @@
 /*
- * The sprites of the well: Animal Well's own sheets, dropped by hand into
+ * The sprites of the well: cut from Animal Well's own atlas into
  * src/assets/animalwell/ (the README there lists them). A sheet is its
  * frames side by side, each `w` by `h`. Until a sheet is there, its sprite is
  * a rectangle of the same size in its key colour, so a wall can be built and
@@ -25,21 +25,24 @@ export type SpriteId =
   | "switchYellow"
   | "switchGreen"
   | "switchPink"
-  | "tile";
+  | "tile"
+  | "grass"
+  | "vine"
+  | "bush";
 
 type Sprite = { file: string; w: number; h: number; frames: number; key: string };
 
 const DIR = "src/assets/animalwell/";
 
 export const SPRITES: Record<SpriteId, Sprite> = {
-  // not in the game: drawn in its style, at its size, floating; two frames of bobbing
-  rotomFrost: { file: `${DIR}rotom-frost.png`, w: 12, h: 12, frames: 2, key: "#9FE8FF" },
-  chinchilla: { file: `${DIR}chinchilla.png`, w: 16, h: 12, frames: 2, key: "#C8B89A" },
+  // not in the game: the 3D Cobblemon model rendered flat, three-quarter, as it flies into the wall; two frames of bobbing
+  rotomFrost: { file: `${DIR}rotom-frost.png`, w: 48, h: 26, frames: 2, key: "#9FE8FF" },
+  chinchilla: { file: `${DIR}chinchilla.png`, w: 19, h: 18, frames: 2, key: "#C8B89A" },
   // shut and open
   chest: { file: `${DIR}chest.png`, w: 16, h: 12, frames: 2, key: "#C9A227" },
   porcupine: { file: `${DIR}porcupine.png`, w: 16, h: 12, frames: 2, key: "#8A6A4A" },
   // still and cawing
-  crow: { file: `${DIR}crow.png`, w: 12, h: 12, frames: 2, key: "#3A3A55" },
+  crow: { file: `${DIR}crow.png`, w: 19, h: 18, frames: 2, key: "#3A3A55" },
   // under water and afloat
   turtle: { file: `${DIR}turtle.png`, w: 16, h: 8, frames: 2, key: "#4FA36B" },
   // shut and in flower
@@ -52,7 +55,7 @@ export const SPRITES: Record<SpriteId, Sprite> = {
   tv: { file: `${DIR}tv.png`, w: 32, h: 24, frames: 2, key: "#506070" },
   // one frame for each of the flute's eight directions, in its order
   face: { file: `${DIR}face.png`, w: 12, h: 12, frames: 8, key: "#A0F0D0" },
-  flame: { file: `${DIR}flame.png`, w: 8, h: 12, frames: 4, key: "#FF8A2A" },
+  flame: { file: `${DIR}flame.png`, w: 19, h: 21, frames: 4, key: "#FF8A2A" },
   // full and empty
   blockPink: { file: `${DIR}block-pink.png`, w: 8, h: 8, frames: 2, key: "#FF5FA8" },
   blockBlue: { file: `${DIR}block-blue.png`, w: 8, h: 8, frames: 2, key: "#4FB8FF" },
@@ -61,12 +64,19 @@ export const SPRITES: Record<SpriteId, Sprite> = {
   switchGreen: { file: `${DIR}switch-green.png`, w: 8, h: 8, frames: 2, key: "#5FD35F" },
   switchPink: { file: `${DIR}switch-pink.png`, w: 8, h: 8, frames: 2, key: "#FF7FC0" },
   // the tile sheet: one frame per kind of stone
-  tile: { file: `${DIR}tiles.png`, w: 8, h: 8, frames: 16, key: "#2A3140" },
+  tile: { file: `${DIR}tiles.png`, w: 8, h: 8, frames: 2, key: "#2A3140" },
+  // the setting: a strip of the floor's grass, the moss that hangs from a ceiling, a bush
+  grass: { file: `${DIR}grass.png`, w: 80, h: 16, frames: 1, key: "#3FE08A" },
+  vine: { file: `${DIR}vine.png`, w: 8, h: 10, frames: 1, key: "#3FE08A" },
+  bush: { file: `${DIR}bush.png`, w: 16, h: 8, frames: 1, key: "#3FE08A" },
 };
 
 /** The sheets that are there, by file name. A missing one is simply not in it. */
 const URLS = import.meta.glob("../../assets/animalwell/*.png", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
 const urlOf = (file: string) => URLS[`../../assets/animalwell/${file.slice(DIR.length)}`];
+
+/** Where a sprite's sheet is served from, for the hall's own textures; nothing while it is missing. */
+export const spriteUrl = (id: SpriteId): string | undefined => urlOf(SPRITES[id].file);
 
 const images = new Map<SpriteId, HTMLImageElement | null>();
 function image(id: SpriteId) {
@@ -83,7 +93,7 @@ function image(id: SpriteId) {
 }
 
 /** Where the face's pupil sits for each of the flute's eight directions (u, ur, r, dr, d, dl, l, ul), from its centre. */
-const GAZE: [number, number][] = [[0, -2], [2, -2], [2, 0], [2, 2], [0, 2], [-2, 2], [-2, 0], [-2, -2]];
+export const GAZE: [number, number][] = [[0, -2], [2, -2], [2, 0], [2, 2], [0, 2], [-2, 2], [-2, 0], [-2, -2]];
 
 /**
  * The stand-in for a missing sheet, drawn in code so the frames still read

@@ -5,6 +5,7 @@ import { useTap } from "../Hotspot";
 import { onWall } from "../machines/hall";
 import { H, W, chase, inCircle, toPixel } from "../../lib/well/pixels";
 import { SPRITES, drawSprite } from "../../lib/well/sprites";
+import { paintFireflies } from "./setting";
 import { SCREEN_Y, WELL_R } from "./wall";
 
 /*
@@ -35,6 +36,9 @@ export const finger: { current: [number, number] | null } = { current: null };
  * Paints a wall's room. `uvAt` says whether a pixel is under the UV light:
  * the hidden marks are drawn only where it is true.
  */
+/** How far from a tap Rotom stops, in pixels: beside the finger, his arms of plasma clear of it. */
+const KEEP = 30;
+
 /** How often a screen seen from across the hall is repainted, in seconds. */
 const IDLE_S = 1 / 10;
 
@@ -149,7 +153,8 @@ export default function Screen({
     if (active) {
       const g = goal.current;
       if (g[0] !== rotom.current[0]) facingLeft.current = g[0] < rotom.current[0];
-      rotom.current = reduced ? g : chase(rotom.current, g, step);
+      // he comes up to the tap, not onto it; under reduced motion in one jump
+      rotom.current = chase(rotom.current, g, reduced ? Infinity : step, 140, KEEP);
       const s = SPRITES.rotomFrost;
       drawSprite(ctx, "rotomFrost", rotom.current[0] - s.w / 2, rotom.current[1] - s.h / 2, reduced ? 0 : Math.floor(t * 4), facingLeft.current);
     }
@@ -168,6 +173,8 @@ export default function Screen({
         ctx.drawImage(masks().hole, x - R, y - R);
       }
     }
+    // the fireflies glow in the dark too; under reduced motion they keep still
+    paintFireflies(ctx, reduced ? 0 : t);
     if (uv && at) ctx.drawImage(masks().glow, at[0] - R, at[1] - R);
     texture.needsUpdate = true;
   });

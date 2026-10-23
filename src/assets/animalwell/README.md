@@ -13,11 +13,11 @@ gioco. I nomi sono quelli di `src/lib/well/sprites.ts`: se una misura cambia, va
 
 | `SpriteId`     | File               | Fotogramma | Fotogrammi | Cosa sono                                    |
 | -------------- | ------------------ | ---------- | ---------- | -------------------------------------------- |
-| `rotomFrost`   | `rotom-frost.png`  | 12×12      | 2          | Rotom Gelo, da disegnare nello stile del gioco |
-| `chinchilla`   | `chinchilla.png`   | 16×12      | 2          | il cincillà che cammina                      |
+| `rotomFrost`   | `rotom-frost.png`  | 48×26      | 2          | Rotom Gelo, il modello 3D reso in pixel        |
+| `chinchilla`   | `chinchilla.png`   | 19×18      | 2          | il cincillà che cammina                      |
 | `chest`        | `chest.png`        | 16×12      | 2          | il baule, chiuso e aperto                    |
 | `porcupine`    | `porcupine.png`    | 16×12      | 2          | il porcospino che cammina                    |
-| `crow`         | `crow.png`         | 12×12      | 2          | il corvo, fermo e mentre gracchia            |
+| `crow`         | `crow.png`         | 19×18      | 2          | il corvo, fermo e mentre gracchia            |
 | `turtle`       | `turtle.png`       | 16×8       | 2          | la tartaruga, sott'acqua e a galla           |
 | `bud`          | `bud.png`          | 8×12       | 2          | il bocciolo, chiuso e fiorito                |
 | `ghost`        | `ghost.png`        | 16×16      | 2          | il fantasma della stanza buia                |
@@ -25,7 +25,7 @@ gioco. I nomi sono quelli di `src/lib/well/sprites.ts`: se una misura cambia, va
 | `phone`        | `phone.png`        | 16×16      | 1          | il telefono, il punto di salvataggio         |
 | `tv`           | `tv.png`           | 32×24      | 2          | la televisione, spenta e accesa              |
 | `face`         | `face.png`         | 12×12      | 8          | la faccia di fantasma: una per direzione del flauto, nell'ordine su, su-destra, destra, giù-destra, giù, giù-sinistra, sinistra, su-sinistra |
-| `flame`        | `flame.png`        | 8×12       | 4          | la fiamma                                    |
+| `flame`        | `flame.png`        | 19×21      | 4          | la fiamma                                    |
 | `blockPink`    | `block-pink.png`   | 8×8        | 2          | il blocco rosa, pieno e vuoto                |
 | `blockBlue`    | `block-blue.png`   | 8×8        | 2          | il blocco azzurro, pieno e vuoto             |
 | `switchYellow` | `switch-yellow.png`| 8×8        | 2          | l'interruttore giallo, su e premuto          |
@@ -36,7 +36,12 @@ gioco. I nomi sono quelli di `src/lib/well/sprites.ts`: se una misura cambia, va
 
 | `SpriteId` | File        | Tile | Quanti | Cosa sono                                   |
 | ---------- | ----------- | ---- | ------ | ------------------------------------------- |
-| `tile`     | `tiles.png` | 8×8  | 16     | le pietre delle stanze, in una sola riga    |
+| `tile`     | `tiles.png` | 8×8  | 2      | le pietre delle stanze, in una sola riga    |
+| `grass`    | `grass.png` | 80×16 | 1     | una striscia del prato, ripetuta sui pavimenti |
+| `vine`     | `vine.png`  | 8×10 | 1      | il muschio che pende dal soffitto, a catena |
+| `bush`     | `bush.png`  | 16×8 | 1      | il cespuglio sul prato                      |
+
+Le lucciole non sono un file: nel gioco sono particelle, qui le disegna `src/scenes/well/setting.ts`.
 
 ## Musica
 

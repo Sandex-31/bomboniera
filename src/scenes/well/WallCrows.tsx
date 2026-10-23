@@ -1,5 +1,5 @@
 import { useMemo, useRef } from "react";
-import { hit, touchRect, type Rect } from "../../lib/well/pixels";
+import { H, W, hit, touchRect, type Rect } from "../../lib/well/pixels";
 import { SPRITES, drawSprite } from "../../lib/well/sprites";
 import { follow, type Played } from "../../lib/flute";
 import { crowVoice } from "../../lib/crowVoice";
@@ -25,6 +25,7 @@ import {
 } from "../../lib/well/crows";
 import type { PillarsState } from "../../lib/well/pillars";
 import { paintPillars, stampPillar } from "./pillarPaint";
+import { paintSetting } from "./setting";
 import type { Painter } from "./Screen";
 
 /*
@@ -127,6 +128,9 @@ export function useWallCrows({
       }
       const open = now.current.box;
 
+      // no floor here: the grass grows along the bottom
+      paintSetting(ctx, t, [[0, W, H]], 3);
+
       // the box
       ctx.fillStyle = "#0E1218";
       ctx.fillRect(BX, BY, COLS * CELL, ROWS * CELL);
@@ -178,8 +182,8 @@ export function useWallCrows({
         ctx.fillRect(PERCH.x, PERCH.y, PERCH.w, PERCH.h);
         CROWS.forEach((c) => {
           const cawing = caw >= 0 && CROW_TUNE[caw].note === c;
-          // a cawing crow bobs; a scattering one flies outwards and up
-          const bob = cawing ? -Math.abs(Math.sin(t * 24)) * 3 : 0;
+          // a short caw bobs, a long one stands raised for all of it; a scattering crow flies outwards and up
+          const bob = !cawing ? 0 : CROW_TUNE[caw].long ? -5 : -Math.abs(Math.sin(t * 24)) * 3;
           const x = MID[0] + VEC[c][0] * (REACH + spread * 70) - SPRITES.crow.w / 2;
           const y = MID[1] + VEC[c][1] * REACH * 0.8 - SPRITES.crow.h + bob - spread * 50;
           drawSprite(ctx, "crow", x, y, cawing || spread > 0 ? 1 : 0, VEC[c][0] < 0);
@@ -190,7 +194,7 @@ export function useWallCrows({
         ctx.fillStyle = "#05070B";
         ctx.fillRect(HATCH.x, HATCH.y, HATCH.w, HATCH.h);
         const rise = (ms - flameAt.current) / FLAME_MS;
-        if (rise >= 0 && rise < 1) drawSprite(ctx, "flame", MID[0] - 4, HATCH.y - rise * 80, Math.floor(t * 8));
+        if (rise >= 0 && rise < 1) drawSprite(ctx, "flame", MID[0] - SPRITES.flame.w / 2, HATCH.y - rise * 80, Math.floor(t * 8));
       }
 
       // the pillar stands on top, so that its marks show
@@ -218,17 +222,19 @@ export function useWallCrows({
     }
   };
 
-  /** A note of the flute: it counts once the crows have been heard, and not while they caw. */
+  /** A note of the flute: it counts once the crows have been heard, and cuts them short if they are cawing. */
   const onNote = (p: Played) => {
     const s = now.current;
     // notes come from a press: the place to make or wake the audio before a caw is heard
     crowVoice();
-    if (!s.box || s.flame || play.current) return;
+    if (!s.box || s.flame) return;
     // the crows not yet heard (a reload): a note is their cue, in a gesture
     if (!s.heard) {
-      start(false);
+      if (!play.current) start(false);
       return;
     }
+    // the visitor plays over them: they fall quiet and listen
+    play.current = null;
     heard.current = follow(CROW_TUNE, heard.current, p);
     if (heard.current === 0) {
       // wrong: they scatter, settle, and caw from the start

@@ -21,6 +21,7 @@ import {
   type PillarsState,
 } from "../../lib/well/pillars";
 import { paintPillars, stampPillar } from "./pillarPaint";
+import { paintSetting } from "./setting";
 import type { Painter } from "./Screen";
 import { WALL_ANGLES } from "./wall";
 
@@ -181,6 +182,7 @@ export function useWallPillars({
       const tile = SPRITES.tile;
       for (let x = 0; x < W; x += tile.w)
         for (let y = FLOOR; y < H; y += tile.h) drawSprite(ctx, "tile", x, y, (x / tile.w + y / tile.h) % tile.frames);
+      paintSetting(ctx, t, [[0, W, FLOOR]], 4);
 
       if (!s.uv) {
         const pressed = s.switches.every(Boolean);
@@ -256,7 +258,7 @@ export function useWallPillars({
           }
           // the flame rises out of the telephone and away
           const rise = (ms - flameAt.current) / 1800;
-          if (rise >= 0 && rise < 1) drawSprite(ctx, "flame", PHONE.x - 4, 76 - rise * 100, Math.floor(t * 8));
+          if (rise >= 0 && rise < 1) drawSprite(ctx, "flame", PHONE.x - SPRITES.flame.w / 2, 76 - rise * 100, Math.floor(t * 8));
         }
       }
       paintPillars(ctx, "pilastri", s, uvAt);

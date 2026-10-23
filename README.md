@@ -316,8 +316,9 @@ L'organo invece è sintetizzato con Web Audio (`src/lib/organ.ts`).
 
 Il pozzo del quarto piano è un omaggio a ***Animal Well*** (2024) di **Billy Basso**, Shared Memory, pubblicato da Bigmode. Ne usa gli sprite, i tile, un
 brano della colonna sonora e i suoni (le note del flauto, il corvo, gli
-interruttori, il baule, il telefono), tutti di proprietà dei loro autori. I
-file non stanno nel repository: li fornisce Salvo a parte e vanno in
-`src/assets/animalwell/` (l'elenco è nel suo `README.md`). Finché un file
-manca, il pozzo disegna un segnaposto e i suoni sono un bip di Web Audio.
+interruttori, il baule, il telefono), tutti di proprietà dei loro autori. Gli
+sprite sono ritagliati dall'atlante originale del gioco e stanno in
+`src/assets/animalwell/` (l'elenco è nel suo `README.md`); Rotom Gelo, che
+nel gioco non c'è, è il suo modello 3D di Cobblemon reso in pixel. Finché un file manca, il pozzo
+disegna un segnaposto e i suoni sono un bip di Web Audio.
 `npm test` fallisce se questa citazione sparisce dal README.

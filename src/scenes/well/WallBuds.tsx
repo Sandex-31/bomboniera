@@ -7,6 +7,7 @@ import { bounce, type Dir } from "../../lib/beam";
 import { BUD_TUNE, MURAL, TURTLE_TUNE, budOrder, firstHidden, traceMural, type BudsState } from "../../lib/well/buds";
 import type { PillarsState } from "../../lib/well/pillars";
 import { paintPillars, stampPillar } from "./pillarPaint";
+import { paintSetting } from "./setting";
 import type { Painter } from "./Screen";
 
 /*
@@ -71,6 +72,24 @@ const DARK: number[] = (() => {
   }
   return out;
 })();
+/** How far along the beam each of its points is, in pixels. */
+const ALONG: number[] = BEAM.reduce<number[]>((acc, q, i) => [...acc, i ? acc[i - 1] + Math.hypot(q[0] - BEAM[i - 1][0], q[1] - BEAM[i - 1][1]) : 0], []);
+/** Where the beam stops being drawn and is left to the UV light. */
+const SEEN_TO = ALONG[SEEN.length - 1];
+/** The point `d` pixels along the beam. */
+function along(d: number): [number, number] {
+  const i = Math.max(1, ALONG.findIndex((a) => a >= d));
+  const f = (d - ALONG[i - 1]) / (ALONG[i] - ALONG[i - 1] || 1);
+  return [BEAM[i - 1][0] + (BEAM[i][0] - BEAM[i - 1][0]) * f, BEAM[i - 1][1] + (BEAM[i][1] - BEAM[i - 1][1]) * f];
+}
+/** How far along the beam it first reaches each bud. */
+const BUD_AT = MURAL.buds.map((b) => ALONG[traceMural().findIndex(([c, r]) => c === b.cell[0] && r === b.cell[1]) + 1]);
+/** A pulse of light runs the beam at this speed, in pixels a second, and its tail is this long. */
+const PULSE_SPEED = 70;
+const PULSE_LEN = 12;
+/** How long a bud glows as the pulse goes by, in pixels of the pulse's run. */
+const GLOW = 14;
+
 /** Each mirror's two ends, and its middle. */
 const MIRRORS = MURAL.mirrors.map(({ cell, m, hidden }) => {
   const [x, y] = centre(cell);
@@ -108,6 +127,8 @@ export function useWallBuds({
   other.current = { set, pillars, setPillars, uvOn, onFlame };
 
   const heard = useRef(0);
+  /** The buds tapped so far, in order: judged only once all four are. */
+  const tapped = useRef<number[]>([]);
   const flameAt = useRef(-Infinity);
   const raisedAt = useRef(-Infinity);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -127,6 +148,7 @@ export function useWallBuds({
       ctx.fillStyle = "#0E1218";
       ctx.fillRect(0, 24, 320, 132);
       for (let x = 0; x < 320; x += tile.w) drawSprite(ctx, "tile", x, 156, (x / tile.w) % tile.frames);
+      paintSetting(ctx, t, [[0, 320, 156]], 2);
 
       // the pool: water with a ripple that moves
       ctx.fillStyle = "#12304A";
@@ -134,14 +156,19 @@ export function useWallBuds({
       ctx.fillStyle = "#1E4A6E";
       for (let y = POOL.y + 6; y < POOL.y + POOL.h; y += 10) ctx.fillRect(POOL.x + 4 + ((y * 7 + Math.floor(t * 6)) % 30), y, 14, 1);
 
-      // the tune painted by the water, under the UV light only: a head, and a stem towards the note's direction, longer for a long note
+      // the tune painted by the water, under the UV light only: the flute's own arrows, a long note's with a longer stem and a bar across its tail
       ctx.fillStyle = "#FF4FD8";
       for (let k = 0; k < TURTLE_TUNE.length; k++) {
         const [x, y] = MARKS[k];
-        if (!uvAt([x, y])) continue;
         const { note, long } = TURTLE_TUNE[k];
-        ctx.fillRect(x - 1, y - 1, 3, 3);
-        for (let i = 2; i < (long ? 12 : 6); i += 2) ctx.fillRect(x + VEC[note][0] * i, y + VEC[note][1] * i, 1, 1);
+        const [vx, vy] = VEC[note];
+        const dot = (px: number, py: number) => uvAt([px, py]) && ctx.fillRect(px - 1, py - 1, 2, 2);
+        const len = long ? 8 : 5;
+        for (let i = -len; i <= len; i++) dot(x + vx * i, y + vy * i);
+        // the head: two arms back from the tip, square to each other
+        const arms: [number, number][] = vx && vy ? [[-vx, 0], [0, -vy]] : [[-vx - vy, vx - vy], [-vx + vy, -vy - vx]];
+        for (const [ax, ay] of arms) for (let i = 1; i <= 4; i++) dot(x + vx * len + ax * i, y + vy * len + ay * i);
+        if (long) for (let i = -3; i <= 3; i++) dot(x - vx * len - vy * i, y - vy * len + vx * i);
       }
 
       // the turtles: a ripple while sunk, a shell on the water once raised
@@ -195,18 +222,29 @@ export function useWallBuds({
           ctx.stroke();
         }
 
-        // the buds: lit once sung right, all of them when the flame is given
+        // a pulse of light runs the beam from the source, again and again; past the dark it shows only under UV
+        const head = ((ms / 1000) * PULSE_SPEED) % (ALONG[ALONG.length - 1] + 60);
+        ctx.fillStyle = "#FFFFFF";
+        for (let d = Math.max(0, head - PULSE_LEN); d <= Math.min(head, ALONG[ALONG.length - 1]); d++) {
+          const q = along(d);
+          if (d <= SEEN_TO || uvAt(q)) ctx.fillRect(Math.round(q[0]) - 1, Math.round(q[1]) - 1, 3, 3);
+        }
+
+        // the buds: one glows as the pulse reaches it, where the pulse can be seen; tapped ones stay lit
         ctx.fillStyle = "#FFE9A0";
         ctx.fillRect(MX - 6, SOURCE_Y - 3, 6, 6);
         for (let k = 0; k < MURAL.buds.length; k++) {
-          const lit = s.flame || ORDER.indexOf(k) < s.played;
+          PT[0] = BUD_RECTS[k].x + BUD_RECTS[k].w / 2;
+          PT[1] = BUD_RECTS[k].y + BUD_RECTS[k].h / 2;
+          const reached = Math.abs(head - BUD_AT[k]) < GLOW && (BUD_AT[k] <= SEEN_TO || uvAt(PT));
+          const lit = s.flame || tapped.current.includes(k) || reached;
           drawSprite(ctx, "bud", BUD_RECTS[k].x, BUD_RECTS[k].y, lit ? 1 : 0);
         }
 
         if (s.flame) {
           const rise = (ms - flameAt.current) / FLAME_MS;
           const [fx, fy] = centre(BUD_TUNE[BUD_TUNE.length - 1].cell);
-          if (rise >= 0 && rise < 1) drawSprite(ctx, "flame", fx - 4, fy - rise * 80, Math.floor(t * 8));
+          if (rise >= 0 && rise < 1) drawSprite(ctx, "flame", fx - SPRITES.flame.w / 2, fy - rise * 80, Math.floor(t * 8));
         }
       }
 
@@ -226,20 +264,20 @@ export function useWallBuds({
     }
     if (!s.turtles || s.flame) return;
     const k = BUD_RECTS.findIndex((r) => hit(pt, touchRect(r)));
-    if (k < 0) return;
+    if (k < 0 || tapped.current.includes(k)) return;
     // a tap is a gesture: the place to make the audio, and the bud sings its whistle
     const voice = organ().start(MURAL.buds[k].whistle);
     timers.current.push(setTimeout(() => voice.stop(), WHISTLE_MS));
-    if (ORDER[s.played] !== k) {
-      organ().puff();
-      commit({ ...s, played: 0 });
+    // nothing tells a right bud from a wrong one until all four are lit: then they are judged together
+    tapped.current = [...tapped.current, k];
+    if (tapped.current.length < MURAL.buds.length) return;
+    const right = tapped.current.every((b, i) => b === ORDER[i]);
+    tapped.current = [];
+    if (!right) {
+      timers.current.push(setTimeout(() => organ().puff(), WHISTLE_MS));
       return;
     }
-    const played = s.played + 1;
-    if (played < MURAL.buds.length) {
-      commit({ ...s, played });
-      return;
-    }
+    const played = MURAL.buds.length;
     flameAt.current = performance.now();
     o.onFlame();
     commit({ ...s, played, flame: true });

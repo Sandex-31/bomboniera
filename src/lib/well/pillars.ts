@@ -47,8 +47,9 @@ export const PILLARS: { wall: WallId; x: number; y: number }[] = [
   { wall: "pilastri", x: 304, y: 100 },
   { wall: "boccioli", x: 20, y: 100 },
   { wall: "boccioli", x: 290, y: 100 },
-  { wall: "tv", x: 20, y: 100 },
-  { wall: "tv", x: 290, y: 100 },
+  // on the living room's floor, behind it, one each side of the TV and clear of the sofa
+  { wall: "tv", x: 40, y: 74 },
+  { wall: "tv", x: 262, y: 74 },
   { wall: "corvi", x: 153, y: 100 },
 ];
 

@@ -22,6 +22,7 @@ import { savedBuds, type BudsState } from "../lib/well/buds";
 import { firstFlame, type Flames } from "../lib/well/flames";
 import { lit, place, savedMural, type MuralState, type PieceId } from "../lib/well/mural";
 import Altar, { PANEL_Y, PIT_R } from "./well/Altar";
+import Overgrowth, { useStone } from "./well/Overgrowth";
 import Mural from "../components/Mural";
 import { useWallPillars } from "./well/WallPillars";
 import { useWallTv } from "./well/WallTv";
@@ -142,6 +143,7 @@ export default function Well({
   first: boolean;
 }) {
   const controls = useRef<OrbitControlsImpl>(null);
+  const stone = useStone();
   const [flying, setFlying] = useState(false);
   const [zapAt, setZapAt] = useState(0);
   /** The wall or the altar the camera stands in front of, if any. */
@@ -416,13 +418,19 @@ export default function Well({
       {/* the floor: dark stone */}
       <mesh rotation-x={-Math.PI / 2}>
         <ringGeometry args={[PIT_R, WELL_R, 64]} />
-        <meshStandardMaterial color="#14181F" roughness={0.9} />
+        {stone.floor ? <meshStandardMaterial map={stone.floor} color="#7A8090" roughness={0.9} /> : <meshStandardMaterial color="#14181F" roughness={0.9} />}
       </mesh>
       {/* the wall, from the inside only */}
       <mesh position={[0, WALL_H / 2, 0]}>
         <cylinderGeometry args={[WELL_R, WELL_R, WALL_H, 64, 1, true]} />
-        <meshStandardMaterial color="#232A36" side={BackSide} roughness={0.95} />
+        {stone.wall ? (
+          <meshStandardMaterial map={stone.wall} color="#C0C8D8" side={BackSide} roughness={0.95} />
+        ) : (
+          <meshStandardMaterial color="#232A36" side={BackSide} roughness={0.95} />
+        )}
       </mesh>
+      {/* grass, moss and fireflies, as in a room of the game */}
+      <Overgrowth reduced={reduced} />
       <mesh position={[0, WALL_H, 0]} rotation-x={-Math.PI / 2} visible={focus === null}>
         <ringGeometry args={[WELL_R, WELL_R + 0.12, 64]} />
         <meshStandardMaterial color="#2E3440" roughness={0.8} />
