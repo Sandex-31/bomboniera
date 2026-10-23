@@ -20,6 +20,8 @@ import Logica from "./aula/Logica";
 import Lft from "./aula/Lft";
 import Bd from "./aula/Bd";
 import Ium from "./aula/Ium";
+import So from "./aula/So";
+import { moodRng } from "../lib/aula/so";
 import Libretto, { Booklet } from "./aula/Libretto";
 import { Carried, onlySeen } from "./machines/hall";
 import {
@@ -202,7 +204,7 @@ export default function Aula({
   const answer = (id: ExamId, v: Verdict) => {
     const t = Date.now();
     setNow(t);
-    setAula((s) => (v === true ? pass(s, id) : fail(s, id, t, v === "stamp")));
+    setAula((s) => (v === true ? pass(s, id, id === "so" ? moodRng(t) : undefined) : fail(s, id, t, v === "stamp")));
   };
   const [booklet, setBooklet] = useState(false);
 
@@ -452,6 +454,8 @@ export default function Aula({
               <Bd {...p} />
             ) : id === "ium" ? (
               <Ium {...p} onScene={setScene} reduced={reduced} firstTry={aula.failedAt.ium === undefined} />
+            ) : id === "so" ? (
+              <So {...p} grade={aula.soGrade} />
             ) : (
               <Stub {...p} />
             )

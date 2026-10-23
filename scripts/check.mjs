@@ -2765,6 +2765,93 @@ try {
   }
 }
 
+/* ---------------------------------------------------------- aula: sistemi operativi
+ * The five students at their desks. By habit they deadlock; a global order
+ * for what they share can break the circle, and not every one does. Then the
+ * finish order of round robin, which every input moves: the quantum, the
+ * arrival from ASD's way, the queue's rule. And the prof's mood: the grade
+ * drawn goes with the face of that moment.
+ */
+{
+  const vite25 = await createServer({ server: { middlewareMode: true }, appType: "custom" });
+  try {
+    const so = await vite25.ssrLoadModule("/src/lib/aula/so.ts");
+    const as = await vite25.ssrLoadModule("/src/lib/aula/asd.ts");
+    const fi = await vite25.ssrLoadModule("/src/lib/aula/fisica.ts");
+    const c = await vite25.ssrLoadModule("/src/lib/aula/chain.ts");
+
+    assert.equal(so.PROCS.length, 5);
+    const ids = so.PROCS.map((p) => p.id);
+    assert.equal(new Set(ids).size, 5);
+    for (const p of so.PROCS) {
+      assert.ok(p.needs[0] !== p.needs[1] && p.needs.every((r) => so.RES.includes(r)), `${p.name} needs ${p.needs}`);
+      assert.ok(Number.isInteger(p.burst) && p.burst > 0);
+    }
+
+    // the deadlock: habit closes a circle, some orders break it and some do not
+    assert.ok(so.deadlocks(so.DEFAULT_ORDER), "the students do not deadlock by habit");
+    const orders = [[]];
+    for (let n = 0; n < so.RES.length; n++)
+      for (const o of orders.filter((o) => o.length === n)) for (const r of so.RES) if (!o.includes(r)) orders.push([...o, r]);
+    const safe = orders.filter((o) => !so.deadlocks(o));
+    assert.ok(safe.length > 0, "no order breaks the deadlock");
+    assert.ok(orders.some((o) => o.length === 1 && so.deadlocks(o)), "any one thing ranked first breaks it");
+    // every complete order is safe, as a global order always is
+    for (const o of orders.filter((o) => o.length === so.RES.length)) assert.ok(!so.deadlocks(o), `${o} deadlocks`);
+
+    // the arrival: one student per aisle of ASD's way, in its order, and not by desk
+    const arr = so.arrival(as.ASD_ANSWER);
+    assert.deepEqual([...arr].sort(), [...ids].sort(), "not every student comes in by ASD's way");
+    assert.equal(as.ASD_ANSWER.length - 1, 5, "ASD's way has not 5 aisles");
+    assert.deepEqual(so.SO_ARRIVAL, arr);
+    assert.notDeepEqual(arr, ids);
+    assert.deepEqual(so.arrival([...as.ASD_ANSWER].reverse()), [...arr].reverse(), "an aisle is walked one way only");
+
+    // the quantum, 1 to 5, from Fisica's mA by the board's rule
+    assert.equal(fi.FISICA_ANSWER, 30);
+    for (let mA = 0; mA <= 60; mA++) assert.ok(so.quantumFrom(mA) >= 1 && so.quantumFrom(mA) <= 5);
+    assert.equal(so.SO_QUANTUM, 3);
+
+    // round robin by hand: Anna (5) then Bruno (3), quantum 2; Bruno, come in during Anna's quantum, goes before her
+    assert.deepEqual(so.schedule([1, 2], 2).map((x) => [x.id, x.from, x.to]), [[1, 0, 2], [2, 2, 4], [1, 4, 6], [2, 6, 7], [1, 7, 8]]);
+    assert.deepEqual(so.roundRobin([1, 2], 2), [2, 1]);
+    assert.equal(so.schedule([1, 2], 1)[1].id, 2, "the one just stopped goes before the one just come");
+    const total = so.PROCS.reduce((s, p) => s + p.burst, 0);
+    const sl = so.schedule(so.SO_ARRIVAL, so.SO_QUANTUM);
+    assert.equal(sl[sl.length - 1].to, total, "the schedule idles or overlaps");
+    for (let i = 1; i < sl.length; i++) assert.equal(sl[i].from, sl[i - 1].to);
+    for (const x of sl) assert.ok(x.to - x.from <= so.SO_QUANTUM);
+
+    // every input matters
+    const A = so.SO_ANSWER.join("");
+    assert.deepEqual(so.SO_ANSWER, so.roundRobin(so.arrival(as.ASD_ANSWER), so.quantumFrom(fi.FISICA_ANSWER)));
+    assert.notEqual(so.roundRobin(arr, 1).join(""), A, "quantum 1 gives the same finish");
+    assert.notEqual(so.roundRobin(arr, Infinity).join(""), A, "FCFS gives the same finish");
+    assert.notEqual(so.roundRobin(ids, so.SO_QUANTUM).join(""), A, "arrival by desk gives the same finish");
+    for (let q = 1; q <= 5; q++) if (q !== so.SO_QUANTUM) assert.notEqual(so.roundRobin(arr, q).join(""), A, `quantum ${q} gives the same finish`);
+
+    assert.ok(so.checkSo(safe[0], so.SO_ANSWER));
+    assert.ok(!so.checkSo(so.DEFAULT_ORDER, so.SO_ANSWER), "a deadlock passes");
+    assert.ok(!so.checkSo(safe[0], so.SO_ANSWER.slice(1)));
+    assert.ok(!so.checkSo(safe[0], so.roundRobin(arr, 1)));
+
+    // the mood: every grade has a face, and the one drawn at t is the face shown at t
+    for (let g = 18; g <= 30; g++) assert.equal(so.MOODS.filter((m) => g >= m.grades[0] && g <= m.grades[1]).length, 1, `${g} has not one face`);
+    for (let k = 0; k < 40; k++) {
+      const t = k * 517;
+      for (const r of [0, 0.5, 0.999]) {
+        const s = c.pass(c.aulaUpTo(c.ORDER.indexOf("so")), "so", so.moodRng(t, () => r));
+        assert.equal(so.moodOf(s.soGrade), so.moodAt(t), `the grade at ${t} is not the face's`);
+      }
+    }
+
+    assert.deepEqual(c.results().so, so.SO_ANSWER);
+    console.log(`ok — aula: sistemi operativi ${A}, ${safe.length} ordini su ${orders.length} senza deadlock, quanto ${so.SO_QUANTUM}`);
+  } finally {
+    await vite25.close();
+  }
+}
+
 /* ---------------------------------------------------------- no words, no numbers
  * The machines of the third floor say nothing in writing: shapes, colours,
  * movement and sound only. No text between their tags, no text element, no
