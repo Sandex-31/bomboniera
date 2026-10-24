@@ -237,12 +237,13 @@ export default function Aula({
 
   /**
    * The laptop tapped: walked up to, and still shut until the libretto is full.
-   * Open, up close it fills a phone's screen and leaves nothing else to tap,
-   * so a tap on the case, off its keys and its video, walks back to the hall.
+   * On, up close it fills a phone's screen and leaves nothing else to tap, so a
+   * tap on the case, off its video, walks back to the hall. Never while the
+   * code is being typed: a near-miss on a key must not lose it.
    */
   const tapLaptop = () => {
     if (scene) return;
-    if (focus === "desk" && canOpen(aula)) return leave();
+    if (focus === "desk" && aula.laptop === "on") return leave();
     if (focus !== "desk") pick("desk");
     if (!canOpen(aula)) setShut(true);
   };

@@ -1782,7 +1782,7 @@ function Desk({
       </button>
       {/* debug: back to an untouched puzzle, or straight to any point of it */}
       <div className="void-reset">
-        <button onClick={() => onJump(0)}>⟲ ricomincia il puzzle</button>
+        <button onClick={() => window.confirm("Ricominciare il puzzle da capo? Tutti i piani tornano chiusi.") && onJump(0)}>⟲ ricomincia il puzzle</button>
         <select
           aria-label="Salta a un punto del puzzle"
           value=""

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from "react";
+import { useMemo, useRef, useState, type SyntheticEvent } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html, useGLTF } from "@react-three/drei";
 import { Color, Vector3, type Mesh, type MeshStandardMaterial, type Object3D } from "three";
@@ -203,10 +203,6 @@ export default function Laptop({
       clank();
     } else if (r.result === "ok") onOn();
   };
-  // a wrong code typed half-way is forgotten on walking away
-  useEffect(() => {
-    if (!focused) setBuffer("");
-  }, [focused]);
 
   const tap = useTap(onOpen);
   const typing = focused && open && !on;
