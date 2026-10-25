@@ -289,10 +289,34 @@ in alto fluttua l'etichetta, `ring` = il cerchio dorato a terra).
 - **Boot:** si vede per intero solo la prima volta (flag in `localStorage`), ed è
   sempre saltabile.
 
+## Il portatile dell'aula e il video di Salvo
+
+Il finale del quinto piano è il portatile steampunk sulla cattedra,
+`public/models/portatile.glb` (circa 1,8 MB, il limite è 3 MB). Viene dal file
+di stampa `FinaleQReasy.3mf`, che ne contiene cinque copie: se ne è presa una
+sola (`object id="1"` in `3D/3dmodel.model`), estratta in OBJ con uno script
+usa e getta e lavorata in Blender:
+
+- il rilievo del QR sul retro del coperchio è stato schiacciato in piano: il QR
+  non c'è più, da nessuna parte;
+- i due cavi tra coperchio e cassa sono stati tolti, perché il coperchio possa
+  chiudersi;
+- il modello è diviso nelle parti che la scena muove: `base` (supporto e cassa),
+  `lid` con l'origine sull'asse della cerniera, `screen` (l'oblò del coperchio),
+  `keys`, `gear_a`, `gear_b`, `gear_c` (ognuno gira attorno al proprio asse
+  verticale) e `heart`, un cuore aggiunto a mano sulla base;
+- ridotto con Decimate, colorato (legno, rame, ottone, avorio) ed esportato in
+  GLB senza normali né UV, in scala: la base è larga 0,5 unità della scena.
+
+Il video sullo schermo è `public/media/finale.mp4`: H.264 + AAC, 720p, al
+massimo 15 MB circa. Parte solo con un tocco (`playsInline`, niente autoplay);
+finché il file non c'è, sullo schermo si legge «il video di Salvo arriverà
+qui».
+
 ## Crediti dei modelli
 
-Il guardiano della stanza nascosta, Rotom, e le sue forme (per ora Rotom
-Lavaggio) sono i modelli e le texture del mod **Cobblemon**
+Il guardiano della stanza nascosta, Rotom, e le sue forme (Rotom Lavaggio,
+Calore, Gelo e Vortice) sono i modelli e le texture del mod **Cobblemon**
 (<https://gitlab.com/cable-mc/cobblemon>), usati sotto licenza **MPL-2.0**.
 I file, non modificati, stanno in `src/assets/rotom/cobblemon/` con un
 `SOURCE.txt` che dice da quale commit vengono; `src/lib/bedrock.ts` li legge
@@ -311,3 +335,14 @@ sopra un ritaglio di 22 secondi (da 0:38,5) di **«Genesis Retake Light»** di
 `src/assets/organo/genesis-retake-light.mp3`, tagliato ai frame dall'mp3
 originale senza ricodificarlo; tutti i diritti restano ai loro autori.
 L'organo invece è sintetizzato con Web Audio (`src/lib/organ.ts`).
+
+## Crediti di Animal Well
+
+Il pozzo del quarto piano è un omaggio a ***Animal Well*** (2024) di **Billy Basso**, Shared Memory, pubblicato da Bigmode. Ne usa gli sprite, i tile, un
+brano della colonna sonora e i suoni (le note del flauto, il corvo, gli
+interruttori, il baule, il telefono), tutti di proprietà dei loro autori. Gli
+sprite sono ritagliati dall'atlante originale del gioco e stanno in
+`src/assets/animalwell/` (l'elenco è nel suo `README.md`); Rotom Gelo, che
+nel gioco non c'è, è il suo modello 3D di Cobblemon reso in pixel. Finché un file manca, il pozzo
+disegna un segnaposto e i suoni sono un bip di Web Audio.
+`npm test` fallisce se questa citazione sparisce dal README.

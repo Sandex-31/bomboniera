@@ -41,11 +41,11 @@ export const SPOTS: Record<Exclude<MachineId, "press">, { a: number; y: number; 
   organ: { a: FAR - 2.68, y: 0.86, zoom: 3.9, polar: 1.4 },
 };
 
-/** Placed against the wall at angle `a`, `inset` in from it, turned to face the middle. */
-export function onWall(a: number, inset: number, y: number) {
-  const r = HALL_R - inset;
+/** Placed against the wall at angle `a`, `inset` in from it, turned to face the middle. `r` is the hall's radius: the well's is wider. */
+export function onWall(a: number, inset: number, y: number, r = HALL_R) {
+  const wall = r - inset;
   return {
-    position: [Math.cos(a) * r, y, Math.sin(a) * r] as [number, number, number],
+    position: [Math.cos(a) * wall, y, Math.sin(a) * wall] as [number, number, number],
     "rotation-y": -a - Math.PI / 2,
   };
 }
@@ -53,16 +53,42 @@ export function onWall(a: number, inset: number, y: number) {
 /**
  * Standing in the middle of the hall, looking straight at the wall at angle
  * `a`, from `polar` off the vertical. OrbitControls measure azimuth from +z towards +x, and the camera has
- * to be on the far side of the middle from the wall it looks at.
+ * to be on the far side of the middle from the wall it looks at. `r` is the
+ * hall's radius, the machine room's unless the hall is another.
  */
-export function facing({ a, y, zoom, polar }: { a: number; y: number; zoom: number; polar: number }): View {
+export function facing({ a, y, zoom, polar }: { a: number; y: number; zoom: number; polar: number }, r = HALL_R): View {
   return {
-    target: [Math.cos(a) * (HALL_R - 0.3), y, Math.sin(a) * (HALL_R - 0.3)],
+    target: [Math.cos(a) * (r - 0.3), y, Math.sin(a) * (r - 0.3)],
     azimuth: Math.atan2(-Math.cos(a), -Math.sin(a)),
     polar,
     zoom,
     spread: { azimuth: 0.25, polar: 0.15 },
   };
+}
+
+/** Rotom, eased to where it is put and to the size it is wanted at. */
+export function Carried({
+  at,
+  size,
+  instant,
+  children,
+}: {
+  at: [number, number, number];
+  size: number;
+  instant: boolean;
+  children: ReactNode;
+}) {
+  const group = useRef<Group>(null);
+  useFrame((_, dt) => {
+    const g = group.current;
+    if (!g) return;
+    const k = instant ? 1 : Math.min(1, dt * 4);
+    g.position.x += (at[0] - g.position.x) * k;
+    g.position.y += (at[1] - g.position.y) * k;
+    g.position.z += (at[2] - g.position.z) * k;
+    g.scale.setScalar(g.scale.x + (size - g.scale.x) * Math.min(1, dt * 5));
+  });
+  return <group ref={group}>{children}</group>;
 }
 
 /** The press, from a little above, with the floor round it. */

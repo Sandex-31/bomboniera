@@ -1,6 +1,6 @@
-Rotom, Wash Rotom and Heat Rotom, from Cobblemon (https://gitlab.com/cable-mc/cobblemon),
+Rotom, Wash Rotom, Heat Rotom, Frost Rotom and Fan Rotom, from Cobblemon (https://gitlab.com/cable-mc/cobblemon),
 branch main at commit 6e57d77d105dd042def0a1ca302d94a746e2ec32.
 Models: common/src/main/resources/assets/cobblemon/bedrock/pokemon/models/0479_rotom/
-Textures: common/src/main/resources/assets/cobblemon/textures/pokemon/0479_rotom/ (the forms in their own subfolders: wash/, heat/)
+Textures: common/src/main/resources/assets/cobblemon/textures/pokemon/0479_rotom/ (the forms in their own subfolders: wash/, heat/, frost/, fan/)
 Licence: Mozilla Public License 2.0 (MPL-2.0), https://mozilla.org/MPL/2.0/
 The files are unmodified.

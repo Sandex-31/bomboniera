@@ -9,6 +9,7 @@
  * on load, so a wrong answer here shows up as an unsolved screen.
  */
 import {
+  AULA_KEY,
   BEAM_KEY,
   BOILERS_KEY,
   FLOOR_KEY,
@@ -29,9 +30,16 @@ import {
   PLAN_KEY,
   PUZZLE_KEY,
   SAGOME_KEY,
+  SENIA_KEY,
   SKI_KEY,
   TITLES_KEY,
   TOMBINO_KEY,
+  WELL_BUDS_KEY,
+  WELL_CROWS_KEY,
+  WELL_INSIDE_KEY,
+  WELL_MURAL_KEY,
+  WELL_PILLARS_KEY,
+  WELL_TV_KEY,
 } from "../data/puzzle";
 import { buildMaze, solve } from "./maze";
 import { FLOORS } from "./beam";
@@ -47,9 +55,15 @@ import { solvedGears } from "./gears";
 import { solvedHoist } from "./hoist";
 import { solvedOrgan } from "./card";
 import { solvedPress } from "./press";
+import { solvedPillars, solvedUv } from "./well/pillars";
+import { solvedTv } from "./well/tv";
+import { solvedCrows } from "./well/crows";
+import { solvedBuds } from "./well/buds";
+import { solvedMural } from "./well/mural";
+import { ORDER, aulaUpTo, examName } from "./aula/chain";
 
 /** The lever bank that closes the tape, found the way the test finds it. */
-function levers(): boolean[] {
+export function levers(): boolean[] {
   for (let n = 0; n < 1 << SLOTS.length; n++) {
     const bank = SLOTS.map((_, i) => Boolean((n >> i) & 1));
     if (solvedTape(bank)) return bank;
@@ -103,13 +117,32 @@ export const STAGES: { label: string; key: string; solved: () => unknown }[] = [
   { label: "montacarichi", key: HOIST_KEY, solved: solvedHoist },
   { label: "organo", key: ORGAN_KEY, solved: solvedOrgan },
   { label: "pressa", key: PRESS_KEY, solved: solvedPress },
+  { label: "quarto piano", key: FLOOR_KEY, solved: () => "3" },
+  { label: "luce uv", key: WELL_PILLARS_KEY, solved: solvedUv },
+  { label: "pilastri", key: WELL_PILLARS_KEY, solved: solvedPillars },
+  { label: "tv", key: WELL_TV_KEY, solved: solvedTv },
+  { label: "corvi", key: WELL_CROWS_KEY, solved: solvedCrows },
+  { label: "boccioli", key: WELL_BUDS_KEY, solved: solvedBuds },
+  { label: "murale", key: WELL_MURAL_KEY, solved: solvedMural },
+  { label: "quinto piano", key: FLOOR_KEY, solved: () => "4" },
+  // the hall: one exam more at each stop, in an order that never skips what one needs
+  ...ORDER.map((id, i) => ({ label: `aula: ${examName(id)}`, key: AULA_KEY, solved: () => aulaUpTo(i + 1) })),
+  // and the finale done: the code in, Rotom gone into the laptop, the video on its screen
+  { label: "aula: portatile", key: AULA_KEY, solved: () => ({ ...aulaUpTo(ORDER.length), laptop: "on" }) },
 ];
 
 /**
  * What the puzzle keeps that is not a stop of its own: which chats have been
- * opened, and how deep the visitor has been. Wiped with the rest.
+ * opened, how deep the visitor has been, whether Senia has called. Wiped
+ * with the rest. The remaining key of the well waits here until its task
+ * moves it onto a stop.
  */
-export const WIPED = [CHAT_KEY, DEPTH_KEY];
+export const WIPED = [
+  CHAT_KEY,
+  DEPTH_KEY,
+  WELL_INSIDE_KEY,
+  SENIA_KEY,
+];
 
 /**
  * Wipes the whole chain, then solves the first `upTo` stops of it.

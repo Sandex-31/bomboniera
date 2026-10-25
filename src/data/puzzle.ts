@@ -102,12 +102,12 @@ export const LOCK_KEY = 'bomboniera.puzzle.lucchetto';
 
 /**
  * Which floor of the tower the visitor is on: 0 the island, 1 Babel, 2 the
- * machine room. Missing means they have never been down.
+ * machine room, 3 the well, 4 the hall. Missing means they have never been down.
  */
 export const FLOOR_KEY = 'bomboniera.puzzle.piano';
 
 /** How many floors are built so far, the island included. */
-export const FLOORS = 3;
+export const FLOORS = 5;
 
 /** The stored floor, read back: anything that is not a floor is the island. */
 export function floorFrom(stored: string | null): number {
@@ -151,6 +151,33 @@ export const ORGAN_KEY = 'bomboniera.puzzle.organo';
 /** Whether the big lever was pulled and the press went through the floor. */
 export const PRESS_KEY = 'bomboniera.puzzle.pressa';
 
+/** What the TV on the wall of the well has been taught. */
+export const WELL_TV_KEY = 'bomboniera.puzzle.pozzo.tv';
+
+/** The crows of the well: which of them have been seen to. */
+export const WELL_CROWS_KEY = 'bomboniera.puzzle.pozzo.corvi';
+
+/** The buds of the well: which of them have opened. */
+export const WELL_BUDS_KEY = 'bomboniera.puzzle.pozzo.boccioli';
+
+/** The pillars of the well: where each was left. */
+export const WELL_PILLARS_KEY = 'bomboniera.puzzle.pozzo.pilastri';
+
+/** Whether Rotom has gone into the walls of the well, so he says so once. */
+export const WELL_INSIDE_KEY = 'bomboniera.puzzle.pozzo.dentro';
+
+/** Rotom's going in, read back: only the mark it leaves counts. */
+export const insideFrom = (stored: string | null) => stored === '1';
+
+/** The mural of the well, and how much of it has been uncovered. */
+export const WELL_MURAL_KEY = 'bomboniera.puzzle.pozzo.murale';
+
+/** The lecture hall of the fifth floor: its exams, and how far each has got. */
+export const AULA_KEY = 'bomboniera.puzzle.aula';
+
+/** Whether Senia has already called about the git, the first time IUM-TWEB was opened. */
+export const SENIA_KEY = 'bomboniera.puzzle.aula.telefonata';
+
 /** The read phrases, read back: anything that is not a list of distinct phrases is none. */
 export function langFrom(stored: string | null): number[] {
   try {
@@ -172,10 +199,8 @@ export const sarcLine = 'Rotom: mi ritrasformooooo!!!';
 
 /**
  * The one thing the keeper says once the star has finished drawing itself.
- *
- * TODO: da scrivere — questa riga è segnaposto.
  */
-export const starLine = 'Rotom: TODO — la battuta dopo la stella.';
+export const starLine = "Rotom: Una stella. Carina, eh? Non montarti la testa, è solo l’inizio.";
 
 /**
  * And the one it says once the machine has finished drawing.
@@ -183,10 +208,8 @@ export const starLine = 'Rotom: TODO — la battuta dopo la stella.';
  * This is the line that names what the creature is, because a drawing eight
  * pixels across cannot be relied on to name itself and whoever cannot place
  * it would otherwise be stuck.
- *
- * TODO: da scrivere — questa riga è segnaposto.
  */
-export const tapeLine = 'Rotom: TODO — la battuta che nomina Animal Well.';
+export const tapeLine = "Rotom: Non lo riconosci? Mi dispiace, dovresti...";
 
 /**
  * And the one it says once the word off the tape has opened the database.
@@ -199,24 +222,58 @@ export const wiredLine =
 
 /**
  * What it says once the first boiler of the machine room is lit.
- *
- * TODO: da scrivere — questa riga è segnaposto.
  */
-export const boilerLine = 'Rotom: TODO — la battuta della prima caldaia.';
+export const boilerLine = "Rotom: Davvero sei riuscito? Non me l’aspettavo, wow! Ancora ti manca tanto però.";
 
 /**
  * And once the three pieces of the punched card are back together.
- *
- * TODO: da scrivere — questa riga è segnaposto.
  */
-export const cardLine = 'Rotom: TODO — la battuta della scheda ricomposta.';
+export const cardLine = "Rotom: Chissà che bella sinfonia suonerà, e chissà se riuscirai a suonarla hahahaha";
 
 /**
  * And once the press has broken through the floor.
- *
- * TODO: da scrivere — questa riga è segnaposto.
  */
-export const pressLine = 'Rotom: TODO — la battuta della pressa.';
+export const pressLine = "Rotom: Bro... il pavimento ora chi lo ripaga?";
+
+/**
+ * What it says on landing in the well, as Frost Rotom.
+ */
+export const wellLine = "Rotom: Porca Madonna che freddo che fa qua sotto";
+
+/**
+ * And what it says at the first of the walls of the well.
+ */
+export const wallLine = 'Rotom: così ti controllo meglio';
+
+/**
+ * And what it says once the flame of the well is lit.
+ */
+export const flameLine = "Rotom: Grazie, hai acceso una candela, si sta già meglio. Ce ne sono altre, mi fai il favore di accenderle?";
+
+/**
+ * And what it says once the mural is whole.
+ */
+export const muralLine = "Rotom: Il murale è completo. Bello, vero? L’ho sempre detto che eri un artista. Più o meno.";
+
+/**
+ * What it says on landing in the lecture hall, back from Frost Rotom.
+ */
+export const aulaLine = "Rotom: Eccoci qua, nelle aule più puzzolenti della storia";
+
+/**
+ * Senia on the phone, the first time the file in conflict is opened.
+ */
+export const seniaLine = "Rotom: Che ricordi. Salvo si godeva il PyCon e gli arriva una chiamata da Senia la sera prima della consegna del laboratorio: «Piero, è esploso tutto, non so cos’ho fatto con git». A quel punto Salvo ha pensato al suicidio.";
+
+/**
+ * And what it says when the laptop is tapped before the libretto is full.
+ */
+export const laptopShutLine = "Rotom: Chiuso. Prima riempi il libretto, poi ne riparliamo.";
+
+/**
+ * And what it says as it goes into the laptop.
+ */
+export const laptopLine = "Rotom: Libretto pieno? Allora si entra. Tieniti forte.";
 
 /** What it says to anyone who names a silhouette right: right, and useless. */
 export const bravoLine = 'Rotom: Bravo! giusto ma non ti servirá a un bel niente hahahahah';

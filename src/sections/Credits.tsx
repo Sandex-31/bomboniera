@@ -22,7 +22,8 @@ export default function Credits() {
         entries.forEach((e) => {
           if (e.isIntersecting) e.target.classList.add("is-in");
         }),
-      { threshold: 0.35 },
+      // a share of the block would never be reached by one taller than the panel: its top coming in is enough
+      { rootMargin: "0px 0px -20% 0px" },
     );
     blocks.forEach((b) => io.observe(b));
     return () => io.disconnect();

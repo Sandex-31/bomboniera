@@ -482,7 +482,8 @@ button { font: inherit; color: inherit; }
   font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.26em;
   text-transform: uppercase; color: var(--gold); margin-bottom: 12px;
 }
-.credits__block p { font-size: 16.5px; color: var(--muted); margin: 0; }
+/* pre-line: the acknowledgements keep the thesis's paragraphs, a blank line between two */
+.credits__block p { font-size: 16.5px; color: var(--muted); margin: 0; white-space: pre-line; }
 .credits__block--emphasis p {
   font-family: var(--font-display); font-size: 23px; line-height: 1.45;
   color: var(--text); font-style: italic;
@@ -877,7 +878,7 @@ button { font: inherit; color: inherit; }
   margin: 0 0 10px; font-size: 15px; line-height: 1.5; color: var(--text);
 }
 .keeper__next {
-  display: block; margin-left: auto; padding: 7px 14px;
+  display: block; margin-left: auto; padding: 7px 14px; min-height: 44px; min-width: 44px;
   border: 1px solid rgba(138, 216, 255, 0.45); border-radius: 999px;
   background: rgba(138, 216, 255, 0.1); color: #BCE9FB;
   font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
@@ -1514,6 +1515,35 @@ button { font: inherit; color: inherit; }
 .lock.is-open .lock__wheel { cursor: default; }
 @media (prefers-reduced-motion: reduce) { .lock__shackle { transition: none; } }
 
+/* ------------------------------------------------------------- the mural
+ * The community mural on the altar of the well: seven slots stacked like the
+ * floors, the loose pieces beside them. Sized in px for the scene to scale,
+ * so that at 390 px every slot and piece is still a finger wide.
+ */
+.mural {
+  display: grid; grid-template-columns: 210px 200px; gap: 10px;
+  width: 420px; height: 420px; padding: 0; box-sizing: border-box;
+  font-family: var(--font-mono); user-select: none; touch-action: none;
+}
+.mural__slots { list-style: none; margin: 0; padding: 8px; display: grid; grid-template-rows: repeat(7, 1fr); gap: 4px;
+  border-radius: 10px; background: #1B2029; box-shadow: inset 0 0 0 2px #3A4150, 0 10px 30px rgba(0, 0, 0, 0.6); }
+.mural__tray { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 54px; gap: 6px; align-content: center; }
+.mural__slot, .mural__loose {
+  display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 50px;
+  padding: 4px; border: 0; border-radius: 6px; background: #2A303C; color: #EAF6EF; cursor: grab; touch-action: none;
+}
+.mural__slot { background: #11151C; box-shadow: inset 0 0 0 1px #3A4150; }
+.mural__slot.is-held, .mural__loose.is-held { box-shadow: 0 0 0 2px #FFE7A0; }
+.mural__slot:focus-visible, .mural__loose:focus-visible { outline: 2px solid var(--gold); }
+.mural__gap { border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(58, 65, 80, 0.5); }
+.mural__piece { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+.mural__piece svg, .mural__piece img { max-width: 100%; max-height: 42px; }
+.mural__piece--babele { line-height: 1.1; font-size: 10px; text-align: center; }
+.mural__piece--samus img, .mural__piece--cuphead img, .mural__piece--knight img { filter: brightness(0) invert(0.85); }
+.mural__ghost { position: fixed; z-index: 50; width: 90px; height: 48px; transform: translate(-50%, -50%); pointer-events: none; opacity: 0.85; }
+.mural.is-done .mural__slots { box-shadow: inset 0 0 0 2px #9DFFC6, 0 0 30px rgba(111, 224, 168, 0.5); }
+.mural.is-done .mural__slot { cursor: default; }
+
 /* babel folk: the two people of a chat acting out each message. Joints hang
    where they bend and swing by rotation (negative is forward, toward the
    other); a new pose eases in, slowly enough to be watched */
@@ -1701,3 +1731,230 @@ button { font: inherit; color: inherit; }
 }
 button.card-pieces__piece { cursor: pointer; }
 .card-pieces__piece.is-held { transform: translateY(4px) scale(1.12); background: rgba(255, 210, 122, 0.35); }
+
+/* ---------------------------------------------------------- l'aula
+ * The sheets the exams are sat on, the tags over them from the hall, and the
+ * libretto, which opens over everything from its button in the corner.
+ */
+.aula-tag {
+  font: 600 12px/1 var(--font-sans); color: #1A1410; background: #E8D9A8;
+  padding: 3px 6px; border-radius: 4px; white-space: nowrap;
+}
+.aula-sheet {
+  box-sizing: border-box; padding: 16px; border-radius: 6px;
+  background: #F4EFE2; color: #1A1410; font: 15px/1.4 var(--font-sans);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+.aula-sheet p { margin: 0 0 10px; }
+.aula-sheet__lock { font-weight: 600; text-align: center; }
+.aula-sheet__appello { color: #9B1C1C; font-size: 13px; }
+.aula-sheet__appello b { display: block; font: 700 28px/1.1 var(--font-mono); }
+.aula-sheet__body { border: 0; margin: 0; padding: 0; min-width: 0; }
+/* dimmed child by child, so a part of the puzzle the visitor must still read (Analisi's register) can stay out of it */
+.aula-sheet__body:disabled > * > :not(.aula-sheet__keep) { opacity: 0.45; }
+.aula-stub {
+  min-width: 44px; min-height: 44px; padding: 0 16px; border-radius: 6px;
+  border: 1px solid #1A1410; background: #fff; color: #1A1410; font: inherit; cursor: pointer;
+}
+/* Architettura: a corner of the slate, chalk on it, and the levers under it, two rows of a nibble each */
+.aula-arch { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.aula-arch__board {
+  display: flex; gap: 8px; align-items: flex-end; width: 100%; box-sizing: border-box;
+  padding: 10px; border-radius: 4px; background: #1F3A2E; color: #E9EEE6;
+}
+.aula-arch__board > div { flex: 1; min-width: 0; }
+.aula-arch__head { display: flex; align-items: center; gap: 6px; font: 12px/1.2 var(--font-mono); }
+.aula-sheet .aula-arch__head { margin: 0 0 6px; }
+.aula-arch__phone { width: 132px; height: 22px; flex: none; }
+.aula-arch__code { margin: 0 0 6px; padding-left: 2.4em; font: 13px/1.45 var(--font-mono); white-space: pre; }
+.aula-arch__code li::marker { color: #9FB3A6; }
+.aula-arch__pile { width: 40px; height: 168px; flex: none; color: #E9EEE6; }
+.aula-arch__levers { display: grid; grid-template-columns: repeat(4, 56px); gap: 8px; }
+.aula-lever {
+  min-width: 44px; min-height: 52px; border-radius: 6px; border: 1px solid #1A1410;
+  background: linear-gradient(#fff 50%, #D8D2C4 50%); color: #1A1410; font: 700 16px/1 var(--font-mono); cursor: pointer;
+}
+.aula-lever[aria-pressed="true"] { background: linear-gradient(#D8D2C4 50%, #C9A64A 50%); }
+.aula-arch__byte, .aula-asd__done { font: 700 16px/1.2 var(--font-mono); letter-spacing: 0.08em; }
+.aula-sheet .aula-arch__byte { margin: 0; }
+/* ASD: the plan of the floor */
+.aula-asd svg { display: block; width: 100%; height: auto; }
+.aula-asd__bench { cursor: pointer; }
+.aula-sheet .aula-asd__key { margin: 6px 0 4px; font-size: 12px; }
+.aula-sheet .aula-asd__done { margin: 0; letter-spacing: 0; }
+/* Analisi: the big blackboard, the answer under it, the register when the right one was turned down */
+.aula-analisi { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.aula-analisi__board { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 4px; background: #1F3A2E; color: #E9EEE6; }
+.aula-analisi__board svg { display: block; width: 100%; height: auto; }
+.aula-sheet .aula-analisi__f { margin: 0 0 4px; font: 14px/1.3 var(--font-mono); text-align: center; }
+.aula-analisi__answer { display: flex; gap: 10px; align-items: center; }
+.aula-analisi__answer input {
+  width: 5em; min-height: 44px; box-sizing: border-box; padding: 0 8px; border: 1px solid #1A1410; border-radius: 6px;
+  background: #fff; color: #1A1410; font: 700 18px/1 var(--font-mono); text-align: center;
+}
+.aula-sheet .aula-analisi__register { margin: 0; font-size: 13px; text-align: center; }
+.aula-analisi__ring { display: inline-block; padding: 2px 8px; border: 2px solid #C8261E; border-radius: 50%; color: #C8261E; font: 700 16px/1.2 var(--font-mono); }
+/* Fisica: the circuit, the box of resistors under it */
+.aula-fisica { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.aula-fisica > svg { display: block; width: 100%; height: auto; overflow: visible; }
+.aula-fisica__slot { cursor: pointer; }
+.aula-fisica__weight { transition: transform 0.8s ease-out; }
+.aula-fisica__smoke circle { animation: aula-smoke 1.6s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes aula-smoke { from { opacity: 0.8; transform: translateY(0) scale(0.6); } to { opacity: 0; transform: translateY(-14px) scale(1.4); } }
+@media (prefers-reduced-motion: reduce) {
+  .aula-fisica__weight { transition: none; }
+  .aula-fisica__smoke circle { animation: none; opacity: 0.6; }
+}
+.aula-sheet .aula-fisica__key { margin: 0; font-size: 12px; text-align: center; }
+.aula-fisica__box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+.aula-fisica__res { min-height: 44px; padding: 4px; border-radius: 6px; border: 1px solid #1A1410; background: #fff; cursor: pointer; }
+.aula-fisica__res[aria-pressed="true"] { background: #F3D392; border-width: 2px; }
+.aula-fisica__res svg { display: block; width: 100%; height: 22px; }
+.aula-sheet .aula-fisica__note { margin: 0; font-size: 13px; }
+.aula-fisica__thanks { font-weight: 400; font-style: italic; letter-spacing: 0; }
+/* Logica: the notebook's page, and beside the switches and the bulb the table they fill */
+.aula-logica { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.aula-sheet .aula-logica__note {
+  width: 100%; box-sizing: border-box; margin: 0; padding: 4px 10px; border-left: 3px solid #C8261E;
+  background: repeating-linear-gradient(#FFFDF6 0 21px, #BFD0E4 21px 22px) 0 4px; font: 15px/22px var(--font-mono); text-align: center;
+}
+.aula-logica__bench { display: flex; gap: 14px; align-items: flex-start; }
+.aula-logica__switches { display: grid; grid-template-columns: 56px; gap: 8px; }
+.aula-logica__bulb { min-width: 44px; min-height: 56px; padding: 4px; border-radius: 6px; border: 1px solid #1A1410; background: #2A2620; cursor: pointer; }
+.aula-logica__bulb svg { display: block; width: 30px; height: 40px; margin: 0 auto; }
+.aula-logica__table { border-collapse: collapse; font: 14px/1 var(--font-mono); }
+.aula-logica__table th, .aula-logica__table td { padding: 4px 8px; text-align: center; }
+.aula-logica__table thead th { border-bottom: 1px solid #1A1410; }
+.aula-logica__table tbody th { color: #8A7A5A; font-weight: 400; }
+.aula-logica__table td:last-child { border-left: 1px solid #1A1410; font-weight: 700; }
+.aula-logica__table tr[aria-current="true"] { background: #F3D392; }
+/* LFT: the side board in chalk, the word composed so far, and the tiles */
+.aula-lft { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.aula-lft__board { position: relative; width: 100%; box-sizing: border-box; padding: 6px; border-radius: 4px; background: #1F3A2E; }
+.aula-lft__board svg { display: block; width: 100%; height: auto; }
+.aula-sheet .aula-lft__prof {
+  position: absolute; right: 8px; top: 8px; margin: 0; padding: 6px 10px; border-radius: 12px;
+  background: #F4EFE2; color: #1A1410; font: 700 16px/1.2 var(--font-sans); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.aula-sheet .aula-lft__word { min-width: 8ch; margin: 0; padding: 4px 8px; border-bottom: 2px solid #1A1410; font: 700 20px/1.2 var(--font-mono); letter-spacing: 0.15em; text-align: center; }
+.aula-lft__tiles { display: flex; gap: 8px; }
+.aula-lft__tile { min-width: 48px; min-height: 48px; border-radius: 6px; border: 1px solid #1A1410; background: #fff; color: #1A1410; font: 700 20px/1 var(--font-mono); cursor: pointer; }
+/* Basi di Dati: the registers, scrolled in their own box, the board question over them, the query in cards under them */
+.aula-bd { display: flex; flex-direction: column; gap: 8px; max-height: 540px; overflow: auto; overscroll-behavior: contain; }
+.aula-sheet .aula-bd__target { margin: 0; padding: 6px 8px; border-radius: 4px; background: #1F3A2E; color: #E9EEE6; font-size: 14px; }
+.aula-bd__registers { display: flex; gap: 4px; flex: none; scrollbar-width: thin; align-items: flex-start; max-height: 200px; overflow: auto; overscroll-behavior: contain; border: 1px solid #C9BFA6; background: #FBF8F0; }
+.aula-bd__registers table { border-collapse: collapse; font: 9.5px/1.35 var(--font-mono); }
+.aula-bd__registers caption { font: 600 11px/1.6 var(--font-sans); text-align: left; padding-left: 4px; }
+.aula-bd__registers th, .aula-bd__registers td { padding: 0 2px; text-align: left; white-space: nowrap; }
+.aula-bd__registers thead th { position: sticky; top: 0; background: #FBF8F0; border-bottom: 1px solid #1A1410; }
+.aula-bd__registers tr[aria-current="true"] { background: #F3D392; font-weight: 700; }
+.aula-bd__query { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.aula-bd__line { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font: 12px/1 var(--font-mono); }
+.aula-bd__line > b { min-width: 44px; }
+.aula-bd__card {
+  min-width: 44px; min-height: 44px; padding: 0 5px; border-radius: 4px; border: 1px solid #1A1410;
+  background: #fff; color: #1A1410; font: 11px/1 var(--font-mono); cursor: pointer;
+}
+.aula-bd__card[aria-pressed="true"] { background: #F3D392; }
+.aula-bd__cards { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px; border-radius: 4px; background: #E8D9A8; }
+.aula-bd__rows { display: flex; flex-direction: column; font: 12px/1.4 var(--font-mono); }
+.aula-bd__tutor { display: flex; gap: 8px; align-items: center; }
+.aula-sheet .aula-bd__tutor p { margin: 0; font-size: 13px; font-style: italic; }
+/* IUM-TWEB: the page as drawn, the file in conflict under it, its halves the buttons, then the commit */
+.aula-ium { position: relative; display: flex; flex-direction: column; gap: 8px; }
+.aula-ium__call { position: absolute; z-index: 1; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: rgba(20, 16, 12, 0.88); color: #F4EFE2; border-radius: 4px; }
+.aula-ium__call .keeper { width: 100%; box-sizing: border-box; }
+.aula-ium__preview { min-height: 90px; max-height: 150px; overflow: auto; border: 6px solid #3A3A40; border-radius: 4px; background: #fff; font-size: 13px; }
+.aula-ium__preview p { margin: 0 0 4px; }
+.aula-ium__file { max-height: 260px; overflow: auto; overscroll-behavior: contain; padding: 4px; border-radius: 4px; background: #1E1E24; color: #D8D8DE; }
+.aula-ium__file pre, .aula-ium__half { margin: 0; font: 10.5px/1.35 var(--font-mono); font-variant-ligatures: none; white-space: pre-wrap; word-break: break-all; }
+.aula-ium__hunk > pre { color: #E8A04A; }
+.aula-ium__half {
+  display: block; width: 100%; min-height: 44px; padding: 2px 4px; text-align: left; cursor: pointer;
+  border: 1px dashed #6A6A74; border-radius: 3px; background: transparent; color: inherit;
+}
+.aula-ium__half[aria-pressed="true"] { border-style: solid; border-color: #7FD18B; background: rgba(127, 209, 139, 0.14); }
+.aula-ium__half[data-dropped="true"] { opacity: 0.4; text-decoration: line-through; }
+.aula-ium__commit { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 12px/1 var(--font-mono); }
+.aula-ium__commit input { width: 9ch; min-height: 44px; padding: 0 6px; border: 1px solid #1A1410; border-radius: 4px; background: #fff; color: #1A1410; font: 16px/1 var(--font-mono); }
+.aula-sheet .aula-ium__log { margin: 0; padding: 6px 8px; border-radius: 4px; background: #1E1E24; color: #D8D8DE; font: 700 15px/1.2 var(--font-mono); }
+.aula-ium__log span { color: #E8C14A; }
+.aula-so { display: flex; flex-direction: column; gap: 8px; }
+.aula-so__prof { display: flex; align-items: center; gap: 10px; }
+.aula-so__face { width: 52px; height: 52px; flex: none; }
+.aula-sheet .aula-so__prof p { margin: 0; font-size: 14px; }
+.aula-so__prof b { font: 700 22px/1 var(--font-mono); }
+.aula-so__board { margin: 0; padding: 8px 8px 8px 26px; border-radius: 4px; background: #1F3A2E; color: #E9EEE6; font-size: 12px; line-height: 1.35; }
+.aula-so__board li + li { margin-top: 3px; }
+.aula-so__desks { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.aula-so__desks li { display: flex; align-items: center; gap: 8px; font: 11px/1.3 var(--font-mono); }
+.aula-so__student { display: flex; flex-direction: column; justify-content: center; flex: none; width: 64px; min-height: 44px; padding: 2px; border-radius: 6px; border: 2px solid; background: #fff; color: #1A1410; font: 600 13px/1.1 var(--font-sans); cursor: pointer; }
+.aula-so__student[aria-pressed="true"] { background: #F3D392; }
+.aula-so__student b { font: 700 12px/1 var(--font-mono); }
+.aula-so__things { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.aula-so__things .aula-stub { padding: 0 6px; }
+.aula-so__things .aula-stub[aria-pressed="true"] { background: #F3D392; }
+.aula-sheet .aula-so__label { margin: 0; font-size: 13px; }
+.aula-so__gantt { display: block; width: 100%; height: auto; }
+.aula-sheet .aula-so__done { margin: 0; font: 700 14px/1.2 var(--font-mono); }
+/* Sistemi Intelligenti: the nine boxes, the page of constraints scrolled in its own box, each with its chip, and the keypad */
+.aula-si { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.aula-si__boxes { display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.aula-si__boxes li { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.aula-si__boxes b { display: flex; align-items: center; justify-content: center; width: 28px; height: 36px; box-sizing: border-box; border: 1px solid #1A1410; border-radius: 4px; background: #fff; font: 700 20px/1 var(--font-mono); }
+.aula-si__boxes li[aria-current="true"] b { border-width: 2px; background: #F3D392; }
+.aula-si__boxes span { font: 10px/1 var(--font-mono); color: #8A7A5A; }
+.aula-si__page {
+  max-height: 260px; overflow: auto; overscroll-behavior: contain; margin: 0; padding: 6px 10px; list-style: none;
+  border-left: 3px solid #C8261E; background: #FFFDF6; font-size: 13px; line-height: 1.35;
+}
+.aula-si__page li + li { margin-top: 6px; }
+.aula-si__chip { display: inline-block; padding: 1px 6px; border-radius: 9px; background: #1F3A2E; color: #E9EEE6; font: 600 11px/1.4 var(--font-sans); white-space: nowrap; }
+.aula-si__keys { display: grid; grid-template-columns: repeat(6, 44px); gap: 4px; }
+.aula-si__keys .aula-lft__tile { min-width: 44px; min-height: 44px; }
+/* the laptop: a digit over each key of its grid, the code typed so far, and the video on its screen */
+.aula-laptop__key {
+  display: block; padding: 2px 5px; border-radius: 4px; background: rgba(26, 20, 16, 0.78);
+  color: #F3D392; font: 700 13px/1 var(--font-mono);
+}
+.aula-laptop__tape {
+  display: block; padding: 3px 8px; border-radius: 4px; background: #F4EFE2; color: #1A1410;
+  font: 700 14px/1 var(--font-mono); letter-spacing: 0.2em; white-space: nowrap;
+}
+.aula-video {
+  position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px;
+  background: #0E1A1F; box-shadow: 0 0 24px rgba(191, 230, 255, 0.55);
+}
+.aula-video video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.aula-video__play {
+  position: absolute; inset: 0; margin: auto; width: 72px; height: 72px; border-radius: 50%;
+  border: 2px solid #F3D392; background: rgba(10, 14, 22, 0.7); color: #F3D392; font-size: 30px; cursor: pointer;
+}
+.aula-video__missing {
+  display: flex; align-items: center; justify-content: center; height: 100%; margin: 0; padding: 16px; box-sizing: border-box;
+  color: #DCEBFF; font: 600 16px/1.4 var(--font-sans); text-align: center;
+}
+.libretto-btn {
+  position: fixed; z-index: 20; right: max(14px, env(safe-area-inset-right)); top: max(14px, var(--safe-t));
+  min-height: 44px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid #C9A64A; background: rgba(10, 14, 22, 0.72); color: #F3D392;
+  font: 600 13px/1 var(--font-mono); cursor: pointer; touch-action: manipulation;
+}
+.libretto {
+  position: fixed; z-index: 30; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(360px, calc(100vw - 32px)); max-height: calc(100vh - 120px); overflow: auto;
+  box-sizing: border-box; padding: 16px 18px; border-radius: 8px;
+  background: #7A1F2B; color: #F7EEDC; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+.libretto header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.libretto h2 { margin: 0; font: 600 18px/1.2 var(--font-display); color: #F3D392; }
+.libretto__close {
+  width: 44px; height: 44px; border: 0; background: transparent; color: inherit; font-size: 26px; cursor: pointer;
+}
+.libretto ol { margin: 10px 0 0; padding: 0; list-style: none; }
+.libretto li {
+  display: flex; justify-content: space-between; gap: 12px; padding: 7px 0;
+  border-bottom: 1px dashed rgba(247, 238, 220, 0.25); font-size: 14px;
+}
+.libretto li[data-passed="false"] { opacity: 0.55; }
+.libretto li b { font-family: var(--font-mono); white-space: nowrap; }
