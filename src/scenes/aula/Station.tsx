@@ -1,5 +1,6 @@
-import type { ReactNode, SyntheticEvent } from "react";
+import { useEffect, useState, type ReactNode, type SyntheticEvent } from "react";
 import { Html } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import { useTap } from "../Hotspot";
 import { lockedFor, open, passed, type AulaState, type ExamId, type Verdict } from "../../lib/aula/chain";
 import { FIT_W, SPOTS, SPOT_MARK, TAP_W } from "./spots";
@@ -51,7 +52,21 @@ export default function Station({
   const done = passed(state, id);
   const left = lockedFor(state.failedAt[id], now);
   const mark = done ? " ✓" : shut ? " 🔒" : left > 0 ? " ⏳" : "";
-  const scale = ((SHEET_FILL * FIT_W) / view.zoom) * (PX_PER_UNIT / SHEET_PX);
+  // the camera fits FIT_W in the screen's shorter side: the sheet takes most of its width, and no more of its height
+  const size = useThree((s) => s.size);
+  const [sheet, setSheet] = useState<HTMLDivElement | null>(null);
+  const [tall, setTall] = useState(0);
+  useEffect(() => {
+    if (!sheet) return;
+    const ro = new ResizeObserver(() => setTall(sheet.offsetHeight));
+    ro.observe(sheet);
+    return () => ro.disconnect();
+  }, [sheet]);
+  const worldH = (FIT_W * size.height) / Math.min(size.width, size.height) / view.zoom;
+  const scale = Math.min(
+    ((SHEET_FILL * FIT_W) / view.zoom) * (PX_PER_UNIT / SHEET_PX),
+    tall ? (SHEET_FILL * worldH * PX_PER_UNIT) / tall : Infinity,
+  );
 
   return (
     <>
@@ -79,7 +94,7 @@ export default function Station({
         // square onto the camera of the spot's view, wherever that looks from
         <group position={view.target} rotation={[view.polar - Math.PI / 2, view.azimuth, 0, "YXZ"]}>
           <Html transform scale={scale} zIndexRange={[20, 10]}>
-            <div className="aula-sheet" style={{ width: SHEET_PX }} onPointerDown={stop} onPointerUp={stop} onClick={stop}>
+            <div ref={setSheet} className="aula-sheet" style={{ width: SHEET_PX }} onPointerDown={stop} onPointerUp={stop} onClick={stop}>
               {shut ? (
                 <p className="aula-sheet__lock">
                   <span aria-hidden="true">🔒</span> propedeuticità mancanti

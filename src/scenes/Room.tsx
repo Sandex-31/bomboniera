@@ -12,7 +12,6 @@ import {
   AdditiveBlending,
   CanvasTexture,
   DoubleSide,
-  RepeatWrapping,
   type BufferGeometry,
   type Group,
   type Mesh,
@@ -24,14 +23,14 @@ import CameraRig from "./CameraRig";
 import { glowTexture } from "./glow";
 import Hotspot, { useTap } from "./Hotspot";
 import Portal from "./Portal";
-import { creditRoll } from "../data/credits";
+import { creditRoll, credits } from "../data/credits";
 import { easterEggs } from "../data/easterEggs";
 import { PORTAL_AT } from "../data/puzzle";
 import { exams } from "../data/exams";
 import { projects } from "../data/projects";
 import { thesis } from "../data/thesis";
 import { CREDITS_SCREEN, FLIGHT, FOCUS_VIEWS, ROOM_VIEW, type FocusId } from "./focus";
-import type { CreditGroup, SectionId } from "../types";
+import type { CreditBlock, CreditGroup, SectionId } from "../types";
 
 /* ----------------------------------------------------------------- palette
  * Warm charcoal shell, warm wood floor, everything lit by a few warm pools.
@@ -2045,9 +2044,11 @@ function Door({ focused }: { focused: boolean }) {
 }
 
 /* ------------------------------------------------------- the credits roll --
- * The names scroll on one canvas texture: drawn once at mount, moved by its
- * own offset. No font file, no text geometry, no mesh per name — and the same
- * data feeds the Grazie panel, so the roll is readable without WebGL too.
+ * The acknowledgements, then the names, scroll on one canvas texture the size
+ * of the screen. The whole roll is too tall for one canvas on a phone, so it
+ * is laid out in lines once and only the lines in view are redrawn as it
+ * moves. No font file, no text geometry — and the same data feeds the Grazie
+ * panel, so the roll is readable without WebGL too.
  */
 const SCREEN_W = 3.4;
 const SCREEN_H = 2;
@@ -2055,56 +2056,66 @@ const ROLL_W = 1024;
 /** Texture pixels visible at once — matches the screen so the text is square. */
 const ROLL_WINDOW = Math.round((ROLL_W * SCREEN_H) / SCREEN_W);
 /** Reading pace, in texture pixels per second. */
-const ROLL_SPEED = 55;
+const ROLL_SPEED = 32;
+/** Free space each side of a wrapped line. */
+const ROLL_PAD = 90;
+const SERIF = "Georgia, 'Times New Roman', serif";
 
-function rollTexture(groups: CreditGroup[]) {
-  const HEAD = 96; // a group heading and the air around it
-  const NAME = 64; // one name
-  const GAP = 52; // between groups
-  const END = 200; // the closing word
-  // a blank window at each end, so the roll starts and ends on an empty screen
-  const height =
-    ROLL_WINDOW * 2 +
-    END +
-    groups.reduce((h, g) => h + HEAD + g.names.length * NAME + GAP, 0);
+type RollLine = { y: number; text: string; font: string; color: string };
 
-  const canvas = document.createElement("canvas");
-  canvas.width = ROLL_W;
-  canvas.height = height;
-
-  const ctx = canvas.getContext("2d");
-  if (ctx) {
-    ctx.fillStyle = "#14110F";
-    ctx.fillRect(0, 0, ROLL_W, height);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    let y = ROLL_WINDOW;
-    for (const group of groups) {
-      ctx.fillStyle = GOLD;
-      ctx.font = "600 34px Georgia, 'Times New Roman', serif";
-      ctx.fillText(group.heading.toUpperCase(), ROLL_W / 2, y + HEAD / 2);
-      y += HEAD;
-
-      ctx.fillStyle = "#F4EFE7";
-      ctx.font = "500 46px Georgia, 'Times New Roman', serif";
-      for (const name of group.names) {
-        ctx.fillText(name, ROLL_W / 2, y + NAME / 2);
-        y += NAME;
+/** Every line of the roll with its centre, and the roll's height, a blank screen at each end. */
+function rollLayout(blocks: CreditBlock[], groups: CreditGroup[]) {
+  const measure = document.createElement("canvas").getContext("2d");
+  const lines: RollLine[] = [];
+  let y = ROLL_WINDOW;
+  const put = (text: string, font: string, color: string, lh: number) => {
+    lines.push({ y: y + lh / 2, text, font, color });
+    y += lh;
+  };
+  const wrap = (text: string, font: string, color: string, lh: number) => {
+    if (measure) measure.font = font;
+    for (const para of text.split("\n\n")) {
+      let line = "";
+      for (const word of para.split(" ")) {
+        const next = line ? `${line} ${word}` : word;
+        if (line && measure && measure.measureText(next).width > ROLL_W - 2 * ROLL_PAD) {
+          put(line, font, color, lh);
+          line = word;
+        } else line = next;
       }
-      y += GAP;
+      if (line) put(line, font, color, lh);
+      y += lh / 2;
     }
+  };
 
-    ctx.fillStyle = GOLD;
-    ctx.font = "600 92px Georgia, 'Times New Roman', serif";
-    ctx.fillText("GRAZIE", ROLL_W / 2, y + END / 2);
+  for (const block of blocks) {
+    if (block.heading) put(block.heading.toUpperCase(), `600 30px ${SERIF}`, GOLD, 70);
+    if (block.emphasis) wrap(block.body, `italic 500 38px ${SERIF}`, "#F4EFE7", 56);
+    else wrap(block.body, `400 31px ${SERIF}`, "#D9D1C3", 46);
+    y += 80;
   }
+  for (const group of groups) {
+    put(group.heading.toUpperCase(), `600 34px ${SERIF}`, GOLD, 96);
+    for (const name of group.names) put(name, `500 46px ${SERIF}`, "#F4EFE7", 64);
+    y += 52;
+  }
+  put("GRAZIE", `600 92px ${SERIF}`, GOLD, 200);
+  return { lines, height: y + ROLL_WINDOW };
+}
 
-  const texture = new CanvasTexture(canvas);
-  texture.wrapT = RepeatWrapping;
-  texture.repeat.set(1, ROLL_WINDOW / height);
-  texture.offset.y = 1 - ROLL_WINDOW / height; // start at the top of the list
-  return texture;
+/** The window of the roll whose top edge is `top` pixels down it. */
+function drawRoll(ctx: CanvasRenderingContext2D, lines: RollLine[], top: number) {
+  ctx.fillStyle = "#14110F";
+  ctx.fillRect(0, 0, ROLL_W, ROLL_WINDOW);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  for (const l of lines) {
+    const y = l.y - top;
+    if (y < -60 || y > ROLL_WINDOW + 60) continue;
+    ctx.font = l.font;
+    ctx.fillStyle = l.color;
+    ctx.fillText(l.text, ROLL_W / 2, y);
+  }
 }
 
 /**
@@ -2113,17 +2124,26 @@ function rollTexture(groups: CreditGroup[]) {
  * credits are being watched — from the room it would be a slab in mid-air.
  */
 function CreditsStage({ reduced }: { reduced: boolean }) {
-  const texture = useMemo(() => {
-    const t = rollTexture(creditRoll);
-    // nothing will scroll for these visitors, so start them on the first name
-    if (reduced) t.offset.y -= t.repeat.y;
-    return t;
-  }, [reduced]);
-  useEffect(() => () => texture.dispose(), [texture]);
+  const roll = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = ROLL_W;
+    canvas.height = ROLL_WINDOW;
+    return { ...rollLayout(credits, creditRoll), canvas, texture: new CanvasTexture(canvas) };
+  }, []);
+  useEffect(() => () => roll.texture.dispose(), [roll]);
+  // nothing will scroll for these visitors, so start them on the first line
+  const top = useRef(reduced ? ROLL_WINDOW : 0);
+  const drawn = useRef(-1);
 
   useFrame((_, delta) => {
-    // down the texture means up the screen, the way credits have always rolled
-    if (!reduced) texture.offset.y -= (delta * ROLL_SPEED) / texture.image.height;
+    // further down the roll means up the screen, the way credits have always rolled
+    if (!reduced) top.current = (top.current + delta * ROLL_SPEED) % roll.height;
+    const px = Math.floor(top.current);
+    const ctx = px === drawn.current ? null : roll.canvas.getContext("2d");
+    if (!ctx) return;
+    drawn.current = px;
+    drawRoll(ctx, roll.lines, px);
+    roll.texture.needsUpdate = true;
   });
 
   return (
@@ -2142,7 +2162,7 @@ function CreditsStage({ reduced }: { reduced: boolean }) {
 
       <mesh>
         <planeGeometry args={[SCREEN_W, SCREEN_H]} />
-        <meshBasicMaterial map={texture} toneMapped={false} />
+        <meshBasicMaterial map={roll.texture} toneMapped={false} />
       </mesh>
 
       {/* behind the frame, so it halos the screen instead of washing it out */}

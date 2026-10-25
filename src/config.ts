@@ -18,7 +18,7 @@ export const graduationConfig = {
    * Set to false once every TODO in src/data/* has been replaced with real
    * content. While true, a small "demo content" ribbon is shown.
    */
-  isPlaceholder: true,
+  isPlaceholder: false,
 } as const;
 
 /**

@@ -1,4 +1,3 @@
-import { credits } from "../data/credits";
 import { exams } from "../data/exams";
 import { projects } from "../data/projects";
 import { thesis } from "../data/thesis";
@@ -25,11 +24,6 @@ const HINTS: Record<FocusId, string> = {
 };
 
 function lookup(section: FocusId, id: string | null): Card | null {
-  if (section === "credits") {
-    // nothing to pick apart here — the roll on the screen is the whole scene
-    const first = credits[0];
-    return first ? { eyebrow: "lo schermo", title: "Grazie", body: first.body } : null;
-  }
   if (!id) return null;
 
   if (section === "exams") {
@@ -80,6 +74,8 @@ type Props = {
  * screen reader, while the picking itself stays in 3D.
  */
 export default function FocusCard({ section, id, onClose, onMore }: Props) {
+  // nothing to pick apart beyond the door: the roll on the screen is the whole scene
+  if (section === "credits") return null;
   const card = lookup(section, id);
 
   if (!card) {

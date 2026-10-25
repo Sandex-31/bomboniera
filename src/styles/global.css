@@ -482,7 +482,8 @@ button { font: inherit; color: inherit; }
   font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.26em;
   text-transform: uppercase; color: var(--gold); margin-bottom: 12px;
 }
-.credits__block p { font-size: 16.5px; color: var(--muted); margin: 0; }
+/* pre-line: the acknowledgements keep the thesis's paragraphs, a blank line between two */
+.credits__block p { font-size: 16.5px; color: var(--muted); margin: 0; white-space: pre-line; }
 .credits__block--emphasis p {
   font-family: var(--font-display); font-size: 23px; line-height: 1.45;
   color: var(--text); font-style: italic;
