@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, events } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
+import { DPR, Steady } from "./Steady";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { BackSide, type Intersection, type Object3D } from "three";
 import CameraRig from "./CameraRig";
@@ -308,12 +309,13 @@ export default function Aula({
     <>
     <Canvas
       orthographic
-      dpr={[1, 1.75]}
+      dpr={DPR}
       camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
       events={(store) => ({ ...events(store), filter: reachable })}
       onPointerMissed={back}
     >
       <color attach="background" args={["#0A0C10"]} />
+      <Steady />
       <ambientLight intensity={0.35} color="#F1E8DA" />
       <hemisphereLight args={["#E8F0FF", "#2A2018", 0.35]} />
       {/* daylight through the windows on the left */}
@@ -520,12 +522,12 @@ export default function Aula({
         )}
       </Carried>
 
-      <CameraRig view={view} controls={controls} reduced={reduced} onFlight={setFlying} fit={[FIT_W, FIT_W]} />
+      <CameraRig view={view} controls={controls} reduced={reduced} onFlight={setFlying} fit={[FIT_W, FIT_W]} zoomable />
       <OrbitControls
         ref={controls}
-        enabled={!flying && !scene && focus === null}
+        enabled={!flying && !scene}
+        enableRotate={focus === null}
         enablePan={false}
-        enableZoom={false}
         enableDamping
         dampingFactor={0.08}
         minPolarAngle={view.polar - view.spread.polar}

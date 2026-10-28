@@ -7,6 +7,9 @@ import { FLIGHT, type View } from "./focus";
 /** Distance the camera keeps from its target. Orthographic, so it only sets angle. */
 const FLY_RADIUS = 18;
 
+/** How many times closer than its view a zoomable rig lets the camera come. */
+const ZOOM_IN = 2.5;
+
 /**
  * Flies the camera between one view and the next.
  *
@@ -24,6 +27,7 @@ export default function CameraRig({
   reduced,
   onFlight,
   fit: [fitW, fitH],
+  zoomable,
 }: {
   view: View;
   controls: RefObject<OrbitControlsImpl | null>;
@@ -35,6 +39,12 @@ export default function CameraRig({
    * a multiple of the zoom that fits this box rather than an absolute number.
    */
   fit: [number, number];
+  /**
+   * Whether a pinch or the wheel may bring the camera closer than the view,
+   * up to ZOOM_IN times. Never further out: the view is already everything
+   * there is. Left out, the controls keep whatever limits they were given.
+   */
+  zoomable?: boolean;
 }) {
   const camera = useThree((s) => s.camera);
   const size = useThree((s) => s.size);
@@ -111,6 +121,14 @@ export default function CameraRig({
     };
     onFlight(true);
   }, [goal, camera, controls, reduced, onFlight]);
+
+  // the zoom limits follow the view, and the fit that sizes it
+  useEffect(() => {
+    const c = controls.current;
+    if (!c || !zoomable) return;
+    c.minZoom = fit * goal.zoom;
+    c.maxZoom = fit * goal.zoom * ZOOM_IN;
+  }, [fit, goal.zoom, zoomable, controls]);
 
   // a resize re-fits the zoom, but must not interrupt a flight in progress
   useEffect(() => {

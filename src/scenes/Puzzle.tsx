@@ -11,6 +11,7 @@ import {
 } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
+import { DPR, DRAWN, Steady } from "./Steady";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
   AdditiveBlending,
@@ -1199,7 +1200,7 @@ const Island = memo(function Island({
   return (
     <Canvas
       orthographic
-      dpr={[1, 1.75]}
+      dpr={DPR}
       camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
       onPointerMissed={() => {
         setPicked(null);
@@ -1207,6 +1208,7 @@ const Island = memo(function Island({
       }}
     >
       <color attach="background" args={["#05060A"]} />
+      <Steady />
       <ambientLight intensity={0.45} color="#6E7FB0" />
       <pointLight position={[0, 3.4, 1.6]} intensity={7} distance={12} color="#8AD8FF" />
 
@@ -1421,13 +1423,13 @@ const Island = memo(function Island({
         reduced={reduced}
         onFlight={setFlying}
         fit={[VOID_W, VOID_W]}
+        zoomable
       />
 
       <OrbitControls
         ref={controls}
         enabled={!flying && !scene}
         enablePan={false}
-        enableZoom={false}
         enableDamping
         dampingFactor={0.08}
         minPolarAngle={view.polar - view.spread.polar}
@@ -1530,6 +1532,8 @@ function Desk({
   const [arrival, setArrival] = useState({ at: -Infinity, first: false, from: 0 });
   /** The dark of the shaft, drawn over the cut from one floor to the next. */
   const [veil, setVeil] = useState(false);
+  /** The floors' canvases are drawn in here; the veil watches for a new one. */
+  const stage = useRef<HTMLDivElement>(null);
   /**
    * Through the shaft to another floor: dark, swap, light. The floor is saved
    * only here, on arrival — leave halfway and the visitor is still upstairs.
@@ -1551,7 +1555,23 @@ function Desk({
         setDepth(deepest);
         setArrival({ at: performance.now(), first, from: floor });
         setFloor(n);
-        setVeil(false);
+        // building the next floor stalls the page, more than once and for
+        // longer on a slow machine: the dark stays until its scene has been
+        // drawn and a few frames in a row have come through smoothly, so the
+        // stalls happen out of sight. Gives up after a few seconds, so a
+        // floor that never settles cannot leave it dark
+        let drawn = false;
+        stage.current?.addEventListener(DRAWN, () => (drawn = true), { once: true });
+        const since = performance.now();
+        let last = since;
+        let smooth = 0;
+        const lift = (t: number) => {
+          smooth = drawn && t - last < 80 ? smooth + 1 : 0;
+          last = t;
+          if (smooth >= 5 || t - since > 4000) setVeil(false);
+          else requestAnimationFrame(lift);
+        };
+        requestAnimationFrame(lift);
       };
       if (reduced) return land();
       setVeil(true);
@@ -1679,7 +1699,7 @@ function Desk({
   return (
     /* below the island its windows stay open but out of sight, so going back
        up finds them where they were */
-    <div className={["stage", scene && "is-scene", floor > 0 && "is-below"].filter(Boolean).join(" ")}>
+    <div ref={stage} className={["stage", scene && "is-scene", floor > 0 && "is-below"].filter(Boolean).join(" ")}>
       {floor === 0 ? (
         <Island
           reduced={reduced}
