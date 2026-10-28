@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, events, useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
+import { DPR, Steady } from "./Steady";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
   BackSide,
@@ -613,13 +614,14 @@ export default function Engine({
     <>
       <Canvas
         orthographic
-        dpr={[1, 1.75]}
+        dpr={DPR}
         camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
         events={(store) => ({ ...events(store), filter: (hits) => onlySeen(hits, focusRef.current) })}
         onPointerMissed={back}
         onPointerUp={drop}
       >
         <color attach="background" args={["#0B0705"]} />
+        <Steady />
         <ambientLight intensity={DARK.ambient + PER_BOILER.ambient * burning} color="#FFC8A0" />
         <hemisphereLight args={["#FFD0A0", "#1A0E08", DARK.hemi + PER_BOILER.hemi * burning]} />
         {/* Heat Rotom is the one fire left: it lights the middle of the hall */}
@@ -825,12 +827,12 @@ export default function Engine({
           </Html>
         )}
 
-        <CameraRig view={view} controls={controls} reduced={reduced} onFlight={setFlying} fit={[FIT_W, FIT_W]} />
+        <CameraRig view={view} controls={controls} reduced={reduced} onFlight={setFlying} fit={[FIT_W, FIT_W]} zoomable />
         <OrbitControls
           ref={controls}
-          enabled={!flying && !scene && focus === null}
+          enabled={!flying && !scene}
+          enableRotate={focus === null}
           enablePan={false}
-          enableZoom={false}
           enableDamping
           dampingFactor={0.08}
           minPolarAngle={view.polar - view.spread.polar}

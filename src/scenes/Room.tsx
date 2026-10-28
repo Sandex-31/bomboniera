@@ -8,6 +8,7 @@ import {
 } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows, Html, OrbitControls } from "@react-three/drei";
+import { DPR, Steady } from "./Steady";
 import {
   AdditiveBlending,
   CanvasTexture,
@@ -2695,7 +2696,7 @@ export default function Room({ reduced, focus, picked, onPick, onPickItem, porta
     <div className="stage">
       <Canvas
         orthographic
-        dpr={[1, 1.75]}
+        dpr={DPR}
         camera={{ position: [11, 9, 11], zoom: 60, near: 0.1, far: 90 }}
         gl={{ antialias: true, powerPreference: "high-performance", toneMappingExposure: 1.15 }}
         onPointerMissed={() => {
@@ -2703,6 +2704,7 @@ export default function Room({ reduced, focus, picked, onPick, onPickItem, porta
           if (focus) onPickItem(null);
         }}
       >
+        <Steady />
         <Suspense fallback={null}>
           <SceneContent
             portal={portal}

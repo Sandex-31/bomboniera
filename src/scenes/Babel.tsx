@@ -1,6 +1,7 @@
 import { Suspense, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
+import { DPR, Steady } from "./Steady";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { BackSide, CanvasTexture, RepeatWrapping, SRGBColorSpace, type Group, type PointLight } from "three";
 import CameraRig from "./CameraRig";
@@ -510,10 +511,11 @@ export default function Babel({
     <>
       <Canvas
         orthographic
-        dpr={[1, 1.75]}
+        dpr={DPR}
         camera={{ position: [7, 5.6, 7], zoom: 60, near: 0.1, far: 90 }}
       >
         <color attach="background" args={["#05060A"]} />
+        <Steady />
         <ambientLight intensity={0.35} color="#FFD9A8" />
         <hemisphereLight args={["#FFE2B8", "#2A1A10", 0.5]} />
 
@@ -634,12 +636,12 @@ export default function Babel({
           reduced={reduced}
           onFlight={setFlying}
           fit={[FIT_W, FIT_W]}
+          zoomable
         />
         <OrbitControls
           ref={controls}
           enabled={!flying && !scene}
           enablePan={false}
-          enableZoom={false}
           enableDamping
           dampingFactor={0.08}
           minPolarAngle={view.polar - view.spread.polar}
