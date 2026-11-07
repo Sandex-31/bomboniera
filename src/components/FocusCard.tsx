@@ -75,7 +75,8 @@ type Props = {
  */
 export default function FocusCard({ section, id, onClose, onMore }: Props) {
   // nothing to pick apart beyond the door: the roll on the screen is the whole scene
-  if (section === "credits") return null;
+  if (section === "credits")
+    return <p className="focus-hint">Tieni premuto per fermare · trascina in giú per tornare indietro</p>;
   const card = lookup(section, id);
 
   if (!card) {

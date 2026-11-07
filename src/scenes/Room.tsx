@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Html, OrbitControls } from "@react-three/drei";
 import { DPR, Steady } from "./Steady";
 import {
@@ -2060,6 +2060,8 @@ const ROLL_W = 1024;
 const ROLL_WINDOW = Math.round((ROLL_W * SCREEN_H) / SCREEN_W);
 /** Reading pace, in texture pixels per second. */
 const ROLL_SPEED = 32;
+/** Texture pixels the roll moves per screen pixel dragged: under one, so winding back is gentle. */
+const ROLL_DRAG = 0.8;
 /** Free space each side of a wrapped line. */
 const ROLL_PAD = 90;
 const SERIF = "Georgia, 'Times New Roman', serif";
@@ -2137,10 +2139,35 @@ function CreditsStage({ reduced }: { reduced: boolean }) {
   // nothing will scroll for these visitors, so start them on the first line
   const top = useRef(reduced ? ROLL_WINDOW : 0);
   const drawn = useRef(-1);
+  /** Where the finger is while it holds the roll, or null when the roll runs on its own. */
+  const held = useRef<number | null>(null);
+  const el = useThree((s) => s.gl.domElement);
+
+  // a finger on the screen stops the roll; dragging it down winds back, up goes ahead
+  useEffect(() => {
+    const down = (e: PointerEvent) => (held.current = e.clientY);
+    const move = (e: PointerEvent) => {
+      if (held.current === null) return;
+      top.current -= (e.clientY - held.current) * ROLL_DRAG;
+      held.current = e.clientY;
+    };
+    const up = () => (held.current = null);
+    el.addEventListener("pointerdown", down);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+    return () => {
+      el.removeEventListener("pointerdown", down);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+  }, [el]);
 
   useFrame((_, delta) => {
     // further down the roll means up the screen, the way credits have always rolled
-    if (!reduced) top.current = (top.current + delta * ROLL_SPEED) % roll.height;
+    if (!reduced && held.current === null) top.current += delta * ROLL_SPEED;
+    top.current = ((top.current % roll.height) + roll.height) % roll.height;
     const px = Math.floor(top.current);
     const ctx = px === drawn.current ? null : roll.canvas.getContext("2d");
     if (!ctx) return;
@@ -2731,6 +2758,8 @@ export default function Room({ reduced, focus, picked, onPick, onPickItem, porta
           ref={controls}
           enabled={!flying}
           enablePan={false}
+          // in front of the credits a drag winds the roll, not the camera
+          enableRotate={focus !== "credits"}
           enableDamping
           dampingFactor={0.08}
           rotateSpeed={0.55}
