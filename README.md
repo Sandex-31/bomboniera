@@ -29,7 +29,7 @@ npm run dev        # http://localhost:5173
 
 ```text
 src/
-  config.ts              ← nome, università, anno, URL del QR, ospiti
+  config.ts              ← nome, università, anno, URL del QR
   types.ts               ← forma dei dati (Exam, Project, Thesis, CreditBlock)
   data/
     exams.ts             ← esami            (TODO: da sostituire)
@@ -50,7 +50,7 @@ src/
     Panel.tsx            ← bottom sheet su telefono / drawer su desktop
     FocusCard.tsx        ← la scheda dell'oggetto scelto dentro un primo piano
     Media.tsx  Toast.tsx  Icons.tsx  QrPage.tsx
-  hooks/index.ts         ← reduced-motion, WebGL, ospite, localStorage
+  hooks/index.ts         ← reduced-motion, WebGL, localStorage
   styles/global.css      ← token di design + tutti gli stili
   labs/                  ← pagina /#/progetti: demo vive, codice, documenti
 public/media/            ← screenshot e video dei progetti
@@ -205,25 +205,8 @@ L'app **non** genera il QR fisico, ma stampa quello che devi codificare:
 
 1. metti in `graduationConfig.qrBaseUrl` l'URL definitivo (senza slash finale);
 2. apri **`/#/qr`** (es. `http://localhost:5173/#/qr`);
-3. la pagina mostra un QR per ogni variante e un bottone _scarica PNG_ — quelli
+3. la pagina mostra il QR e un bottone _scarica PNG_ — quelli
    sono i file da mandare in stampa.
-
-**URL da codificare:**
-
-| Bomboniera        | URL                               |
-| ----------------- | --------------------------------- |
-| standard          | `https://tuo-dominio/`            |
-| dedicata a Marco  | `https://tuo-dominio/?for=marco`  |
-| dedicata a Giulia | `https://tuo-dominio/?for=giulia` |
-
-Le varianti si definiscono nella mappa `guests` in `src/config.ts`: ogni ospite
-ha `label` (mostrato nell'intestazione) e `message` (mostrato a fine boot). Uno
-slug sconosciuto viene ignorato e si apre la versione standard.
-
-La forma `?for=` funziona ovunque senza configurazione. Se un giorno preferisci
-`tuo-dominio/graduation/marco`, il parser in `src/hooks/index.ts` legge già
-anche l'ultimo segmento del path: basta aggiungere il rewrite SPA dell'host
-(`/* → /index.html 200`).
 
 Stampa il QR ad almeno **2 cm** di lato: su un oggetto piccolo è il limite sotto
 il quale i telefoni iniziano a faticare.

@@ -14,14 +14,12 @@ const LINES = [
 ];
 
 type Props = {
-  /** Shown instead of the generic welcome when the QR carried a guest slug. */
-  guestMessage?: string;
   /** true when this browser has already seen the full sequence. */
   seen: boolean;
   onStart: () => void;
 };
 
-export default function Boot({ guestMessage, seen, onStart }: Props) {
+export default function Boot({ seen, onStart }: Props) {
   const reduced = usePrefersReducedMotion();
   const instant = seen || reduced;
 
@@ -72,12 +70,6 @@ export default function Boot({ guestMessage, seen, onStart }: Props) {
         <div className="boot__bar" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
           <i style={{ width: `${progress}%` }} />
         </div>
-
-        {guestMessage && done && (
-          <p className="boot__sub" style={{ marginTop: 22, marginBottom: 0 }}>
-            {guestMessage}
-          </p>
-        )}
 
         <div className="boot__actions">
           {done ? (

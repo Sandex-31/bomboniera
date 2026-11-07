@@ -20,22 +20,3 @@ export const graduationConfig = {
    */
   isPlaceholder: false,
 } as const;
-
-/**
- * Per-guest variants: /?for=marco or #marco (see src/hooks/useGuest.ts).
- * The QR on each bomboniera can point at a different slug.
- * Omit or leave empty to always show the default greeting.
- */
-export const guests: Record<string, { label: string; message: string }> = {
-  // TODO: replace / extend with the real recipients
-  famiglia: {
-    label: 'Famiglia',
-    message: 'Questa porta si apre solo per chi c’era dal primo giorno.',
-  },
-  marco: {
-    label: 'Marco',
-    message: 'Metà di questi progetti esistono per colpa tua. Grazie.',
-  },
-};
-
-export type GuestKey = keyof typeof guests;

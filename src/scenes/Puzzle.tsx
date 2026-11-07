@@ -1800,8 +1800,8 @@ function Desk({
       <button className="void-exit ghost-btn" onClick={onExit}>
         Torna nella stanza
       </button>
-      {/* debug: back to an untouched puzzle, or straight to any point of it */}
-      <div className="void-reset">
+      {/* debug, dev server only: back to an untouched puzzle, or straight to any point of it */}
+      {import.meta.env.DEV && <div className="void-reset">
         <button onClick={() => window.confirm("Ricominciare il puzzle da capo? Tutti i piani tornano chiusi.") && onJump(0)}>⟲ ricomincia il puzzle</button>
         <select
           aria-label="Salta a un punto del puzzle"
@@ -1817,7 +1817,7 @@ function Desk({
             </option>
           ))}
         </select>
-      </div>
+      </div>}
     </div>
   );
 }
