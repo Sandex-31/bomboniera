@@ -17,7 +17,6 @@ type Props = {
   /** Set when the camera is inside a close-up rather than on the wide shot. */
   focus: FocusId | null;
   foundCount: number;
-  guestLabel?: string;
   onOpen: (id: SectionId) => void;
   onExitFocus: () => void;
   onOpenList: () => void;
@@ -32,7 +31,6 @@ export default function Hud({
   active,
   focus,
   foundCount,
-  guestLabel,
   onOpen,
   onExitFocus,
   onOpenList,
@@ -44,7 +42,6 @@ export default function Hud({
         <div className="hud__id">
           <h1>{graduationConfig.handle}</h1>
           <p>
-            {guestLabel ? `per ${guestLabel} · ` : ""}
             {graduationConfig.degree} · {graduationConfig.year}
           </p>
         </div>

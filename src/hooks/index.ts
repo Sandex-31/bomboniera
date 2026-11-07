@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { guests } from '../config';
 
 /** true when the OS asks for reduced motion. Reacts to live changes. */
 export function usePrefersReducedMotion(): boolean {
@@ -29,26 +28,6 @@ export function useWebGLSupport(): boolean {
     }
   });
   return supported;
-}
-
-/**
- * Per-bomboniera personalisation.
- * Supports /?for=marco, /#marco and /graduation/marco — the last one only on
- * hosts with SPA rewrites; the query form is the safe default for the QR.
- */
-export function useGuest() {
-  const [key] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    const fromQuery = params.get('for');
-    const fromHash = window.location.hash.replace(/^#\/?/, '');
-    const fromPath = window.location.pathname.split('/').filter(Boolean).pop();
-    for (const candidate of [fromQuery, fromHash, fromPath]) {
-      const slug = candidate?.toLowerCase();
-      if (slug && slug in guests) return slug;
-    }
-    return null;
-  });
-  return key ? { key, ...guests[key] } : null;
 }
 
 /** A boolean flag persisted in localStorage (safe in private mode). */

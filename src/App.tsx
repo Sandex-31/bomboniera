@@ -15,7 +15,7 @@ import EasterEggs from "./sections/EasterEggs";
 import { easterEggs } from "./data/easterEggs";
 import { PORTAL_AT } from "./data/puzzle";
 import { graduationConfig } from "./config";
-import { useFoundEggs, useGuest, usePersistentFlag, usePrefersReducedMotion, useWebGLSupport } from "./hooks";
+import { useFoundEggs, usePersistentFlag, usePrefersReducedMotion, useWebGLSupport } from "./hooks";
 import type { SectionId } from "./types";
 
 const Room = lazy(() => import("./scenes/Room"));
@@ -58,7 +58,6 @@ class SceneBoundary extends Component<{ fallback: ReactNode; children: ReactNode
 export default function App() {
   const reduced = usePrefersReducedMotion();
   const webgl = useWebGLSupport();
-  const guest = useGuest();
   const { found, discover } = useFoundEggs();
   const [booted, setBooted] = usePersistentFlag("bomboniera.booted");
 
@@ -253,7 +252,6 @@ export default function App() {
         active={active}
         focus={focus}
         foundCount={found.length}
-        guestLabel={guest?.label}
         onOpen={openSection}
         onExitFocus={exitFocus}
         onOpenList={() => setReading(true)}
@@ -320,7 +318,7 @@ export default function App() {
         </Panel>
       )}
 
-      {!started && <Boot seen={booted} guestMessage={guest?.message} onStart={start} />}
+      {!started && <Boot seen={booted} onStart={start} />}
 
       <div className="rotate-hint">
         <span>
