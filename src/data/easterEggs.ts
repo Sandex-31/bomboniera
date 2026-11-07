@@ -73,6 +73,11 @@ export const easterEggs: EasterEgg[] = [
     reveal: 'Regalone da parte di Laura per un mio compleanno, viva DS1!',
   },
   {
+    id: 'cofanetto',
+    label: 'Cuphead Out Of The Cards',
+    reveal: 'La cosa piú preziosa che racchiude le mie vere passioni',
+  },
+  {
     id: 'funko-verde',
     label: 'Gon',
     reveal: 'L’unico Funko che mi sono comprato io. guardatevi HxH',
