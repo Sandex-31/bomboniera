@@ -13,6 +13,7 @@ import {
   AdditiveBlending,
   CanvasTexture,
   DoubleSide,
+  LinearFilter,
   type BufferGeometry,
   type Group,
   type Mesh,
@@ -2133,7 +2134,11 @@ function CreditsStage({ reduced }: { reduced: boolean }) {
     const canvas = document.createElement("canvas");
     canvas.width = ROLL_W;
     canvas.height = ROLL_WINDOW;
-    return { ...rollLayout(credits, creditRoll), canvas, texture: new CanvasTexture(canvas) };
+    const texture = new CanvasTexture(canvas);
+    // redrawn many times a second and never shown much smaller than it is: mipmaps would only cost
+    texture.generateMipmaps = false;
+    texture.minFilter = LinearFilter;
+    return { ...rollLayout(credits, creditRoll), canvas, texture };
   }, []);
   useEffect(() => () => roll.texture.dispose(), [roll]);
   // nothing will scroll for these visitors, so start them on the first line

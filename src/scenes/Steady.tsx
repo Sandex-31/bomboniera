@@ -30,6 +30,9 @@ export function Steady() {
     <PerformanceMonitor
       // start sharp and only give it up when the frames say so
       factor={1}
+      // every change resizes the canvas, which blanks it for a frame: a phone
+      // hovering on the threshold flickered without end, so after three it stays put
+      flipflops={3}
       onChange={({ factor }) => setDpr(Math.round((0.6 + (most - 0.6) * factor) * 20) / 20)}
     />
   );
