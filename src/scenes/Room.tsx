@@ -2134,11 +2134,14 @@ function CreditsStage({ reduced }: { reduced: boolean }) {
     const canvas = document.createElement("canvas");
     canvas.width = ROLL_W;
     canvas.height = ROLL_WINDOW;
+    // kept in plain memory, not on the GPU: Chrome on Android uploaded a GPU canvas
+    // redrawn every frame half-finished, and the screen tore into black stripes
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     const texture = new CanvasTexture(canvas);
     // redrawn many times a second and never shown much smaller than it is: mipmaps would only cost
     texture.generateMipmaps = false;
     texture.minFilter = LinearFilter;
-    return { ...rollLayout(credits, creditRoll), canvas, texture };
+    return { ...rollLayout(credits, creditRoll), ctx, texture };
   }, []);
   useEffect(() => () => roll.texture.dispose(), [roll]);
   // nothing will scroll for these visitors, so start them on the first line
@@ -2174,7 +2177,7 @@ function CreditsStage({ reduced }: { reduced: boolean }) {
     if (!reduced && held.current === null) top.current += delta * ROLL_SPEED;
     top.current = ((top.current % roll.height) + roll.height) % roll.height;
     const px = Math.floor(top.current);
-    const ctx = px === drawn.current ? null : roll.canvas.getContext("2d");
+    const ctx = px === drawn.current ? null : roll.ctx;
     if (!ctx) return;
     drawn.current = px;
     drawRoll(ctx, roll.lines, px);
