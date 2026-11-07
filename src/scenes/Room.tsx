@@ -1733,8 +1733,8 @@ function KnightStatue({ position }: { position: [number, number, number] }) {
   );
 }
 
-/** TODO: the name printed on the boxed set on the middle shelf. */
-const BOX_TITLE = "Cofanetto";
+/** The name printed on the boxed set on the middle shelf. */
+const BOX_TITLE = "Cuphead";
 
 /**
  * Gold lettering drawn straight onto a canvas at runtime. Real text geometry
@@ -1896,7 +1896,9 @@ function Collectibles({ focused, reduced, onPick }: Omit<EggBus, "muted"> & { fo
         <KnightStatue position={[0, 0, 0]} />
       </Egg>
       <MangaRow position={[0.38, display, 0]} count={3} color="#8E2C2C" />
-      <Slipcase position={[0.56, display, -0.01]} title={BOX_TITLE} />
+      <Egg position={[0.56, display, -0.01]} id="cofanetto" height={0.3} hit={[0.17, 0.32, 0.24]} hitOffset={[0, 0.15, 0]} {...egg}>
+        <Slipcase position={[0, 0, 0]} title={BOX_TITLE} />
+      </Egg>
     </group>
   );
 }
